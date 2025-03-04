@@ -20,6 +20,9 @@ try {
   // Initialize the PostgreSQL pool
   const pool = new Pool({
     connectionString: dbUrl,
+    ssl: { rejectUnauthorized: false }, // ✅ Ensure SSL is enabled
+    connectionTimeoutMillis: 30000, // ✅ Increase connection timeout
+    idleTimeoutMillis: 30000, // ✅ Keep idle connections
   });
 
   // Initialize the drizzle ORM with schemas
