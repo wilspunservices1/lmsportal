@@ -48,13 +48,12 @@ const WishlistContextProvider = ({ children }) => {
 	// `useCallback` ensures the function remains stable
 
 	useEffect(() => {
-		if (!wishlistFetched) {
+		if (!wishlistFetched && !session?.user?.id) {
 			const localWishlist = getItemsFromLocalstorage("wishlist") || [];
-			if (session?.user?.id) {
-				fetchWishlistFromDB(session.user.id);
-			} else {
-				setWishlistProducts(localWishlist);
-			}
+			setWishlistProducts(localWishlist);
+			setWishlistFetched(true);
+		} else if (!wishlistFetched && session?.user?.id) {
+			fetchWishlistFromDB(session.user.id);
 		}
 	}, [fetchWishlistFromDB, session?.user?.id, wishlistFetched]);
 	// Now `fetchWishlistFromDB` is safely included
