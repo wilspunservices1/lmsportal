@@ -18,7 +18,7 @@ const LoginForm = ({ csrfToken }) => {
       const res = await signIn(provider, { callbackUrl: "/" });
 
       if (!res?.error) {
-        router.push("/");
+        // router.push("/");
       } else {
         setError(`Failed to login with ${provider}`);
       }
@@ -37,7 +37,7 @@ const LoginForm = ({ csrfToken }) => {
         redirect: false,
         email,
         password,
-        callbackUrl: "/",
+        // callbackUrl: "/",
       });
 
       setLoading("Log in");
@@ -54,13 +54,15 @@ const LoginForm = ({ csrfToken }) => {
           setError("An unexpected error occurred. Please try again.");
         }
       } else {
-        router.push("/");
+        // router.push("/");
       }
     } catch (err) {
       setLoading("Log in");
       setError(err.message || "An unexpected error occurred.");
     }
   };
+
+  console.log("csrfToken", csrfToken, email, password, loading, error); 
 
   return (
     <div className="opacity-100 transition-opacity duration-150 ease-linear">
