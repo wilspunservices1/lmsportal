@@ -10,5 +10,6 @@ export default defineConfig({
   dbCredentials: {
     url: process.env.POSTGRES_URL_UNPOOLED || process.env.POSTGRES_URL || '',  // Keep this as it was working
     ssl: { rejectUnauthorized: false },
+    
   },
 });
