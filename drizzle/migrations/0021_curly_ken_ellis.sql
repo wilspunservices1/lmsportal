@@ -1,0 +1,1 @@
+ALTER TABLE "chapters" ALTER COLUMN "questionnaireId" DROP NOT NULL;

@@ -1,0 +1,36 @@
+const count = () => {
+  const countContainers = document.querySelectorAll(".count-container");
+  if (!count) {
+    return;
+  }
+
+  countContainers.forEach((countContainer) => {
+    const countIput = countContainer.querySelector("input");
+    const minCount = countContainer.querySelector(".mincount");
+    const maxCount = countContainer.querySelector(".maxcount");
+
+    if (minCount) {
+      minCount.addEventListener("click", () => {
+        let currentValue = parseInt(countIput.value);
+        if (currentValue === 0 || currentValue < 0) {
+          if (currentValue === 0) {
+            currentValue = 1;
+          } else {
+            currentValue = 0;
+          }
+        } else {
+          currentValue = currentValue - 1;
+        }
+        countIput.value = currentValue;
+      });
+    }
+    if (maxCount) {
+      maxCount.addEventListener("click", () => {
+        let currentValue = parseInt(countIput.value);
+        currentValue = currentValue + 1;
+        countIput.value = currentValue;
+      });
+    }
+  });
+};
+export default count;

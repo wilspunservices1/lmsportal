@@ -1,0 +1,79 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "incremental": true,
+    "module": "esnext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve", // Use react-jsx for JSX transformation in React 17 and above
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@/db": [
+        "src/db/index"
+      ],
+      "@/components/*": [
+        "src/components/*"
+      ],
+      "@/utils/*": [
+        "src/utils/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "strictNullChecks": true,
+    "types": [
+      "node",
+      "react",
+      "react-dom"
+    ], // Added react-dom for proper React type support
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
+    "target": "ES2017"
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "src/app/api/auth/[...nextauth]/route.ts",
+    "src/components/shared/user/DropdownUser.js",
+    "src/app/layout.js",
+    "src/components/shared/dashboards/_comp/UserDetails.js",
+    "src/components/sections/hero-banners/HeroDashboard.js",
+    "src/components/sections/create-course/_comp/CourseContent.tsx",
+    "src/components/sections/create-course/_comp/ImageField.tsx",
+    "src/app/api/upload/route.ts",
+    "src/components/sections/create-course/CreateCoursePrimary.js",
+    "src/components/shared/courses/CourseCard.js",
+    "src/components/sections/courses/CoursesPrimary.js",
+    "src/app/test/page.js",
+    "src/app/test/test.js",
+    "src/app/courses/[id]/edit-course/page.js",
+    "src/components/sections/create-course/hooks/ChapterEditing.js",
+    "src/app/dashboards/certificates/_comp/ManageCertificateTable.tsx",
+    "src/app/dashboards/certificates/_comp/ManageCertificate.tsx",
+    "src/components/sections/questionnaire/**/*.tsx",
+    "src/app/dashboards/questionnaire/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

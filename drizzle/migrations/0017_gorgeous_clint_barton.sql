@@ -1,0 +1,1 @@
+ALTER TABLE "managecertificates" DROP COLUMN IF EXISTS "course_id";
