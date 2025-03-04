@@ -7,8 +7,7 @@ import { courses } from './schemas/courses';
 import { certificateTracking } from './schemas/certificateTracking';
 
 // Load environment variables
-// config({ path: '.env.local' });
-config();
+config({ path: '.env.local' });
 
 const dbUrl = process.env.POSTGRES_URL;
 if (!dbUrl) {
