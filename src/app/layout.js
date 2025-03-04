@@ -1,4 +1,6 @@
 import FixedShadow from "@/components/shared/others/FixedShadow";
+import { StackProvider, StackTheme } from "@stackframe/stack";
+import { stackServerApp } from "../stack";
 import PreloaderPrimary from "@/components/shared/others/PreloaderPrimary";
 import { Hind, Inter } from "next/font/google";
 import "@/assets/css/icofont.min.css";
@@ -42,7 +44,7 @@ export default async function RootLayout({ children }) {
     <html lang="en" className={`${hind.variable}`}>
       <body
         className={`relative leading-[1.8] bg-bodyBg dark:bg-bodyBg-dark z-0 ${inter.className}`}
-      >
+      ><StackProvider app={stackServerApp}><StackTheme>
         <PreloaderPrimary />
         <Providers>
           <SessionProvider session={session}>
@@ -55,7 +57,7 @@ export default async function RootLayout({ children }) {
           <FixedShadow />
           <FixedShadow align={"right"} />
         </div>
-      </body>
+      </StackTheme></StackProvider></body>
     </html>
   );
 }
