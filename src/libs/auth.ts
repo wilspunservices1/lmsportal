@@ -10,7 +10,9 @@ import { getServerSession } from "next-auth/next";
 import { v4 as uuidv4 } from "uuid";
 import { headers } from "next/headers";
 
+
 export const options = {
+  debug: true,
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID as string,
@@ -102,6 +104,7 @@ export const options = {
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",
+    error: "/login", // Will append ?error=Message if any error occurs
   },
 };
 

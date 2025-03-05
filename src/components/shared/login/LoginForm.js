@@ -88,7 +88,7 @@ const LoginForm = () => {
             Sign up for free
           </Link>
         </p>
-      </div>
+      </div> 
 
       <form className="pt-25px" onSubmit={handleSubmit} data-aos="fade-up">
         <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
