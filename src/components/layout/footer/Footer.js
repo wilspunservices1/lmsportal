@@ -29,7 +29,7 @@ const Footer = () => {
 
         {/* ❌❌❌❌❌❌❌ */}
         {/* footer main */}
-        {/* <FooterNavList /> */}
+        <FooterNavList />
 
         {/* footer copyright  */}
         <CopyRight />
