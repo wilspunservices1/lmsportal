@@ -1,3 +1,4 @@
+"use client";
 import useIsSecondary from "@/hooks/useIsSecondary";
 
 const FooterAbout = () => {
@@ -11,9 +12,9 @@ const FooterAbout = () => {
       <p className="text-base lg:text-sm 2xl:text-base text-darkgray mb-30px leading-1.8 2xl:leading-1.8">
         orporate clients and leisure travelers has been relying on Groundlink
         for dependable safe, and professional chauffeured car end service in
-        major cities across World.
-        orporate clients and leisure travelers has been relying on Groundlink
-        for dependable safe, and professional chauffeured.
+        major cities across World. orporate clients and leisure travelers has
+        been relying on Groundlink for dependable safe, and professional
+        chauffeured.
       </p>
       {isSecondary ? (
         <ul className="flex gap-3 lg:gap-2 2xl:gap-3" data-aos="fade-up">

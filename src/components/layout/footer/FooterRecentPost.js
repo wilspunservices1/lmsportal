@@ -1,7 +1,7 @@
-import useIsSecondary from "@/hooks/useIsSecondary";
+// import useIsSecondary from "@/hooks/useIsSecondary";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+// import React from "react";
 
 const FooterRecentPost = ({ post }) => {
   const { title, date, image, id } = post;

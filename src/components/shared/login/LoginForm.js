@@ -1,16 +1,25 @@
-"use client"
+"use client";
 
 import { getCsrfToken, signIn } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-const LoginForm = ({ csrfToken }) => {
+const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState("Log in");
   const [error, setError] = useState(""); // Ensure this is a string
   const router = useRouter();
+  const [csrfToken, setCsrfToken] = useState("");
+
+  useEffect(() => {
+    const fetchCsrfToken = async () => {
+      const token = await getCsrfToken();
+      setCsrfToken(token || "");
+    };
+    fetchCsrfToken();
+  }, []);
 
   const signInOAuth = async (provider) => {
     try {
@@ -18,7 +27,7 @@ const LoginForm = ({ csrfToken }) => {
       const res = await signIn(provider, { callbackUrl: "/" });
 
       if (!res?.error) {
-        // router.push("/");
+        router.push("/");
       } else {
         setError(`Failed to login with ${provider}`);
       }
@@ -37,7 +46,7 @@ const LoginForm = ({ csrfToken }) => {
         redirect: false,
         email,
         password,
-        // callbackUrl: "/",
+        callbackUrl: "/",
       });
 
       setLoading("Log in");
@@ -54,7 +63,7 @@ const LoginForm = ({ csrfToken }) => {
           setError("An unexpected error occurred. Please try again.");
         }
       } else {
-        // router.push("/");
+        router.push("/");
       }
     } catch (err) {
       setLoading("Log in");
@@ -62,7 +71,7 @@ const LoginForm = ({ csrfToken }) => {
     }
   };
 
-  console.log("csrfToken", csrfToken, email, password, loading, error); 
+  console.log("csrfToken", csrfToken, email, password, loading, error);
 
   return (
     <div className="opacity-100 transition-opacity duration-150 ease-linear">

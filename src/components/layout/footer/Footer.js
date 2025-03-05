@@ -26,8 +26,10 @@ const Footer = () => {
       >
         {/* footer top or subscription */}
         <FooterTop />
+
+        {/* ❌❌❌❌❌❌❌ */}
         {/* footer main */}
-        <FooterNavList />
+        {/* <FooterNavList /> */}
 
         {/* footer copyright  */}
         <CopyRight />

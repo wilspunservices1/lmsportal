@@ -1,3 +1,4 @@
+"use client";
 import useIsSecondary from "@/hooks/useIsSecondary";
 import Image from "next/image";
 import React from "react";
@@ -16,10 +17,9 @@ const FooterTopLeft = () => {
         <>
           <h4 className="text-4xl md:text-size-25 lg:text-size-40 font-bold text-whiteColor leading-50px md:leading-10 lg:leading-16">
             Still You Need Our Support{" "}
-            
           </h4>
           <p className="text-whiteColor text-opacity-65">
-            Don’t wait make a smart & logical quote here. Its pretty easy.
+            Don&apos;t wait make a smart & logical quote here. Its pretty easy.
           </p>
         </>
       )}

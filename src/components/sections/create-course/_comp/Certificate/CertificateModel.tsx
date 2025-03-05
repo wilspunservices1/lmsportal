@@ -1,3 +1,4 @@
+"use client"
 // components/CertificateModal.tsx
 
 import React, { useEffect, useRef } from "react";
