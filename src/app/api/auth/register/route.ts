@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     if (
       !userData?.email ||
       !userData?.password ||
-      !userData?.username 
+      !userData?.username
     ) {
       return NextResponse.json(
         { message: "Missing required fields" },
@@ -94,8 +94,8 @@ export async function POST(req: Request) {
         activationLink: `${BASE_URL}/pass/activate?token=${activationToken}`,
       },
     });
-    
-    
+
+
 
     return NextResponse.json(
       {
