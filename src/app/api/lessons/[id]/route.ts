@@ -8,15 +8,10 @@ import { getToken } from "next-auth/jwt";
 
 export async function GET(
 	req: NextRequest,
-	context: { params: { id: string } }
+	{ params }: { params: { id: string } }
 ) {
 	try {
-		// Explicitly resolving params asynchronously
-		const params = await new Promise<{ id: string }>((resolve) =>
-			resolve(context.params)
-		);
-
-		const lessonId = await params.id; // Explicitly await params.id
+		const lessonId = params.id;
 
 		// Get the user session
 		const token = await getToken({ req });
