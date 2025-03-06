@@ -3,43 +3,54 @@ import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 import LessonMain from "@/components/layout/main/LessonMain";
 import { notFound } from "next/navigation";
 import { BASE_URL } from "@/actions/constant";
-import { isUUID } from "validator"; // Use a UUID validator
+import { isUUID } from "validator"; // UUID validator
 
 export const dynamic = "force-dynamic";
 
 // Fetch lesson data from the API
 const fetchLessonById = async (id) => {
-	// Validate UUID before making the request
-	if (!isUUID(id)) {
-		console.error("Invalid UUID format:", id);
+	// Explicitly await the ID if needed
+	id = await Promise.resolve(id);
+
+	if (!id || !isUUID(id)) {
+		console.error("Invalid or missing UUID:", id);
 		return null;
 	}
 
-	try {
-		const res = await fetch(`${BASE_URL}/api/lessons/${id}`, {
-			method: "GET",
-		});
+	const apiUrl = `${BASE_URL}/api/lessons/${id}`;
+	console.log("Fetching lesson from API:", apiUrl); // Debugging log
 
+	try {
+		const res = await fetch(apiUrl, { method: "GET" });
 		const contentType = res.headers.get("content-type");
 
-		// Check if the response is OK and JSON formatted
 		if (!res.ok || !contentType.includes("application/json")) {
-			console.error("Error response:", await res.text());
-			throw new Error(
-				"Failed to fetch the lesson or invalid JSON response"
-			);
+			console.error("API Error Response:", await res.text());
+			throw new Error("Failed to fetch lesson or invalid JSON response");
 		}
 
-		return await res.json(); // Return parsed lesson data
+		return await res.json();
 	} catch (error) {
-		console.error("Error fetching lesson:", error.message || error);
-		return null; // Handle failure gracefully
+		console.error("Error fetching lesson:", error.message);
+		return null;
 	}
 };
 
 // Generate metadata for SEO and social sharing
 export async function generateMetadata({ params }) {
-	const lessonId = await Promise.resolve(params.id); // Ensuring params.id is awaited
+	// Await the entire params object before using its properties
+	const awaitedParams = await Promise.resolve(params);
+	const lessonId = awaitedParams.id;
+
+	if (!lessonId) {
+		console.error("Lesson ID is missing in metadata generation:", lessonId);
+		return {
+			title: "Lesson Not Found",
+			description:
+				"Lesson not found in Meridian LMS - Education LMS Template",
+		};
+	}
+
 	const lesson = await fetchLessonById(lessonId);
 
 	if (!lesson) {
@@ -61,9 +72,17 @@ export async function generateMetadata({ params }) {
 
 // The main lesson component that renders lesson data or 404 if not found
 const Lesson = async ({ params }) => {
-	const { id } = await Promise.resolve(params); // Awaiting params correctly
+	// Explicitly await params.id
+	const { id } = await Promise.resolve(params);
 
-	// Fetch lesson data from the API
+	if (!id) {
+		console.error("Lesson ID is missing or undefined:", id);
+		notFound(); // Redirect to 404 page
+	}
+
+	console.log("Fetching lesson for ID:", id); // Debugging log
+
+	// Fetch lesson data from API
 	const lesson = await fetchLessonById(id);
 
 	// If the lesson does not exist, show a 404 page
