@@ -1,8 +1,8 @@
-const BASE_URL = process.env.NEXTAUTH_URL;
-const BASE_URL_API = `${BASE_URL}/api`;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+const BASE_URL_API = `${BASE_URL}/api`
+export { BASE_URL, BASE_URL_API }
 
 // https://ai-lms-nine.vercel.app
-export { BASE_URL, BASE_URL_API };
 
 // export const BASE_URL_API_AUTH = `${BASE_URL_API}/auth`;
 // export const BASE_URL_API_USER = `${BASE_URL_API}/user`;

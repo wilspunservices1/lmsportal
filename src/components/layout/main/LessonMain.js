@@ -4,6 +4,7 @@ import React from "react";
 
 const LessonMain = ({ lesson }) => {
 
+
   // console.log("lesson ....",lesson && lesson)
   return <LessonPrimary lessonId={lesson?.id} />;
 };
