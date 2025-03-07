@@ -344,8 +344,12 @@ export async function PATCH(
 // }
 
 // Define precise types based on your schema
+interface EnrolledCourse {
+  courseId: string
+  progress: number
+  completedLectures: string[]
+}
 
-// Define precise types based on your schema
 interface Course {
   id: string
   title: string
@@ -375,10 +379,9 @@ interface UserResponse {
   expertise: string[]
   registrationDate: string
   socials: Socials
-  enrolledCourses: any[]
+  enrolledCourses: Course[]
   wishlist: Course[]
 }
-
 export async function GET(
   req: Request,
   { params }: { params: { userId: string } }
@@ -520,133 +523,3 @@ export async function GET(
     )
   }
 }
-
-// export async function GET(
-//   req: Request,
-//   { params }: { params: { userId: string } }
-// ) {
-//   const { userId } = await params;
-
-//   // Validate that userId is provided
-//   if (!userId) {
-//     return NextResponse.json(
-//       { error: "User ID is required." },
-//       { status: 400 }
-//     );
-//   }
-
-//   try {
-//     // Parse the query parameters from the URL
-//     const url = new URL(req.url);
-//     const includeEnrolledCourses =
-//       url.searchParams.get("includeEnrolledCourses") === "true";
-//     const includeWishlist = url.searchParams.get("includeWishlist") === "true";
-
-//     console.log(`Fetching data for userId: ${userId}`);
-//     console.log(`includeEnrolledCourses: ${includeEnrolledCourses}`);
-//     console.log(`includeWishlist: ${includeWishlist}`);
-
-//     // Perform the base query to fetch user details along with userDetails and userSocials
-//     const [fetchedUser] = await db
-//       .select({
-//         id: user.id,
-//         name: user.name,
-//         username: user.username,
-//         phone: user.phone,
-//         email: user.email,
-//         image: user.image,
-//         roles: user.roles,
-//         isVerified: user.isVerified,
-//         createdAt: user.createdAt,
-//         updatedAt: user.updatedAt,
-//         biography: userDetails.biography,
-//         expertise: userDetails.expertise,
-//         registrationDate: userDetails.registrationDate,
-//         enrolledCourses: user.enrolledCourses,
-//         wishlist: user.wishlist,
-//         // Socials fields
-//         facebook: userSocials.facebook,
-//         twitter: userSocials.twitter,
-//         linkedin: userSocials.linkedin,
-//         website: userSocials.website,
-//         github: userSocials.github,
-//       })
-//       .from(user)
-//       .leftJoin(userDetails, eq(user.id, userDetails.userId))
-//       .leftJoin(userSocials, eq(user.id, userSocials.userId))
-//       .where(eq(user.id, userId))
-//       .limit(1);
-
-//     // If user is not found, return a 404 error
-//     if (!fetchedUser) {
-//       console.warn(`User with ID ${userId} not found.`);
-//       return NextResponse.json(
-//         { error: "User with the given ID was not found." },
-//         { status: 404 }
-//       );
-//     }
-
-//     // Handle 'expertise'
-//     const expertiseProcessed: string[] =
-//       Array.isArray(fetchedUser.expertise) && fetchedUser.expertise.length > 0
-//         ? fetchedUser.expertise
-//         : ["No expertise provided."];
-
-//     // Handle 'enrolledCourses'
-//     const enrolledCoursesProcessed: Course[] =
-//       includeEnrolledCourses && Array.isArray(fetchedUser.enrolledCourses)
-//         ? fetchedUser.enrolledCourses
-//         : [];
-
-//     // Handle 'wishlist'
-//     const wishlistProcessed: Course[] =
-//       includeWishlist && Array.isArray(fetchedUser.wishlist)
-//         ? fetchedUser.wishlist
-//         : [];
-
-//     // Structure the socials data with default values
-//     const socials: Socials = {
-//       facebook: fetchedUser.facebook || "",
-//       twitter: fetchedUser.twitter || "",
-//       linkedin: fetchedUser.linkedin || "",
-//       website: fetchedUser.website || "",
-//       github: fetchedUser.github || "",
-//     };
-
-//     // Prepare the response object with default values where necessary
-//     const response: UserResponse = {
-//       id: fetchedUser.id,
-//       name: fetchedUser.name,
-//       username: fetchedUser.username,
-//       phone: fetchedUser.phone,
-//       email: fetchedUser.email,
-//       image: fetchedUser.image || "/user.png", // Ensure this default image exists in your public directory
-//       roles:
-//         Array.isArray(fetchedUser.roles) && fetchedUser.roles.length > 0
-//           ? fetchedUser.roles
-//           : ["user"],
-//       isVerified: fetchedUser.isVerified ?? false, // Use nullish coalescing to allow false
-//       createdAt: fetchedUser.createdAt,
-//       updatedAt: fetchedUser.updatedAt,
-//       biography: fetchedUser.biography || "Biography not provided.",
-//       expertise: expertiseProcessed,
-//       registrationDate: fetchedUser.registrationDate || "Date not provided",
-//       socials, // Include socials with default values
-//       enrolledCourses: enrolledCoursesProcessed,
-//       wishlist: wishlistProcessed,
-//     };
-
-//     console.log("API Response:", response);
-
-//     // Return the response
-//     return NextResponse.json(response);
-//   } catch (error: any) {
-//     console.error("Error fetching user details:", error);
-
-//     // Return a 500 error with a generic message
-//     return NextResponse.json(
-//       { error: "An error occurred while fetching user details." },
-//       { status: 500 }
-//     );
-//   }
-// }
