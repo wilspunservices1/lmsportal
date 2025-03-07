@@ -1,55 +1,123 @@
-// src/app/api/courses/[id]/certificate/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/db";
+import { user } from "@/db/schemas/user";
+import { courses } from "@/db/schemas/courses";
+import { certification } from "@/db/schemas/certification";
+import { placeholders } from "@/db/schemas/placeholders";
+import { eq } from "drizzle-orm";
 
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
-import { certificateIssuance } from '@/db/schemas/certificateIssuance';
-import { certification } from '@/db/schemas/certification';
-import { eq } from 'drizzle-orm';
+export async function GET(
+	req: NextRequest,
+	context: { params: { id: string } }
+) {
+	try {
+		const params = await Promise.resolve(context.params); // Await params to ensure proper access
+		const courseId = params.id; // Now safely access params.id
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-    const { id: courseId } = params;
+		console.log(`Fetching certificate for courseId: ${courseId}`);
 
-    try {
-        // Fetch the certificate issuance related to the given course
-        const issuance = await db
-            .select()
-            .from(certificateIssuance)
-            .where(eq(certificateIssuance.certificateId, courseId))
-            .limit(1);
+		// 🔹 Extract userId from query parameters
+		const { searchParams } = new URL(req.url);
+		const userId = searchParams.get("userId");
 
-        // Check if issuance was found
-        if (!issuance || issuance.length === 0) {
-            return NextResponse.json({ message: 'Certificate issuance not found for the specified course.' }, { status: 404 });
-        }
+		if (!userId) {
+			return NextResponse.json(
+				{ message: "User ID is required" },
+				{ status: 400 }
+			);
+		}
 
-        const certificateId = issuance[0].certificateId;
+		console.log(`Fetching data for userId: ${userId}`);
 
-        // Fetch the related certificate template data
-        const certificateTemplate = await db
-            .select()
-            .from(certification)
-            .where(eq(certification.id, certificateId))
-            .limit(1);
+		// 🔹 Fetch user details and enrolled courses
+		const [userData] = await db
+			.select({
+				id: user.id,
+				name: user.name,
+				email: user.email,
+				enrolledCourses: user.enrolledCourses,
+			})
+			.from(user)
+			.where(eq(user.id, userId))
+			.limit(1);
 
-        // Check if the certificate template was found
-        if (!certificateTemplate || certificateTemplate.length === 0) {
-            return NextResponse.json({ message: 'Certificate template not found.' }, { status: 404 });
-        }
+		if (!userData) {
+			return NextResponse.json(
+				{ message: "User not found" },
+				{ status: 404 }
+			);
+		}
 
-        // Return the certificate template data along with issuance details
-        return NextResponse.json({
-            certificateId: certificateTemplate.id,
-            certificateData: certificateTemplate[0].certificateData,
-            description: certificateTemplate[0].description,
-            issuedTo: issuance[0].issuedTo,
-            issuedAt: issuance[0].issuedAt,
-            signature: issuance[0].signature,
-            issuanceUniqueIdentifier: issuance[0].issuanceUniqueIdentifier,
-        });
-    } catch (error) {
-        // Log the error details for debugging
-        console.error('Error fetching certificate issuance:', error);
-        return NextResponse.json({ message: 'An internal server error occurred while fetching the certificate.' }, { status: 500 });
-    }
+		console.log("User Data:", userData);
+
+		// 🔹 Check if the user is enrolled in the course
+		const enrolledCourse = userData.enrolledCourses?.find(
+			(c: any) => c.courseId === courseId
+		);
+
+		if (!enrolledCourse) {
+			return NextResponse.json(
+				{ message: "User is not enrolled in this course" },
+				{ status: 403 }
+			);
+		}
+
+		// 🔹 Fetch course details including certificate ID
+		const [courseData] = await db
+			.select({
+				certificateId: courses.certificateId,
+				title: courses.title,
+			})
+			.from(courses)
+			.where(eq(courses.id, courseId))
+			.limit(1);
+
+		if (!courseData || !courseData.certificateId) {
+			return NextResponse.json(
+				{ message: "Certificate not found for this course" },
+				{ status: 404 }
+			);
+		}
+
+		console.log("Course Data:", courseData);
+
+		// 🔹 Fetch certificate details (image URL, no "template")
+		const [certificateData] = await db
+			.select()
+			.from(certification)
+			.where(eq(certification.id, courseData.certificateId))
+			.limit(1);
+
+		if (!certificateData) {
+			return NextResponse.json(
+				{ message: "Certificate data not found" },
+				{ status: 404 }
+			);
+		}
+
+		console.log("Certificate Data:", certificateData);
+
+		// 🔹 Fetch placeholders related to the certificate
+		const placeholdersData = await db
+			.select()
+			.from(placeholders)
+			.where(eq(placeholders.certificate_id, courseData.certificateId));
+
+		console.log("Placeholders:", placeholdersData);
+
+		// 🔹 Return structured JSON response
+		return NextResponse.json({
+			userId: userData.id,
+			userData: userData,
+			courseId,
+			certificateData,
+			placeholders: placeholdersData || [],
+		});
+	} catch (error) {
+		console.error("Error fetching certificate data:", error);
+		return NextResponse.json(
+			{ message: "Internal server error" },
+			{ status: 500 }
+		);
+	}
 }
- 

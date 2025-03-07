@@ -1,15 +1,13 @@
 // src/app/actions/fetchUserDetailsFromApi.ts
 export async function fetchUserDetailsFromApi(userId: string) {
   try {
-    const response = await fetch(`/api/user/${userId}`, {
-      method: "GET",
-    });
-
+    const response = await fetch(`/api/user/${userId}?includeEnrolledCourses=true`);
+    
     if (!response.ok) {
       throw new Error(`Failed to fetch user details: ${response.statusText}`);
     }
-
     const data = await response.json();
+
     return data;
   } catch (error) {
     console.error("Error in fetchUserDetailsFromApi:", error);

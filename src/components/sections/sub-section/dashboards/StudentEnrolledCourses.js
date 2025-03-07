@@ -22,6 +22,7 @@ const StudentEnrolledCourses = () => {
       if (session?.user?.id) {
         try {
           const userData = await fetchUserDetailsFromApi(session.user.id);
+          console.log("Fetched user data:", userData);
           setUserDetails(userData);
         } catch (error) {
           console.error("Failed to fetch user details:", error);
@@ -35,27 +36,27 @@ const StudentEnrolledCourses = () => {
 
   // console.log("session -> .... working userDetails",userDetails && userDetails.enrolledCourses)
 
-  const enrolledCourses = courses
-    ?.filter(({ id }) => (id > 0 && id < 6) || id === 8)
-    ?.map((course) => ({
-      ...course,
-      isCompleted: course?.id < 4 ? true : false,
-      isActive: course?.id === 4 || course?.id === 5 ? true : false,
-      completedParchent: course?.id === 4 ? 80 : course?.id === 5 ? 70 : false,
-    }));
-  const activeCourses = courses
-    ?.filter(({ id }) => id === 4 || id === 5)
-    ?.map((course) => ({
-      ...course,
-      isActive: true,
-      completedParchent: course?.id === 4 ? 80 : 70,
-    }));
-  const completedCourses = courses
-    ?.filter(({ id }) => id < 4)
-    ?.map((course) => ({
-      ...course,
-      isCompleted: true,
-    }));
+  // const enrolledCourses = courses
+  //   ?.filter(({ id }) => (id > 0 && id < 6) || id === 8)
+  //   ?.map((course) => ({
+  //     ...course,
+  //     isCompleted: course?.id < 4 ? true : false,
+  //     isActive: course?.id === 4 || course?.id === 5 ? true : false,
+  //     completedParchent: course?.id === 4 ? 80 : course?.id === 5 ? 70 : false,
+  //   }));
+  // const activeCourses = courses
+  //   ?.filter(({ id }) => id === 4 || id === 5)
+  //   ?.map((course) => ({
+  //     ...course,
+  //     isActive: true,
+  //     completedParchent: course?.id === 4 ? 80 : 70,
+  //   }));
+  // const completedCourses = courses
+  //   ?.filter(({ id }) => id < 4)
+  //   ?.map((course) => ({
+  //     ...course,
+  //     isCompleted: true,
+  //   }));
 
   const tabbuttons = [
     {

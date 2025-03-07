@@ -9,7 +9,7 @@ const FooterNavList = () => {
       heading: "Usefull Links",
       items: [
         {
-          name: "Complaint Ploicy",
+          name: "Complaint Policy",
           path: "/complaint-policy",
         },
         {
