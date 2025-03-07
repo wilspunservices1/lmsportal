@@ -1,4 +1,5 @@
 "use client";
+
 import useSweetAlert from "@/hooks/useSweetAlert";
 import addItemsToLocalstorage from "@/libs/addItemsToLocalstorage";
 import getItemsFromLocalstorage from "@/libs/getItemsFromLocalstorage";
@@ -43,19 +44,25 @@ const WishlistContextProvider = ({ children }) => {
 				creteAlert("error", "Error fetching wishlist.");
 			}
 		},
-		[creteAlert, wishlistFetched]
+		[creteAlert]
 	);
 	// `useCallback` ensures the function remains stable
 
 	useEffect(() => {
-		if (!wishlistFetched && !session?.user?.id) {
-			const localWishlist = getItemsFromLocalstorage("wishlist") || [];
-			setWishlistProducts(localWishlist);
-			setWishlistFetched(true);
-		} else if (!wishlistFetched && session?.user?.id) {
-			fetchWishlistFromDB(session.user.id);
-		}
-	}, [fetchWishlistFromDB, session?.user?.id, wishlistFetched]);
+        const initializeWishlist = async () => {
+            if (wishlistFetched) return; // Early return if already fetched
+
+            if (session?.user?.id) {
+                await fetchWishlistFromDB(session.user.id);
+            } else {
+                const localWishlist = getItemsFromLocalstorage("wishlist") || [];
+                setWishlistProducts(localWishlist);
+                setWishlistFetched(true);
+            }
+        };
+
+        initializeWishlist();
+    }, [session?.user?.id, fetchWishlistFromDB]);
 	// Now `fetchWishlistFromDB` is safely included
 
 	// Sync wishlist to the database

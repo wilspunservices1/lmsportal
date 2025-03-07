@@ -1,4 +1,4 @@
-export const createImage = async (url: string): Promise<HTMLImageElement> =>
+export const createImage = (url: string): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
         if (!url) {
             reject(new Error('Image URL is required'));

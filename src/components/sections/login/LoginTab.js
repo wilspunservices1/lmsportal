@@ -12,7 +12,6 @@ import useTab from "@/hooks/useTab";
 
 const LoginTab = () => {
   const { currentIdx, handleTabClick } = useTab();
-
   const tabButtons = [
     { name: "Login", content: <LoginForm /> },
     {

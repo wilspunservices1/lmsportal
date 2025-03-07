@@ -18,14 +18,10 @@ const Brands = () => {
     brandImage6,
   ];
   return (
-    <section className="bg-lightGrey10 dark:bg-lightGrey10-dark" style={{ marginbottom: "100px !important" }}>
+    <section className="bg-lightGrey10 dark:bg-lightGrey10-dark">
       <div className="container pb-60px">
         {/* Brands Heading  */}
-        <div
-          className="mb-5 md:mb-10"
-          data-aos="fade-up"
-          style={{ marginTop: "50px" }}
-        >
+        <div className="mb-5 md:mb-10" data-aos="fade-up">
           <HeadingPrimary text="center">
             Relied on marketers trusted by engineers and <br />
             Beloved by{" "}
@@ -46,7 +42,7 @@ const Brands = () => {
                 href="#"
                 className="pt-25px pb-45px text-center w-full flex justify-center"
               >
-                <Image src={brand} alt="" />
+                <Image src={brand} alt="" width={100} height={100} /> 
               </Link>
             </div>
           ))}

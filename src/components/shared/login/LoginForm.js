@@ -1,25 +1,16 @@
-"use client";
+"use client"
 
 import { getCsrfToken, signIn } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-const LoginForm = () => {
+const LoginForm = ({ csrfToken }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState("Log in");
   const [error, setError] = useState(""); // Ensure this is a string
   const router = useRouter();
-  const [csrfToken, setCsrfToken] = useState("");
-
-  useEffect(() => {
-    const fetchCsrfToken = async () => {
-      const token = await getCsrfToken();
-      setCsrfToken(token || "");
-    };
-    fetchCsrfToken();
-  }, []);
 
   const signInOAuth = async (provider) => {
     try {
@@ -71,8 +62,6 @@ const LoginForm = () => {
     }
   };
 
-  console.log("csrfToken", csrfToken, email, password, loading, error);
-
   return (
     <div className="opacity-100 transition-opacity duration-150 ease-linear">
       <div className="text-center">
@@ -88,7 +77,7 @@ const LoginForm = () => {
             Sign up for free
           </Link>
         </p>
-      </div> 
+      </div>
 
       <form className="pt-25px" onSubmit={handleSubmit} data-aos="fade-up">
         <input name="csrfToken" type="hidden" defaultValue={csrfToken} />

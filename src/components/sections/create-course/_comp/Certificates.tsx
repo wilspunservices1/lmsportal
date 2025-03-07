@@ -56,7 +56,7 @@ const CertificatesTemp: React.FC = () => {
 	const segments = pathname.split("/");
 	const course_id = segments[2];
 
-	console.log("Extracted course_id from URL:", course_id);
+	// console.log("Extracted course_id from URL:", course_id);
 
 	const [certificates, setCertificates] = useState<Certificate[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(true); // Global loading state for initial fetch

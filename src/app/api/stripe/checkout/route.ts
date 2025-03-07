@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { BASE_URL } from '@/actions/constant';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2024-06-20',
@@ -31,8 +30,8 @@ export async function POST(req: Request) {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${BASE_URL}/payProgress/success`,
-      cancel_url: `${BASE_URL}/payProgress/cancel`,
+      success_url: `${process.env.NEXT_PUBLIC_URL}/payProgress/success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_URL}/payProgress/cancel`,
       metadata: {
         userId, // Pass userId for order processing
         courseIds: courseIds.join(','), // Join courseIds into a comma-separated string

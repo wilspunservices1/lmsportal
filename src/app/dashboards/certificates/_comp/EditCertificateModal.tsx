@@ -17,7 +17,7 @@ import { SettingsIcon, RefreshIcon, TestIcon } from "@/components/icons";
 import Draggable from "react-draggable";
 import ReactCrop, { type Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-// import { getCroppedImg } from "@/utils/cropImage";
+import { getCroppedImg } from "@/utils/cropImage";
 import useSweetAlert from "@/hooks/useSweetAlert";
 import DownloadIcon from "@/components/sections/create-course/_comp/Certificate/Icon/DownloadIcon";
 import { v4 as uuidv4 } from "uuid";

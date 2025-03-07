@@ -1,4 +1,3 @@
-"use client";
 import Image from "next/image";
 import React from "react";
 import logoImage from "@/assets/images/logo/favicon.png";
@@ -43,6 +42,7 @@ const CopyRight = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-30px pt-10 items-center">
+         
           <div className="lg:col-start-1 lg:col-span-3">
             <Link
               href="/"
@@ -53,14 +53,17 @@ const CopyRight = () => {
                 <span className="font-bold text-xl text-white pl-0">
                   Meridian
                 </span>
-                <span className="font-bold text-xl pl-2 text-yellow">LMS</span>
+                <span className="font-bold text-xl pl-2 text-yellow">
+                  LMS
+                </span>
               </div>
             </Link>
           </div>
 
           <div className="lg:col-start-4 lg:col-span-6 pl-10">
             <p className="text-whiteColor">
-              Copyright © 2024 by MeridianLMS. All Rights Reserved.
+              Copyright © 2024  by
+              MeridianLMS. All Rights Reserved.
             </p>
           </div>
 

@@ -25,7 +25,7 @@ import type { CertificateData } from "@/types/certificates";
 import { initialPlaceholders } from "@/assets/mock";
 
 // Utility for cropping (if needed)
-// import { getCroppedImg } from "@/utils/cropImage";
+import { getCroppedImg } from "@/utils/cropImage";
 import DownloadIcon from "@/components/sections/create-course/_comp/Certificate/Icon/DownloadIcon";
 
 interface APICertificate {

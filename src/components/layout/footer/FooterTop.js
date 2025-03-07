@@ -1,4 +1,3 @@
-"use client"
 import useIsSecondary from "@/hooks/useIsSecondary";
 import FooterTopLeft from "./FooterTopLeft";
 

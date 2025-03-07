@@ -1,3 +1,4 @@
+import React from "react";
 import FooterNavItems from "./FooterNavItems";
 import FooterAbout from "./FooterAbout";
 import FooterRecentPosts from "./FooterRecentPosts";

@@ -1,7 +1,37 @@
 import { BASE_URL } from "./constant";
 
-export const fetchLessonById = async (id : string) => {
+// export const fetchLessonById = async (id : string) => {
+//   try {
+//     const res = await fetch(`${BASE_URL}/api/lessons/${id}`, {
+//       method: "GET",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       credentials: "include",
+//     });
+//     if (!res.ok) {
+//       throw new Error("Failed to fetch lesson");
+//     }
+//     const lesson = await res.json();
+//     return lesson;
+//   } catch (error) {
+//     console.error("Error fetching lesson:", error);
+//     return null;
+//   }
+// };
+
+
+export const fetchLessonById = async (id: string): Promise<any> => {
+  // Ensure a valid ID is provided before attempting to fetch.
+  if (!id) {
+    console.warn("fetchLessonById: No valid lesson ID provided. Please supply a valid ID.");
+    // Optionally wait briefly (here, 1 second) before returning.
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return null;
+  }
+
   try {
+    // Attempt to fetch the lesson using the provided valid ID.
     const res = await fetch(`${BASE_URL}/api/lessons/${id}`, {
       method: "GET",
       headers: {
@@ -9,9 +39,13 @@ export const fetchLessonById = async (id : string) => {
       },
       credentials: "include",
     });
+
+    // Check if the response is successful.
     if (!res.ok) {
-      throw new Error("Failed to fetch lesson");
+      throw new Error(`Failed to fetch lesson with ID ${id}. Status: ${res.statusText}`);
     }
+
+    // Parse and return the lesson data as JSON.
     const lesson = await res.json();
     return lesson;
   } catch (error) {
@@ -19,7 +53,9 @@ export const fetchLessonById = async (id : string) => {
     return null;
   }
 };
-export const fetchEnrolledCourses = async (userId : string) => {
+
+
+export const fetchEnrolledCourses = async (userId: string) => {
   try {
     const res = await fetch(`${BASE_URL}/api/user/${userId}/enrollCourses`, {
       method: "GET",
@@ -40,7 +76,7 @@ export const fetchEnrolledCourses = async (userId : string) => {
 };
 
 // Fetch course data based on chapterId
-export const fetchCourseByChapterId = async (chapterId : string) => {
+export const fetchCourseByChapterId = async (chapterId: string) => {
   try {
     const res = await fetch(`${BASE_URL}/api/courses/chapters/${chapterId}`, {
       method: "GET",
@@ -64,7 +100,7 @@ export const fetchCourseByChapterId = async (chapterId : string) => {
 };
 
 // Convert local path to URL for videos
-export const convertLocalPathToUrl = (videoUrl : string) => {
+export const convertLocalPathToUrl = (videoUrl: string) => {
   if (videoUrl.startsWith("D:\\AI_LMS\\public\\uploads\\")) {
     return videoUrl.replace("D:\\AI_LMS\\public\\uploads\\", "/uploads/");
   }

@@ -1,4 +1,3 @@
-"use client"
 import React, {useMemo, useState, useEffect, useCallback, useRef } from "react";
 import debounce from "lodash.debounce";
 import useSweetAlert from "@/hooks/useSweetAlert";

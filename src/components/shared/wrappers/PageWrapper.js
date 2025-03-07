@@ -8,11 +8,14 @@ const PageWrapper = ({ children }) => {
   return (
     <>
       <CartContextProvider>
+
         {/* header */}
         <Header />
 
         {/* main */}
-        <WishlistContextProvider>{children}</WishlistContextProvider>
+        <WishlistContextProvider>
+          {children}
+        </WishlistContextProvider>
       </CartContextProvider>
 
       {/* footer */}

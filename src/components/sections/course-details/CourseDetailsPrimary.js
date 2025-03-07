@@ -30,6 +30,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
   const [showQuiz, setShowQuiz] = useState(false);
   const showAlert = useSweetAlert();
 
+  const [isBrowser, setIsBrowser] = useState(false);
   const [isPurchased, setIsPurchased] = useState(false);
   const [error, setError] = useState(null); // Track errors
 
@@ -121,12 +122,18 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
     return html;
   }
 
+  useEffect(() => {
+    setIsBrowser(true);
+  }, []);
+
   function openFullScreenCertificate(certificateUrl, placeholders) {
+    if (typeof document === "undefined") return; // Ensure this runs only in the browser
+  
     const originalWidth = 1024; // Set to actual certificate width
     const originalHeight = 728; // Set to actual certificate height
-
+  
     const newWindow = window.open("", "_blank");
-
+  
     const html = `
       <html>
       <head>
@@ -173,12 +180,13 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
       </body>
       </html>
     `;
-
+  
     newWindow.document.write(html);
     newWindow.document.close();
   }
 
   const handleCertificateSelect = async () => {
+    if (!isBrowser) return;
     if (!session?.user) {
       router.push("/login");
       return;
@@ -299,18 +307,19 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
       );
 
       // Display the selected certificate (modify as per your actual implementation)
-      Swal.fire({
-        title: "Certificate of Completion",
-        html: htmlContent,
-        showCancelButton: true,
-        confirmButtonText: "Download",
-        cancelButtonText: "Close",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Optionally download the image
-          openFullScreenCertificate(certificate_data_url, filledPlaceholders);
-        }
-      });
+      if (isBrowser) {
+        Swal.fire({
+          title: "Certificate of Completion",
+          html: htmlContent,
+          showCancelButton: true,
+          confirmButtonText: "Download",
+          cancelButtonText: "Close",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            openFullScreenCertificate(certificate_data_url, filledPlaceholders);
+          }
+        });
+      }
     } catch (error) {
       console.error("Detailed error:", error);
       showAlert(
