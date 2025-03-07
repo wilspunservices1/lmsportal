@@ -1,14 +1,6 @@
-import path from "path";
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
-  eslint: {
-    ignoreDuringBuilds: true, // ⛔ Skips ESLint checks during builds
-  },
-  typescript: {
-    ignoreBuildErrors: true, // <--- Ignores TS errors during production build
-  },
   unoptimized: true,
   images : {
     remotePatterns : [

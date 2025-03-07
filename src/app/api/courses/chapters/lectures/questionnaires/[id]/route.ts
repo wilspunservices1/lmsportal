@@ -9,24 +9,20 @@ export async function GET(
 	{ params }: { params?: { id?: string } }
 ) {
 	try {
-		// Await the params object before accessing its properties
-		const awaitedParams = await Promise.resolve(params);
-		const id = awaitedParams?.id;
-
-		if (!id) {
+		if (!params || !params.id) {
 			return NextResponse.json(
 				{ error: "Missing questionnaire ID" },
 				{ status: 400 }
 			);
 		}
 
-		console.log("Fetching questionnaire for id:", id);
+		console.log("Fetching questionnaire for id:", params.id);
 
 		// Get the questionnaire by its ID
 		const questionnaire = await db
 			.select()
 			.from(questionnaires)
-			.where(eq(questionnaires.id, id))
+			.where(eq(questionnaires.id, params.id))
 			.limit(1);
 
 		if (!questionnaire || questionnaire.length === 0) {
@@ -46,10 +42,7 @@ export async function GET(
 		const formattedQuestions = questionsList.map((q) => ({
 			id: q.id,
 			question: q.question,
-			options:
-				typeof q.options === "string"
-					? JSON.parse(q.options)
-					: q.options,
+			options: typeof q.options === "string" ? JSON.parse(q.options) : q.options,
 			correctAnswer: q.correctAnswer,
 		}));
 

@@ -6,9 +6,6 @@
 .pnp.js
 .yarn/install-state.gz
 
-
-public/uploads/*.mp4
-
 # testing
 /coverage
 
@@ -39,4 +36,3 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
-public/uploads/*.mp4

@@ -42,11 +42,7 @@
       "react",
       "react-dom"
     ], // Added react-dom for proper React type support
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/types"
-    ],
-    "target": "ES2017"
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": [
     "next-env.d.ts",
