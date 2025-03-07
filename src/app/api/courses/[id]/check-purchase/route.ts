@@ -3,9 +3,10 @@ import { getSession } from "@/libs/auth";
 import { db } from "@/db";
 import { user } from "@/db/schemas/user";
 import { eq } from "drizzle-orm";
+
 export async function GET(
 	req: NextRequest,
-	context: { params: { id: string } }
+	{ params }: { params: { id: string } }
 ) {
 	try {
 		const session = await getSession();
@@ -13,8 +14,7 @@ export async function GET(
 			return NextResponse.json({ hasPurchased: false }, { status: 401 });
 		}
 
-		const params = await context.params; // ✅ Awaiting params before accessing `id`
-		const courseId = params.id;
+		const courseId = await params.id;
 		console.log("Checking purchase for courseId:", courseId);
 
 		// Fetch user's roles and enrolled courses
