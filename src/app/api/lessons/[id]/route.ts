@@ -21,11 +21,10 @@ export async function GET(
 			.select({
 				id: lectures.id,
 				title: lectures.title,
-				videoUrl: lectures.videoUrl,
+				videoUrl: lectures.videoUrl, // No modification of videoUrl
 				isLocked: lectures.isLocked,
 				isPreview: lectures.isPreview,
 				chapterId: lectures.chapterId, // Ensure chapterId is included
-				// Include other necessary columns
 			})
 			.from(lectures)
 			.where(eq(lectures.id, lessonId))
@@ -40,12 +39,6 @@ export async function GET(
 
 		let lesson = lessonData[0];
 		// console.log('Fetched lesson:', lesson); // For debugging
-
-		// Ensure videoUrl is formatted correctly
-		if (lesson.videoUrl && lesson.videoUrl.startsWith("/")) {
-			const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
-			lesson.videoUrl = `${baseUrl}${lesson.videoUrl}`; // Ensure full URL
-		}
 
 		if (token && token.sub) {
 			const userId = token.sub as string;
@@ -90,6 +83,7 @@ export async function GET(
 			}
 		}
 
+		// ✅ Returns lesson with **untouched videoUrl**
 		return NextResponse.json(lesson);
 	} catch (error) {
 		console.error("Error fetching lesson:", error);
@@ -99,6 +93,7 @@ export async function GET(
 		);
 	}
 }
+
 // // src/app/api/lessons/[id]/route.ts
 
 // import { NextRequest, NextResponse } from 'next/server';
