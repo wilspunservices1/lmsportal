@@ -16,43 +16,6 @@ const FooterNavList = () => {
           name: "Refund Policy",
           path: "/refund-policy",
         },
-        {
-          name: "Partner",
-          path: "#",
-        },
-        {
-          name: "Room-Details",
-          path: "#",
-        },
-        {
-          name: "Gallery",
-          path: "#",
-        },
-      ],
-    },
-    {
-      heading: "Course",
-      items: [
-        {
-          name: "Ui Ux Design",
-          path: "#",
-        },
-        {
-          name: "Web Development",
-          path: "#",
-        },
-        {
-          name: "Business Strategy",
-          path: "#",
-        },
-        {
-          name: "Softwere Development",
-          path: "#",
-        },
-        {
-          name: "Business English",
-          path: "#",
-        },
       ],
     },
   ];

@@ -11,7 +11,7 @@ const CopyRight = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-10 lg:mt-4 items-center border-t border-darkcolor">
           <div>
             <p className="text-base text-center sm:text-start text-darkgray">
-              © 2024 Powered by{" "}
+              © {new Date().getFullYear()} Powered by{" "}
               <a href="#" className="hover:text-primaryColor">
                 MeridianLMS
               </a>{" "}
@@ -49,20 +49,12 @@ const CopyRight = () => {
               className="flex items-center justify-center w-full py-2"
             >
               <Image src={logoImage} alt="" placeholder="blur" />
-              {/* <div className="flex  items-start text-left">
-                <span className="font-bold text-xl text-white pl-0">
-                  Meridian
-                </span>
-                <span className="font-bold text-xl pl-2 text-yellow">
-                  LMS
-                </span>
-              </div> */}
             </Link>
           </div>
 
           <div className="lg:col-start-4 lg:col-span-6 pl-10">
             <p className="text-whiteColor">
-              Copyright © 2024  by
+              Copyright © {new Date().getFullYear()} by
               MeridianLMS. All Rights Reserved.
             </p>
           </div>

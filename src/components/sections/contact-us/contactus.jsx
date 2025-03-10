@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import axios from 'axios';
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -23,9 +22,21 @@ const ContactUs = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post('http://localhost:3000/send-email', formData);
+      const response = await fetch('http://localhost:3000/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+
+      const data = await response.json();
       setSubmitStatus('Email sent successfully!');
-      console.log(response.data);
+      console.log(data);
     } catch (error) {
       setSubmitStatus('Error sending email. Please try again.');
       console.error('Error:', error);

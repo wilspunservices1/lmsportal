@@ -68,7 +68,7 @@
     "src/app/dashboards/certificates/_comp/ManageCertificate.tsx",
     "src/components/sections/questionnaire/**/*.tsx",
     "src/app/dashboards/questionnaire/**/*.tsx"
-  ],
+,   "src/components/sections/quiz-modal/QuizModal.tsx", "src/components/sections/contact-us/contactus.jsx"  ],
   "exclude": [
     "node_modules"
   ]
