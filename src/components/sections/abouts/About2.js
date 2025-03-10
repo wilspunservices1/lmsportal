@@ -48,10 +48,7 @@ const About2 = () => {
               </span>{" "}
               Learning Center
             </h3>
-            <p className="text-sm md:text-base leading-7 text-contentColor dark:text-contentColor-dark mb-6">
-              Forging relationships between multi to national Governments and
-              global NGOs begins.
-            </p>
+            
             <ul className="space-y-5">
               {items.map((item, idx) => (
                 <AboutListItem key={idx} item={item} />

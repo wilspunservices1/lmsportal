@@ -49,14 +49,14 @@ const CopyRight = () => {
               className="flex items-center justify-center w-full py-2"
             >
               <Image src={logoImage} alt="" placeholder="blur" />
-              <div className="flex  items-start text-left">
+              {/* <div className="flex  items-start text-left">
                 <span className="font-bold text-xl text-white pl-0">
                   Meridian
                 </span>
                 <span className="font-bold text-xl pl-2 text-yellow">
                   LMS
                 </span>
-              </div>
+              </div> */}
             </Link>
           </div>
 

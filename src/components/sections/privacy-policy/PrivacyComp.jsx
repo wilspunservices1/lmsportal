@@ -10,13 +10,13 @@ const PrivacyComp = () => {
           <h2 className="text-2xl font-semibold mb-4">Introduction</h2>
           <p className="mb-4">
             Learning Management System of Meridian Quality Management
-            Professionals, __________, collectively referred to as &quotthe Site&quot,
+            Professionals, __________, collectively referred to as “the Site”,
             is managed and operated by Meridian Quality Management Professionals
             (MEQMP). At MEQMP, we are committed to respecting the privacy of our
-            users. In this Privacy Policy, the terms &quotwe,&quot &quotus,&quot and &quotour&quot refer
-            to Meridian Quality Management Professionals (MEQMP), while &quotyou&quot
-            and &quotyour&quot refer to the user, customer, or prospective customer of
-            the Site. This Privacy Policy (&quotPolicy&quot) outlines our approach to
+            users. In this Privacy Policy, the terms “we,” “us,” and “our” refer
+            to Meridian Quality Management Professionals (MEQMP), while “you”
+            and “your” refer to the user, customer, or prospective customer of
+            the Site. This Privacy Policy (“Policy”) outlines our approach to
             handling and protecting the information collected through the Site.
           </p>
           <p className="mb-4">
@@ -60,8 +60,8 @@ const PrivacyComp = () => {
             Information Collection and Confidentiality
           </h2>
           <p className="mb-4">
-            MEQMP collects both &quotpersonal information&quot and &quotpseudonymized
-            information&quot from users. Pseudonymized information refers to data
+            MEQMP collects both “personal information” and “pseudonymized
+            information” from users. Pseudonymized information refers to data
             that cannot be directly linked to an individual without additional
             details—examples include gender, age, or nationality. In contrast,
             personal information is any data that can be directly associated
@@ -75,7 +75,7 @@ const PrivacyComp = () => {
             purchases, require users to submit personal details. This may
             include, but is not limited to, name, email address, phone number,
             postal address, company affiliation, job title, or industry.
-            Additionally, our online contact form contains a &quotmessage&quot field
+            Additionally, our online contact form contains a “message” field
             where users may voluntarily provide further personal information.
           </p>
           <p className="mb-4">
@@ -241,10 +241,17 @@ const PrivacyComp = () => {
             <div>
               <h3 className="text-xl font-semibold mb-2">Saudi Arabia</h3>
               <p>
-                Office 11 , 3rd Floor Building 4236 King Saud Street, Nawras,
+                Office 11, 3rd Floor Building 4236 King Saud Street, Nawras,
                 Dammam
               </p>
               <p>Phone: +966 50 939 4640</p>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-2">Bahrain</h3>
+              <p>
+                Office #1195, Sitra Mall Building 574, Block 611 Area Al-Hamriyah
+              </p>
+              <p>Phone: +973 3808 7754</p>
             </div>
           </div>
           <p className="mt-4">Attention: Training and IT Manager</p>

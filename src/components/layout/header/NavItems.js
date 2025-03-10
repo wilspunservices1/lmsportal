@@ -37,6 +37,13 @@ const NavItems = () => {
       // dropdown: <DropdownDashboard />,
       isRelative: true,
     },
+    {
+      id: 4,
+      name: "Contact Us",
+      path: "/contact-us-form",
+      // dropdown: <DropdownDashboard />,
+      isRelative: true,
+    },
     // {
     //   id: 2,
     //   name: "Pages",

@@ -520,21 +520,21 @@ const PopularSubjects2 = () => {
               className="text-3xl md:text-size-35 2xl:text-size-38 3xl:text-size-42 leading-10 md:leading-45px 2xl:leading-50px 3xl:leading-2xl font-bold text-blackColor dark:text-blackColor-dark"
               data-aos="fade-up"
             >
-              Populer{" "}
+              Popular{" "}
               <span className="relative after:w-full after:h-[7px]   after:absolute after:left-0 after:bottom-3 md:after:bottom-4 after:z-[-1]">
-                Subjects
+                Modules
               </span>
             </h3>
           </div>
 
           <div className="lg:col-star-5 lg:col-span-5">
-            <p
+            {/* <p
               className="text-sm md:text-base text-contentColor dark:text-contentColor-dark mb-10px 2xl:mb-50px 2xl:pl-50px"
               data-aos="fade-up"
             >
               Forging relationships between multi to national governments and
               global NGOs begins.
-            </p>
+            </p> */}
           </div>
           <div
             className="lg:col-star-10 lg:col-span-3 flex lg:justify-end"

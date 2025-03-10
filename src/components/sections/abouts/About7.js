@@ -42,11 +42,7 @@ const About7 = () => {
                 Discover
               </span>
             </HeadingSecondary>
-            <p className="text-sm md:text-base leading-7 text-contentColor dark:text-contentColor-dark mb-6 md:mb-8">
-              Forging relationships between multi to national Governments and
-              global. Explore a variety of fresh educational teach. National
-              Governments and global.
-            </p>
+            
             <h5 className="text-xl md:text-2xl font-bold text-blackColor dark:text-blackColor-dark mb-15px">
               Whats Material Includes?
             </h5>

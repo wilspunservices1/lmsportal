@@ -40,13 +40,12 @@ const RefundPolicy = () => {
           </h2>
           <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg space-y-4">
             <p className="text-gray-700 dark:text-gray-300">
-              To initiate a refund request, students must:
+              To initiate a refund request, students must submit a written
+              request along with their electronic receipt as proof of purchase.
+              The request should be sent to the designated email address provided
+              below. Requests without valid proof of purchase may not be
+              processed.
             </p>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700 dark:text-gray-300">
-              <li>Submit a written request</li>
-              <li>Include electronic receipt as proof of purchase</li>
-              <li>Send to the designated email address</li>
-            </ul>
           </div>
         </section>
 
@@ -55,17 +54,15 @@ const RefundPolicy = () => {
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
             Refund Processing Timeline
           </h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-              <p className="font-semibold mb-2">Review Period</p>
-              <p className="text-gray-700 dark:text-gray-300">7 working days</p>
-            </div>
-            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-              <p className="font-semibold mb-2">Processing Time</p>
-              <p className="text-gray-700 dark:text-gray-300">
-                10 working days
-              </p>
-            </div>
+          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+            <p className="text-gray-700 dark:text-gray-300">
+              Once a refund request is received, it will be reviewed within 7
+              working days. If the request meets the eligibility criteria, the
+              refund will be processed within 10 working days. The refund will
+              be issued using the original method of payment. Depending on the
+              payment provider, it may take additional time for the refunded
+              amount to reflect in the student's account.
+            </p>
           </div>
         </section>
 
@@ -90,7 +87,7 @@ const RefundPolicy = () => {
                 course access has been granted.
               </li>
               <li>
-                FIf the request is made due to failure to complete the course
+                If the request is made due to failure to complete the course
                 within the allotted timeframe.
               </li>
             </ul>
@@ -135,6 +132,14 @@ const RefundPolicy = () => {
                 <p>Office 11, 3rd Floor Building 4236</p>
                 <p>King Saud Street, Nawras, Dammam</p>
                 <p className="font-medium">Phone: +966 50 939 4640</p>
+              </div>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+              <h3 className="font-semibold mb-4 text-xl">Bahrain Office</h3>
+              <div className="space-y-2 text-gray-700 dark:text-gray-300">
+                <p>Office #1195, Sitra Mall Building 574</p>
+                <p>Block 611 Area Al-Hamriyah</p>
+                <p className="font-medium">Phone: +973 3808 7754</p>
               </div>
             </div>
           </div>

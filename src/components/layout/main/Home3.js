@@ -13,6 +13,7 @@ const Home3 = () => {
   return (
     <>
       <Hero3 />
+      <br></br>
       <BrandHero />
       <About3 />
       <PopularSubjects2 />

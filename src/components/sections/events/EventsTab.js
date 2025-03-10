@@ -82,10 +82,7 @@ const EventsTab = () => {
               </HeadingPrimary>
             </div>
             <div className="md:col-start-8 md:col-span-5" data-aos="fade-up">
-              <p className="text-base text-contentColor dark:text-contentColor-dark relative before:w-1px before:h-full before:bg-darkdeep7 before:absolute before:left-[-30px]">
-                Forging relationships between multi to national governments and
-                global NGOs begins.
-              </p>
+              
             </div>
           </div>
 
