@@ -40,15 +40,14 @@ export async function POST(req: Request) {
 			);
 
 		const totalAttempts = existingAttempts.length;
-		console.log("Total Attempts:", totalAttempts);
 
-		if (totalAttempts >= 3) {
+		if (totalAttempts >= 100) {  // Change this number to any limit you want
 			return NextResponse.json(
-				{
-					error: "Maximum quiz attempts reached",
-					attemptCount: totalAttempts, // ✅ Return attemptCount in response
-				},
-				{ status: 400 }
+			{
+				error: "Maximum quiz attempts reached",
+				attemptCount: totalAttempts,
+			},
+			{ status: 400 }
 			);
 		}
 
