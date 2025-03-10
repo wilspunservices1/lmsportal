@@ -51,10 +51,10 @@ type Certificate = {
 	placeholders?: CertificatePlaceHolders[];
 };
 
-const CertificatesTemp: React.FC = () => {
-	const pathname = usePathname();
-	const segments = pathname.split("/");
-	const course_id = segments[2];
+const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
+	// const pathname = usePathname();
+	// const segments = pathname.split("/");
+	// const course_id = segments[2];
 
 	// console.log("Extracted course_id from URL:", course_id);
 
@@ -89,15 +89,20 @@ const CertificatesTemp: React.FC = () => {
 
 	// Fetch certificates data from the API
 	useEffect(() => {
+		if (!courseId || courseId.trim() === "") {
+			showAlert("error", "Course ID is missing.");
+			return;
+		}
+
 		const fetchCertificates = async () => {
 			try {
-				const response = await fetch("/api/certificates/get-saved");
-				if (!response.ok) {
+				const response = await fetch(
+					`/api/certificates/get-saved?courseId=${courseId}`
+				);
+				if (!response.ok)
 					throw new Error(`Error: ${response.statusText}`);
-				}
-				const data = await response.json();
 
-				// Ensure data.certificates is an array
+				const data = await response.json();
 				if (!Array.isArray(data.certificates)) {
 					throw new Error(
 						"Invalid data format: certificates should be an array."
@@ -106,26 +111,26 @@ const CertificatesTemp: React.FC = () => {
 
 				setCertificates(data.certificates);
 			} catch (err) {
-				// Ensure err is an instance of Error
-				if (err instanceof Error) {
-					setError(err);
-				} else {
-					setError(new Error("An unexpected error occurred."));
-				}
+				setError(
+					err instanceof Error
+						? err
+						: new Error("An unexpected error occurred.")
+				);
 			} finally {
-				setIsLoading(false); // Stop loading regardless of success or failure
+				setIsLoading(false);
 			}
 		};
 
 		fetchCertificates();
-	}, []);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [courseId]);
 
 	// Function to handle certificate selection and send the PATCH request
 	const handleCertificateSelect = async (certificateId: string) => {
 		setSelectedCertificateId(certificateId); // Set the selected certificate's ID
 		setLoadingCertificates((prev) => ({ ...prev, [certificateId]: true })); // Start loading for this certificate
 
-		if (!course_id) {
+		if (!courseId) {
 			showAlert(
 				"error",
 				"Course ID is missing. Please provide a valid course ID."
@@ -139,7 +144,7 @@ const CertificatesTemp: React.FC = () => {
 
 		try {
 			console.log("Sending Unpublish Request with Payload:", {
-				course_id,
+				courseId,
 			});
 
 			const unpublishResponse = await fetch(
@@ -147,10 +152,9 @@ const CertificatesTemp: React.FC = () => {
 				{
 					method: "PATCH",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ courseId: course_id }),
+					body: JSON.stringify({ courseId: courseId }),
 				}
 			);
-			
 
 			if (!unpublishResponse.ok) {
 				const errorData = await unpublishResponse.json();
@@ -179,7 +183,7 @@ const CertificatesTemp: React.FC = () => {
 
 			console.log("✅ Publish API Success");
 
-			const response = await fetch(`/api/courses/${course_id}`, {
+			const response = await fetch(`/api/courses/${courseId}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ certificateId }), // Updating the course

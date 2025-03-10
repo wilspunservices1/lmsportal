@@ -50,6 +50,7 @@ const CreateCoursePrimary = () => {
 
           setInitialCourseData(data.data);
           setInitialChapters(data.data.chapters || []);
+          setCourseId(data.data.id);
         } catch (error) {
           console.error("Error fetching course data:", error);
         }
@@ -139,7 +140,7 @@ const CreateCoursePrimary = () => {
               </li>
               <li className="accordion mb-5">
                 <CertificatesTemp 
-                  courseId={"facb9619-4627-4c54-8bf4-07bcede7d70a"}
+                  courseId={id || courseId}
                 />
               </li>
 
