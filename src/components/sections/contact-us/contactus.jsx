@@ -22,12 +22,20 @@ const ContactUs = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:3000/send-email', {
+      // Create a FormData object
+      const formDataObj = new FormData();
+      formDataObj.append('name', formData.name);
+      formDataObj.append('email', formData.email);
+      formDataObj.append('subject', formData.subject);
+      formDataObj.append('message', formData.message);
+
+      // Send the form data to Formspree
+      const response = await fetch('https://formspree.io/f/xjkyvrwa', {
         method: 'POST',
+        body: formDataObj,
         headers: {
-          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
-        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
