@@ -67,7 +67,7 @@ const Overview = () => {
                 Overview
               </span>{" "}
               <br />
-              For Your Carrer
+              For Your Career
             </HeadingPrimary>
           </div>
         )}

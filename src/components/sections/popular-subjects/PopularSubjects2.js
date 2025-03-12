@@ -280,10 +280,10 @@ const PopularSubjects2 = () => {
     },
     {
       id: 5,
-      title: "Health & Fitness",
+      title: "Food & Safety",
       desc: "health is wealth",
       navButton: false,
-      category: "Health & Fitness",
+      category: "Food & Safety",
       svg: (
         <div className="relative w-20 h-[60px]">
           <svg
@@ -522,7 +522,7 @@ const PopularSubjects2 = () => {
             >
               Popular{" "}
               <span className="relative after:w-full after:h-[7px]   after:absolute after:left-0 after:bottom-3 md:after:bottom-4 after:z-[-1]">
-                Modules
+                Course Catagories
               </span>
             </h3>
           </div>

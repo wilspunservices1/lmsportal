@@ -15,7 +15,7 @@ const CoursesFilter = () => {
               <SectionName> Course List</SectionName>
               <HeadingPrimaryXl>
                 Perfect Online <br className="hidden lg:block" /> Course Your
-                Carrer
+                Career
               </HeadingPrimaryXl>
             </div>
             {/* courses right */}

@@ -30,7 +30,7 @@ const About8 = () => {
             {/* about right */}
             <div data-aos="fade-up">
               <HeadingSecondary>
-                Welcome to the Carrer{" "}
+                Welcome to the Career{" "}
                 <span className="relative after:w-full after:h-[7px]   z-0 after:absolute after:left-0 after:bottom-3 md:after:bottom-5 md:after:-z-1">
                   Development
                 </span>{" "}

@@ -25,7 +25,7 @@ const CoursesFilter2 = ({ type }) => {
                 Course
               </span>
               <br />
-              Your Carrer
+              Your Career
             </HeadingPrimary>
           </div>
 

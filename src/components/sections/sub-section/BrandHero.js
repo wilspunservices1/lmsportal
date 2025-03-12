@@ -59,9 +59,14 @@ import brand3 from "@/assets/images/brand/brand_3.png";
 import brand4 from "@/assets/images/brand/brand_4.png";
 import brand5 from "@/assets/images/brand/brand_5.png";
 import brand6 from "@/assets/images/brand/brand_6.png";
+import brand7 from "@/assets/images/brand/brand_7.png";
+import brand8 from "@/assets/images/brand/brand_8.png";
+import brand9 from "@/assets/images/brand/brand_9.png";
+import brand10 from "@/assets/images/brand/brand_10.png";
+
 
 const BrandHero = () => {
-  const brands = [brand1, brand2, brand3, brand4, brand5, brand6];
+  const brands = [brand1, brand2, brand3, brand4, brand5, brand6, brand7, brand8, brand9, brand10];
 
   // Duplicate the array for seamless looping
   const allBrands = [...brands, ...brands];

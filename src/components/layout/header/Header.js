@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import Navbar from "./Navbar";
 import MobileMenu from "./MobileMenu";
-import HeaderTop from "./HeaderTop";
+// import HeaderTop from "./HeaderTop";
 
 import useIsTrue from "@/hooks/useIsTrue";
 import Aos from "aos";
@@ -29,7 +29,7 @@ const Header = () => {
       <SearchProvider>
         <div>
           {/* header top */}
-          {isHome2Dark || isHome2 ? "" : <HeaderTop />}
+          {/* {isHome2Dark || isHome2 ? "" : <HeaderTop />} */}
           {/* navbar */}
           <Navbar />
           {/* mobile menu */}

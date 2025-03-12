@@ -1,63 +1,51 @@
 import HeadingPrimary from "@/components/shared/headings/HeadingPrimary";
 import React from "react";
-import { motion } from "framer-motion";
+import brandImage1 from "@/assets/images/brand/brand_1.png";
+import brandImage2 from "@/assets/images/brand/brand_2.png";
+import brandImage3 from "@/assets/images/brand/brand_3.png";
+import brandImage4 from "@/assets/images/brand/brand_4.png";
+import brandImage5 from "@/assets/images/brand/brand_5.png";
+import brandImage6 from "@/assets/images/brand/brand_6.png";
 import Link from "next/link";
 import Image from "next/image";
-
-/** Example brand images. Replace with your actual imports */
-import brand1 from "@/assets/images/brand/brand_1.png";
-import brand2 from "@/assets/images/brand/brand_2.png";
-import brand3 from "@/assets/images/brand/brand_3.png";
-import brand4 from "@/assets/images/brand/brand_4.png";
-import brand5 from "@/assets/images/brand/brand_5.png";
-import brand6 from "@/assets/images/brand/brand_6.png";
-
 const Brands = () => {
-  const brands = [brand1, brand2, brand3, brand4, brand5, brand6];
-
-  // Duplicate the array so it can seamlessly loop
-  const allBrands = [...brands, ...brands];
-
-  console.log("Brands:", brands); // Debug: Check if images are loaded
-
+  const brands = [
+    brandImage1,
+    brandImage2,
+    brandImage3,
+    brandImage4,
+    brandImage5,
+    brandImage6,
+  ];
   return (
     <section className="bg-lightGrey10 dark:bg-lightGrey10-dark">
-      <div className="container pb-10">
-        {/* Brands Heading */}
+      <div className="container pb-60px">
+        {/* Brands Heading  */}
         <div className="mb-5 md:mb-10" data-aos="fade-up">
           <HeadingPrimary text="center">
-            Trusted by Engineers and <br />
-            Beloved by Executives
+            Relied on marketers trusted by engineers and <br />
+            Beloved by{" "}
+            <span className="relative after:w-full after:h-[7px] z-0  after:absolute after:left-0 after:bottom-3 md:after:bottom-5 after:z-[-1]">
+              Executives
+            </span>
           </HeadingPrimary>
         </div>
-
-        {/* Marquee Container */}
-        <div className="overflow-hidden relative cursor-grab w-full border-2 border-red-500">
-          {/* The row that moves (motion.div) */}
-          <motion.div
-            className="flex whitespace-nowrap border-2 border-blue-500"
-            initial={{ x: 0 }} // Start from the left
-            animate={{ x: "-100%" }} // Move to the left by 100% of the container width
-            transition={{
-              ease: "linear",
-              duration: 20,
-              repeat: Infinity,
-            }}
-          >
-            {/* Render each brand twice for seamless looping */}
-            {allBrands.map((brand, idx) => (
-              <div key={idx} className="flex-shrink-0 mx-6">
-                <Link href="#" className="flex justify-center">
-                  <Image
-                    src={brand}
-                    alt={`Brand ${idx}`}
-                    width={100}
-                    height={100}
-                  />
-                </Link>
-              </div>
-            ))}
-          </motion.div>
+        {/* brands  */}
+        <div className="flex flex-wrap justify-center">
+          {brands.map((brand, idx) => (
+            <div
+              key={idx}
+              className="basis-1/2 md:basis-1/4 lg:basis-1/5"
+              data-aos="fade-up"
+            >
+              <Link
+                href="#"
+                className="pt-25px pb-45px text-center w-full flex justify-center"
+              >
+                <Image src={brand} alt="" width={100} height={100} /> 
+              </Link>
+            </div>
+          ))}
         </div>
       </div>
     </section>
