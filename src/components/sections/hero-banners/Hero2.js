@@ -54,8 +54,8 @@ const Hero2 = () => {
             <div className="lg:col-start-1 lg:col-span-7" data-aos="fade-up">
               <SectionName>Education</SectionName>
               <HeadingLg>
-                Cloud-based LMS <br className="hidden lg:block" />
-                Trusted by 1000+
+                Cloud-Based LMS <br className="hidden lg:block" />
+                Trusted by 1000+ Organizations
               </HeadingLg>
               <p className="text-size-15 lg:text-base 2xl:text-lg text-contentColor mb-5 2xl:mb-30px dark:text-contentColor-dark">
                  Experience the power and flexibility of our cloud-based <br></br>

@@ -22,8 +22,8 @@ const Hero1 = () => {
           <div data-aos="fade-up">
             <HreoName>EDUCATION SOLUTION</HreoName>
             <HeadingLg color={"white"}>
-              Cloud-based LMS <br className="hidden md:block" />
-              Trusted by 1000+
+              Cloud-Based LMS <br className="hidden md:block" />
+              Trusted by 1000+ Organizations
             </HeadingLg>
             <PagragraphHero color="white">
                Experience the power and flexibility of our cloud-based <br></br>

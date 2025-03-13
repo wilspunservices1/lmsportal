@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 const PrivacyComp = () => {
@@ -10,7 +11,7 @@ const PrivacyComp = () => {
           <h2 className="text-2xl font-semibold mb-4">Introduction</h2>
           <p className="mb-4">
             Learning Management System of Meridian Quality Management
-            Professionals, __________, collectively referred to as “the Site”,
+            Professionals, <a href="https://meridian-lms.com" target="_blank" rel="noopener noreferrer" className="text-yellow hover:underline">meridian-lms.com</a>, collectively referred to as “the Site”,
             is managed and operated by Meridian Quality Management Professionals
             (MEQMP). At MEQMP, we are committed to respecting the privacy of our
             users. In this Privacy Policy, the terms “we,” “us,” and “our” refer

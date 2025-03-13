@@ -9,10 +9,10 @@ const FooterAbout = () => {
     >
       <h4 className="text-size-22 font-bold text-whiteColor mb-3">About us</h4>
       <p className="text-base lg:text-sm 2xl:text-base text-darkgray mb-30px leading-1.8 2xl:leading-1.8">
-        At Meridian, we are revolutionizing the way learning happens. Our
-        cutting-edge Learning Management System (LMS) is designed to empower
-        educators, businesses, and learners by providing an intuitive,
-        efficient, and engaging digital learning experience.
+        We are redefining learning with a futuristic LMS that empowers
+        educators, businesses, and learners. Designed for maximum efficiency and
+        engagement, our intuitive platform ensures seamless knowledge transfer
+        and an unparalleled digital learning experience.
       </p>
       {isSecondary ? (
         <ul className="flex gap-3 lg:gap-2 2xl:gap-3" data-aos="fade-up">

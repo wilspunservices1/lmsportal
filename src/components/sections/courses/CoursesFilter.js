@@ -17,6 +17,9 @@ const CoursesFilter = () => {
                 Perfect Online <br className="hidden lg:block" /> Course Your
                 Career
               </HeadingPrimaryXl>
+              <div>
+                <p>Flexible Learning. Expert-Led Courses. Career-Defining Growth.</p>
+              </div>
             </div>
             {/* courses right */}
             <FilterControllerWrapper>

@@ -80,27 +80,29 @@ const BecomeAnInstructorPrimary = () => {
     <section>
       <div className="container pt-100px pb-100px" data-aos="fade-up">
         <h3 className="text-size-32 font-bold text-blackColor dark:text-blackColor-dark leading-1.2 pb-15px border-b border-borderColor dark:border-borderColor-dark mb-10">
-          Apply As Instructor
+        Apply Now to Become an Instructor!
         </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-30px">
           {/* Apply Left */}
           <div data-aos="fade-up">
             {/* Content about becoming an instructor */}
             <h6 className="text-2xl font-semibold text-blackColor dark:text-blackColor-dark leading-1.8 mb-15px">
-              Become an Instructor
+            Share Your Knowledge. Inspire Learners. Earn on Your Terms
             </h6>
             <p className="text-contentColor dark:text-contentColor-dark leading-1.8 mb-15px mt-5">
-              Share your knowledge and passion with learners around the world. As an instructor, you have the opportunity to create engaging courses, reach a global audience, and make a significant impact on students&lsquo; lives while earning income.
+            Join a thriving community of educators and experts. As an instructor, you can create impactful courses, reach a global audience, and earn income—all while doing what you love.
             </p>
-            <p className="text-contentColor dark:text-contentColor-dark leading-1.8 mb-15px mt-5">
-              Join our vibrant community of educators and experts. We provide you with the tools and support needed to develop high-quality courses and succeed in the online learning marketplace.
-            </p>
-
             <h6 className="text-2xl font-semibold text-blackColor dark:text-blackColor-dark leading-1.8 mb-15px">
-              Instructor Guidelines
+            Why Teach Us?
             </h6>
             <p className="text-contentColor dark:text-contentColor-dark leading-1.8 mb-15px mt-5">
-              To ensure the best learning experience for our students, we ask our instructors to adhere to the following guidelines:
+            We give you the tools, resources, and support to create top-quality courses and succeed in the online learning space.
+            </p>
+            <h6 className="text-2xl font-semibold text-blackColor dark:text-blackColor-dark leading-1.8 mb-15px">
+            What We Expect from Our Instructors
+            </h6>
+            <p className="text-contentColor dark:text-contentColor-dark leading-1.8 mb-15px mt-5">
+            To ensure the best learning experience, we ask our instructors to:
             </p>
             <ul className="mb-30px space">
               <li className="mt-5 flex items-center gap-5">
@@ -108,7 +110,7 @@ const BecomeAnInstructorPrimary = () => {
                   <Image src={checkImage1} alt="Check icon" className="w-full" />
                 </div>
                 <p className="text-contentColor dark:text-contentColor-dark leading-1.8">
-                  Deliver high-quality content that is accurate, well-structured, and engaging.
+                 Create well-structured, engaging, and high-quality content.
                 </p>
               </li>
               <li className="mt-5 flex items-center gap-5">
@@ -116,7 +118,7 @@ const BecomeAnInstructorPrimary = () => {
                   <Image src={checkImage1} alt="Check icon" className="w-full" />
                 </div>
                 <p className="text-contentColor dark:text-contentColor-dark leading-1.8">
-                  Respect all students and provide a supportive learning environment.
+                 Treat students with respect and encourage open discussions.
                 </p>
               </li>
               <li className="mt-5 flex items-center gap-5">
@@ -124,7 +126,7 @@ const BecomeAnInstructorPrimary = () => {
                   <Image src={checkImage1} alt="Check icon" className="w-full" />
                 </div>
                 <p className="text-contentColor dark:text-contentColor-dark leading-1.8">
-                  Respond promptly to student questions and feedback.
+                 Respond to student questions in a timely manner.
                 </p>
               </li>
               <li className="mt-5 flex items-center gap-5">
@@ -132,7 +134,7 @@ const BecomeAnInstructorPrimary = () => {
                   <Image src={checkImage1} alt="Check icon" className="w-full" />
                 </div>
                 <p className="text-contentColor dark:text-contentColor-dark leading-1.8">
-                  Uphold academic integrity and originality in your course materials.
+                 Maintain originality and academic integrity.
                 </p>
               </li>
               <li className="mt-5 flex items-center gap-5">
@@ -140,16 +142,16 @@ const BecomeAnInstructorPrimary = () => {
                   <Image src={checkImage1} alt="Check icon" className="w-full" />
                 </div>
                 <p className="text-contentColor dark:text-contentColor-dark leading-1.8">
-                  Comply with our platform policies and terms of service.
+                 Follow platform guidelines and best practices.
                 </p>
               </li>
             </ul>
 
             <h6 className="text-2xl font-semibold text-blackColor dark:text-blackColor-dark leading-1.8 mb-15px">
-              Get Started with Your Courses
+            Start Building Your Course Today
             </h6>
             <p className="text-contentColor dark:text-contentColor-dark leading-1.8 mb-15px mt-5">
-              Embark on your teaching journey by creating your first course. We offer comprehensive resources to help you design, develop, and promote your course effectively.
+            Our easy-to-use tools and expert support make course creation simple.
             </p>
             {/* Rules list */}
             <ul className="mb-30px space">
@@ -158,7 +160,7 @@ const BecomeAnInstructorPrimary = () => {
                   <Image src={checkImage1} alt="Check icon" className="w-full" />
                 </div>
                 <p className="text-contentColor dark:text-contentColor-dark leading-1.8">
-                  Utilize our intuitive course creation tools for a seamless experience.
+                Design and launch your course with confidence.
                 </p>
               </li>
               <li className="mt-5 flex items-center gap-5">
@@ -166,7 +168,7 @@ const BecomeAnInstructorPrimary = () => {
                   <Image src={checkImage1} alt="Check icon" className="w-full" />
                 </div>
                 <p className="text-contentColor dark:text-contentColor-dark leading-1.8">
-                  Access a wealth of resources and best practices for course development.
+                 Learn from industry insights and best practices.
                 </p>
               </li>
               <li className="mt-5 flex items-center gap-5">
@@ -174,15 +176,19 @@ const BecomeAnInstructorPrimary = () => {
                   <Image src={checkImage1} alt="Check icon" className="w-full" />
                 </div>
                 <p className="text-contentColor dark:text-contentColor-dark leading-1.8">
-                  Engage with a community of instructors to exchange ideas and advice.
+                 Connect with other instructors for ideas and support.
                 </p>
               </li>
             </ul>
-            <p className="text-contentColor dark:text-contentColor-dark leading-1.8 mb-15px mt-5">
-              Ready to make a difference? Join us today and start sharing your expertise with eager learners everywhere.
+            <p className="text-2xl font-semibold text-blackColor dark:text-blackColor-dark leading-1.8 mb-15px">
+            Ready to Make an Impact?
+            </p>
+            <br />
+            <br />
+            <p className="text-2xl font-semibold text-blackColor dark:text-blackColor-dark leading-1.8 mb-15px">
+            Turn your expertise into an opportunity. Join us today and start inspiring learners worldwide.
             </p>
           </div>
-
           {/* Apply Right */}
           <div data-aos="fade-up">
             <form
