@@ -105,7 +105,7 @@ const Blogs = ({ secondary }) => {
                           <ul className="flex gap-1">
                             <li>
                               <a
-                                href="#"
+                                href="https://www.facebook.com/meqmp.net/"
                                 className="text-sm md:text-size-15 w-5 h-5 md:w-[39px] md:h-[39px] flex items-center justify-center border border-borderColor text-darkdeep4 hover:text-primaryColor dark:border-borderColor-dark rounded"
                               >
                                 <i className="icofont-facebook"></i>
@@ -113,7 +113,7 @@ const Blogs = ({ secondary }) => {
                             </li>
                             <li>
                               <a
-                                href="#"
+                                href="https://www.youtube.com/@MeridianQMP"
                                 className="text-sm md:text-size-15 w-5 h-5 md:w-[39px] md:h-[39px] flex items-center justify-center border border-borderColor text-darkdeep4 hover:text-primaryColor dark:border-borderColor-dark rounded"
                               >
                                 <i className="icofont-youtube-play"></i>
@@ -121,18 +121,10 @@ const Blogs = ({ secondary }) => {
                             </li>
                             <li>
                               <a
-                                href="#"
+                                href="https://www.linkedin.com/company/meridian-quality-management/"
                                 className="text-sm md:text-size-15 w-5 h-5 md:w-[39px] md:h-[39px] flex items-center justify-center border border-borderColor text-darkdeep4 hover:text-primaryColor dark:border-borderColor-dark rounded"
                               >
-                                <i className="icofont-instagram"></i>
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                href="#"
-                                className="text-sm md:text-size-15 w-5 h-5 md:w-[39px] md:h-[39px] flex items-center justify-center border border-borderColor text-darkdeep4 hover:text-primaryColor dark:border-borderColor-dark rounded"
-                              >
-                                <i className="icofont-twitter"></i>
+                                <i className="icofont-linkedin"></i>
                               </a>
                             </li>
                           </ul>

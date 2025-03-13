@@ -74,7 +74,7 @@ const Testimonials3 = ({ isInsTructorDetails, id: cidx }) => {
                     <li>
                       <Link
                         className="hover:text-primaryColor"
-                        href="https://www.facebook.com/"
+                        href="https://www.facebook.com/meqmp.net/"
                       >
                         <i className="icofont-facebook"></i>
                       </Link>
@@ -82,23 +82,7 @@ const Testimonials3 = ({ isInsTructorDetails, id: cidx }) => {
                     <li>
                       <Link
                         className="hover:text-primaryColor"
-                        href="https://x.com/"
-                      >
-                        <i className="icofont-twitter"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        className="hover:text-primaryColor"
-                        href="https://www.instagram.com/"
-                      >
-                        <i className="icofont-instagram"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        className="hover:text-primaryColor"
-                        href="https://www.youtube.com/"
+                        href="https://www.youtube.com/@MeridianQMP"
                       >
                         <i className="icofont-youtube-play"></i>
                       </Link>

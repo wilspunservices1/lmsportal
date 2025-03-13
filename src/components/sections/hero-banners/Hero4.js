@@ -46,9 +46,6 @@ const Hero4 = () => {
 
                 <div className="mt-30px space-x-30px">
                   <ButtonPrimary path="/courses">View Courses</ButtonPrimary>
-                  <ButtonPrimary color="secondary" path="/courses">
-                    Explore More
-                  </ButtonPrimary>
                 </div>
               </div>
             </div>

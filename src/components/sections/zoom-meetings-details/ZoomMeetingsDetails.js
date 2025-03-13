@@ -228,7 +228,7 @@ const ZoomMeetingsDetails = () => {
                   <ul className="flex gap-10px items-center">
                     <li>
                       <a
-                        href="https://www.facebook.com/"
+                        href="https://www.facebook.com/meqmp.net/"
                         className="w-38px h-38px leading-38px text-center text-blackColor2 bg-whitegrey2 hover:text-whiteColor hover:bg-primaryColor dark:bg-whitegrey2-dark dark:text-blackColor2-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor rounded"
                       >
                         <i className="icofont-facebook"></i>
@@ -236,7 +236,7 @@ const ZoomMeetingsDetails = () => {
                     </li>
                     <li>
                       <a
-                        href="https://www.youtube.com/"
+                        href="https://www.youtube.com/@MeridianQMP"
                         className="w-38px h-38px leading-38px text-center text-blackColor2 bg-whitegrey2 hover:text-whiteColor hover:bg-primaryColor dark:bg-whitegrey2-dark dark:text-blackColor2-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor rounded"
                       >
                         <i className="icofont-youtube-play"></i>
@@ -244,23 +244,7 @@ const ZoomMeetingsDetails = () => {
                     </li>
                     <li>
                       <a
-                        href="https://www.instagram.com/"
-                        className="w-38px h-38px leading-38px text-center text-blackColor2 bg-whitegrey2 hover:text-whiteColor hover:bg-primaryColor dark:bg-whitegrey2-dark dark:text-blackColor2-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor rounded"
-                      >
-                        <i className="icofont-instagram"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="https://x.com/"
-                        className="w-38px h-38px leading-38px text-center text-blackColor2 bg-whitegrey2 hover:text-whiteColor hover:bg-primaryColor dark:bg-whitegrey2-dark dark:text-blackColor2-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor rounded"
-                      >
-                        <i className="icofont-twitter"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="https://www.linkedin.com/"
+                        href="https://www.linkedin.com/company/meridian-quality-management/"
                         className="w-38px h-38px leading-38px text-center text-blackColor2 bg-whitegrey2 hover:text-whiteColor hover:bg-primaryColor dark:bg-whitegrey2-dark dark:text-blackColor2-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor rounded"
                       >
                         <i className="icofont-linkedin"></i>

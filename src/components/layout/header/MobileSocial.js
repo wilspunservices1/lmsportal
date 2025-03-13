@@ -6,27 +6,17 @@ const MobileSocial = () => {
     <div>
       <ul className="flex gap-6 items-center mb-5">
         <li>
-          <Link className="facebook" href="#">
+          <Link className="facebook" href="https://www.facebook.com/meqmp.net/">
             <i className="icofont icofont-facebook text-fb-color dark:text-whiteColor dark:hover:text-secondaryColor"></i>
           </Link>
         </li>
         <li>
-          <Link className="twitter" href="#">
-            <i className="icofont icofont-twitter text-twiter-color dark:text-whiteColor dark:hover:text-secondaryColor"></i>
+          <Link className="instagram" href="https://www.linkedin.com/company/meridian-quality-management/">
+            <i className="icofont icofont-linkedin dark:text-whiteColor dark:hover:text-secondaryColor"></i>
           </Link>
         </li>
         <li>
-          <Link className="pinterest" href="#">
-            <i className="icofont icofont-pinterest dark:text-whiteColor dark:hover:text-secondaryColor"></i>
-          </Link>
-        </li>
-        <li>
-          <Link className="instagram" href="#">
-            <i className="icofont icofont-instagram dark:text-whiteColor dark:hover:text-secondaryColor"></i>
-          </Link>
-        </li>
-        <li>
-          <Link className="google" href="#">
+          <Link className="google" href="https://www.youtube.com/@MeridianQMP">
             <i className="icofont icofont-youtube-play dark:text-whiteColor dark:hover:text-secondaryColor"></i>
           </Link>
         </li>

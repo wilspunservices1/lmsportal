@@ -6,15 +6,27 @@ import FooterRecentPosts from "./FooterRecentPosts";
 const FooterNavList = () => {
   const lists = [
     {
-      heading: "Usefull Links",
+      heading: "Useful Links",
       items: [
         {
-          name: "Complaint Ploicy",
+          name: "Complaint Policy",
           path: "/complaint-policy",
         },
         {
           name: "Refund Policy",
           path: "/refund-policy",
+        },
+        {
+          name: "Privacy Policy",
+          path: "/privacy-policy",
+        },
+        {
+          name: "Contact Us",
+          path: "/contact-us-form",
+        },
+        {
+          name: "About Us",
+          path: "/about",
         },
       ],
     },

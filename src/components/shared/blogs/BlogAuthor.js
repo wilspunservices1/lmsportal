@@ -36,7 +36,7 @@ const BlogAuthor = () => {
         <ul className="flex gap-10px justify-center items-center">
           <li>
             <a
-              href="https://www.facebook.com/"
+              href="https://www.facebook.com/meqmp.net/"
               className="w-35px h-35px leading-35px text-center border border-borderColor2 text-contentColor hover:text-whiteColor hover:bg-primaryColor dark:text-contentColor-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:border-borderColor2-dark rounded"
             >
               <i className="icofont-facebook"></i>
@@ -44,7 +44,7 @@ const BlogAuthor = () => {
           </li>
           <li>
             <a
-              href="https://www.youtube.com/"
+              href="https://www.youtube.com/@MeridianQMP"
               className="w-35px h-35px leading-35px text-center border border-borderColor2 text-contentColor hover:text-whiteColor hover:bg-primaryColor dark:text-contentColor-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:border-borderColor2-dark rounded"
             >
               <i className="icofont-youtube-play"></i>
@@ -52,18 +52,10 @@ const BlogAuthor = () => {
           </li>
           <li>
             <a
-              href="https://www.instagram.com/"
+              href="https://www.linkedin.com/company/meridian-quality-management/"
               className="w-35px h-35px leading-35px text-center border border-borderColor2 text-contentColor hover:text-whiteColor hover:bg-primaryColor dark:text-contentColor-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:border-borderColor2-dark rounded"
             >
-              <i className="icofont-instagram"></i>
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://x.com/"
-              className="w-35px h-35px leading-35px text-center border border-borderColor2 text-contentColor hover:text-whiteColor hover:bg-primaryColor dark:text-contentColor-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:border-borderColor2-dark rounded"
-            >
-              <i className="icofont-twitter"></i>
+              <i className="icofont-linkedin"></i>
             </a>
           </li>
         </ul>

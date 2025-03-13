@@ -11,6 +11,7 @@ import TriangleImage from "@/components/shared/animaited-images/TriangleImage";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import HeadingXl from "@/components/shared/headings/HeadingXl";
 import HreoName from "@/components/shared/section-names/HreoName";
+import Link from "next/link";
 const Hero3 = () => {
   return (
     <section data-aos="fade-up">
@@ -42,10 +43,9 @@ const Hero3 = () => {
                     </p>
 
                     <div className="space-x-5 md:space-x-30px">
-                    <ButtonPrimary path="/courses">View Courses</ButtonPrimary>
-                    <ButtonPrimary color="secondary" path="/courses">
-                      Explore More
-                    </ButtonPrimary>
+                    <Link href="/courses">
+                      <ButtonPrimary>View Courses</ButtonPrimary>
+                    </Link>
                     </div>
                   </div>
                   {/* banner right */}

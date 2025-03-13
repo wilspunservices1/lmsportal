@@ -38,12 +38,6 @@ const Hero1 = () => {
               >
                 View Courses
               </Link>
-              <Link
-                href="/courses"
-                className="text-sm md:text-size-15 font-semibold text-whiteColor py-3 md:py-4 hover:text-secondaryColor inline-block"
-              >
-                Find out more <i className="icofont-long-arrow-right"></i>
-              </Link>
             </div>
           </div>
           {/* banner right  */}

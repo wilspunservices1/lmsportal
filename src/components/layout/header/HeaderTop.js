@@ -41,7 +41,7 @@ const HeaderTop = () => {
                 <li>
                   <a
                     className="hover:text-primaryColor"
-                    href="https://www.facebook.com"
+                    href="https://www.facebook.com/meqmp.net/"
                   >
                     <i className="icofont-facebook"></i>
                   </a>
@@ -49,23 +49,15 @@ const HeaderTop = () => {
                 <li>
                   <a
                     className="hover:text-primaryColor"
-                    href="https://www.twitter.com"
+                    href="https://www.linkedin.com/company/meridian-quality-management/"
                   >
-                    <i className="icofont-twitter"></i>
+                    <i className="icofont-linkedin"></i>
                   </a>
                 </li>
                 <li>
                   <a
                     className="hover:text-primaryColor"
-                    href="https://www.instagram.com"
-                  >
-                    <i className="icofont-instagram"></i>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="hover:text-primaryColor"
-                    href="https://www.youtube.com"
+                    href="https://www.youtube.com/@MeridianQMP"
                   >
                     <i className="icofont-youtube-play"></i>
                   </a>

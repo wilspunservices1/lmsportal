@@ -64,15 +64,15 @@ const FeaturedSlider = ({ courseId }) => {
     isCourseDetails = true;
   }
 
-  // Loading state
-  if (isLoading) {
-    return <p>Loading featured courses...</p>;
-  }
+  // // Loading state
+  // if (isLoading) {
+  //   return <p>Loading featured courses...</p>;
+  // }
 
   // If there are no featured courses
-  if (featuredCourses.length === 0) {
-    return <p>Current author has no more courses.</p>;
-  }
+  // if (featuredCourses.length === 0) {
+  //   return <p>Current author has no more courses.</p>;
+  // }
 
   // Render the Swiper slider with the fetched featured courses
   return (

@@ -117,12 +117,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, title, onClose, onC
 
       <div className="absolute top-4 left-4 flex items-center space-x-4 z-10">
         <h3 className="text-lg font-bold text-white">{title}</h3>
-        <button
-          onClick={handleClose}
-          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
-        >
-          Close
-        </button>
       </div>
 
       {isCompleted && (

@@ -87,13 +87,13 @@ const BecomeAnInstructorPrimary = () => {
           <div data-aos="fade-up">
             {/* Content about becoming an instructor */}
             <h6 className="text-2xl font-semibold text-blackColor dark:text-blackColor-dark leading-1.8 mb-15px">
-            Share Your Knowledge. Inspire Learners. Earn on Your Terms
+            Share your knowledge. Inspire learners. Earn on your terms
             </h6>
             <p className="text-contentColor dark:text-contentColor-dark leading-1.8 mb-15px mt-5">
             Join a thriving community of educators and experts. As an instructor, you can create impactful courses, reach a global audience, and earn income—all while doing what you love.
             </p>
             <h6 className="text-2xl font-semibold text-blackColor dark:text-blackColor-dark leading-1.8 mb-15px">
-            Why Teach Us?
+            Why Teach with us?
             </h6>
             <p className="text-contentColor dark:text-contentColor-dark leading-1.8 mb-15px mt-5">
             We give you the tools, resources, and support to create top-quality courses and succeed in the online learning space.

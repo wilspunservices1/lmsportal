@@ -41,7 +41,7 @@ const CourseDetailsTab = ({ type, id, course }) => {
     {
       name: (
         <>
-          <i className="icofont-teacher mr-2"></i> Instructor
+          <i className="icofont-teacher mr-2"></i>Developer
         </>
       ),
       content: <InstructorContent id={course?.id} />,

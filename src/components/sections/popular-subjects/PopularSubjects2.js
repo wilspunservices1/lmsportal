@@ -9,8 +9,8 @@ const PopularSubjects2 = () => {
   const subjects = [
     {
       id: 1,
-      title: "Business Studies",
-      desc: "  Business is succes",
+      title: "Quality Management",
+      desc: "Business is succes",
       navButton: false,
       category: "Business",
       svg: (
@@ -78,7 +78,7 @@ const PopularSubjects2 = () => {
     },
     {
       id: 2,
-      title: "Programming Tech",
+      title: "Environmental Management",
       desc: "update your skill",
       navButton: false,
       category: "Mobile Application",
@@ -149,7 +149,7 @@ const PopularSubjects2 = () => {
     },
     {
       id: 3,
-      title: " Artist & Design",
+      title: " Health & Safety",
       desc: "show creativity",
       navButton: false,
       category: "Art & Design",
@@ -213,7 +213,7 @@ const PopularSubjects2 = () => {
     },
     {
       id: 4,
-      title: "Machine Learning",
+      title: "Six Sigma", 
       desc: "Science is power",
       navButton: false,
       category: "Development",
@@ -280,7 +280,7 @@ const PopularSubjects2 = () => {
     },
     {
       id: 5,
-      title: "Food & Safety",
+      title: "Food Safety & HACCP",
       desc: "health is wealth",
       navButton: false,
       category: "Food & Safety",
@@ -326,7 +326,7 @@ const PopularSubjects2 = () => {
     },
     {
       id: 6,
-      title: "Health & Fitness",
+      title: "Soft Skills",
       desc: "health is wealth",
       navButton: false,
       category: "Health & Fitness",
@@ -372,7 +372,7 @@ const PopularSubjects2 = () => {
     },
     {
       id: 7,
-      title: "Marketing Analysis",
+      title: "Project Management",
       desc: "Science is power",
       navButton: false,
       category: "Marketing",
@@ -441,7 +441,7 @@ const PopularSubjects2 = () => {
     },
     {
       id: 8,
-      title: "Business Studies",
+      title: "Business Continuity",
       desc: "Business is succes",
       navButton: false,
       category: "Business",
@@ -522,7 +522,7 @@ const PopularSubjects2 = () => {
             >
               Popular{" "}
               <span className="relative after:w-full after:h-[7px]   after:absolute after:left-0 after:bottom-3 md:after:bottom-4 after:z-[-1]">
-                Course Catagories
+                Course Categories
               </span>
             </h3>
           </div>

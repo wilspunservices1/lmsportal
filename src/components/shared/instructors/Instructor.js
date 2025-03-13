@@ -13,7 +13,7 @@ const Instructor = ({ instructor }) => {
           <ul className="flex flex-col gap-10px">
             <li>
               <Link
-                href="#"
+                href="https://www.facebook.com/meqmp.net/"
                 className="w-41px h-41px leading-41px bg-whiteColor text-darkdeep4 hover:bg-primaryColor hover:text-whiteColor dark:bg-whiteColor-dark dark:hover:bg-primaryColor dark:hover:text-whiteColor text-base rounded text-center"
               >
                 <i className="icofont-facebook"></i>
@@ -21,23 +21,15 @@ const Instructor = ({ instructor }) => {
             </li>
             <li>
               <Link
-                href="#"
+                href="https://www.linkedin.com/company/meridian-quality-management/"
                 className="w-41px h-41px leading-41px bg-whiteColor text-darkdeep4 hover:bg-primaryColor hover:text-whiteColor dark:bg-whiteColor-dark dark:hover:bg-primaryColor dark:hover:text-whiteColor text-base rounded text-center"
               >
-                <i className="icofont-twitter"></i>
+                <i className="icofont-linkedin"></i>
               </Link>
             </li>
             <li>
               <Link
-                href="#"
-                className="w-41px h-41px leading-41px bg-whiteColor text-darkdeep4 hover:bg-primaryColor hover:text-whiteColor dark:bg-whiteColor-dark dark:hover:bg-primaryColor dark:hover:text-whiteColor text-base rounded text-center"
-              >
-                <i className="icofont-instagram"></i>
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="#"
+                href="https://www.youtube.com/@MeridianQMP"
                 className="w-41px h-41px leading-41px bg-whiteColor text-darkdeep4 hover:bg-primaryColor hover:text-whiteColor dark:bg-whiteColor-dark dark:hover:bg-primaryColor dark:hover:text-whiteColor text-base rounded text-center"
               >
                 <i className="icofont-youtube-play"></i>

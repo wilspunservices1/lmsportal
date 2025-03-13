@@ -285,15 +285,15 @@ const CourseEnroll = ({ type, course }) => {
 			<ul>
 				<li className="flex items-center justify-between py-10px border-b border-borderColor dark:border-borderColor-dark">
 					<p className="text-sm font-medium text-contentColor dark:text-contentColor-dark leading-1.8">
-						Instructor:
+						Developed By:
 					</p>
 					<p className="text-xs text-contentColor dark:text-contentColor-dark px-10px py-6px bg-borderColor dark:bg-borderColor-dark rounded-full leading-13px">
-						{insName}
+						Meridian
 					</p>
 				</li>
 				<li className="flex items-center justify-between py-10px border-b border-borderColor dark:border-borderColor-dark">
 					<p className="text-sm font-medium text-contentColor dark:text-contentColor-dark leading-1.8">
-						Start Date
+						Start Date:
 					</p>
 					<p className="text-xs text-contentColor dark:text-contentColor-dark px-10px py-6px bg-borderColor dark:bg-borderColor-dark rounded-full leading-13px">
 						{formatDate(updatedAt)}
@@ -301,7 +301,7 @@ const CourseEnroll = ({ type, course }) => {
 				</li>
 				<li className="flex items-center justify-between py-10px border-b border-borderColor dark:border-borderColor-dark">
 					<p className="text-sm font-medium text-contentColor dark:text-contentColor-dark leading-1.8">
-						Skill Level
+						Skill Level:
 					</p>
 					<p className="text-xs text-contentColor dark:text-contentColor-dark px-10px py-6px bg-borderColor dark:bg-borderColor-dark rounded-full leading-13px">
 						{skillLevel}
@@ -317,7 +317,7 @@ const CourseEnroll = ({ type, course }) => {
 					type="submit"
 					className="w-full text-xl text-primaryColor bg-whiteColor px-25px py-10px mb-10px font-bold leading-1.8 border border-primaryColor hover:text-whiteColor hover:bg-primaryColor inline-block rounded group dark:bg-whiteColor-dark dark:text-whiteColor dark:hover:bg-primaryColor"
 				>
-					<i className="icofont-phone"></i> +971 58 267 6585
+					<i className="icofont-email"></i> training@meqmp.com
 				</button>
 			</div>
 		</div>

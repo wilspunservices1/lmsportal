@@ -268,7 +268,7 @@ const EventDetails = () => {
                   </li>
                   <li>
                     <Link
-                      href="#"
+                      href="https://www.facebook.com/meqmp.net/"
                       className="w-10 h-9 leading-9 text-center text-skycolor bg-whitegrey2 hover:text-whiteColor hover:bg-primaryColor dark:bg-whitegrey2-dark dark:text-skycolor dark:hover:text-whiteColor dark:hover:bg-primaryColor rounded"
                     >
                       <i className="icofont-facebook"></i>
@@ -276,15 +276,15 @@ const EventDetails = () => {
                   </li>
                   <li>
                     <Link
-                      href="#"
+                      href="https://www.linkedin.com/company/meridian-quality-management/"
                       className="w-10 h-9 leading-9 text-center text-skycolor bg-whitegrey2 hover:text-whiteColor hover:bg-primaryColor dark:bg-whitegrey2-dark dark:text-skycolor dark:hover:text-whiteColor dark:hover:bg-primaryColor rounded"
                     >
-                      <i className="icofont-twitter"></i>
+                      <i className="icofont-linkedin"></i>
                     </Link>
                   </li>
                   <li>
                     <Link
-                      href="#"
+                      href="https://www.youtube.com/@MeridianQMP"
                       className="w-10 h-9 leading-9 text-center text-deepred bg-whitegrey2 hover:text-whiteColor hover:bg-primaryColor dark:bg-whitegrey2-dark dark:text-deepred dark:hover:text-whiteColor dark:hover:bg-primaryColor rounded"
                     >
                       <i className="icofont-youtube-play"></i>

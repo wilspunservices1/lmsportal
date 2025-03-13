@@ -75,7 +75,7 @@ const InstructorContent = ({ id }) => {
             <ul className="flex gap-10px items-center">
               <li>
                 <a
-                  href={socials?.facebook || "#"}
+                  href={socials?.facebook || "https://www.facebook.com/meqmp.net/"}
                   className="w-35px h-35px leading-35px text-center border border-borderColor2 text-contentColor hover:text-whiteColor hover:bg-primaryColor dark:text-contentColor-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:border-borderColor2-dark rounded"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -85,7 +85,7 @@ const InstructorContent = ({ id }) => {
               </li>
               <li>
                 <a
-                  href={socials?.youtube || "#"}
+                  href={socials?.youtube || "https://www.youtube.com/@MeridianQMP"}
                   className="w-35px h-35px leading-35px text-center border border-borderColor2 text-contentColor hover:text-whiteColor hover:bg-primaryColor dark:text-contentColor-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:border-borderColor2-dark rounded"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -95,22 +95,12 @@ const InstructorContent = ({ id }) => {
               </li>
               <li>
                 <a
-                  href={socials?.instagram || "#"}
+                  href={socials?.instagram || "https://www.linkedin.com/company/meridian-quality-management/"}
                   className="w-35px h-35px leading-35px text-center border border-borderColor2 text-contentColor hover:text-whiteColor hover:bg-primaryColor dark:text-contentColor-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:border-borderColor2-dark rounded"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <i className="icofont-instagram"></i>
-                </a>
-              </li>
-              <li>
-                <a
-                  href={socials?.twitter || "#"}
-                  className="w-35px h-35px leading-35px text-center border border-borderColor2 text-contentColor hover:text-whiteColor hover:bg-primaryColor dark:text-contentColor-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:border-borderColor2-dark rounded"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="icofont-twitter"></i>
+                  <i className="icofont-linkedin"></i>
                 </a>
               </li>
             </ul>

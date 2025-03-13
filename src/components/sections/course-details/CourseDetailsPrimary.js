@@ -125,12 +125,14 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
         "All course materials are provided digitally and can be accessed directly on the course page. No physical materials will be mailed.",
     },
     {
-      question: "What are the minimum computer hardware/software requirements to access the course?",
+      question:
+        "What are the minimum computer hardware/software requirements to access the course?",
       answer:
         "The course content, including the final exam, can be accessed on any internet-enabled device with a web browser and camera. Devices such as smartphones, tablets, laptops, and desktops are all supported.",
     },
     {
-      question: "What happens if a student is suspected of violating the online exam security?",
+      question:
+        "What happens if a student is suspected of violating the online exam security?",
       answer:
         "Our proctoring service monitors for any unusual behavior during the exam to ensure security and prevent cheating. If any violations are suspected, the student may be required to retake the exam at their own cost.",
     },
@@ -234,12 +236,14 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
   }, []);
 
   function openFullScreenCertificate(certificateUrl, placeholders) {
-    if (typeof document === "undefined") return; // Ensure this runs only in the browser
+    if (typeof window === "undefined") return; // ✅ Ensures this runs only in the browser
 
     const originalWidth = 1024; // Set to actual certificate width
     const originalHeight = 728; // Set to actual certificate height
 
     const newWindow = window.open("", "_blank");
+
+    if (!newWindow) return; // Prevents errors if popup is blocked
 
     const html = `
       <html>
@@ -263,6 +267,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
                 top: ${(ph.y / originalHeight) * 100 + 16}%;
                 left: ${(ph.x / originalWidth) * 100 + 14}%;
                 font-size: ${(ph.font_size / originalWidth) * 100}vw;
+                font-family: ${ph.font};
                 color: ${ph.color || "#000000"};
               ">
               ${ph.value ?? ph.label ?? ""}
@@ -576,9 +581,9 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
                         <ul className="p-10px md:py-55px md:pl-50px md:pr-70px lg:py-35px lg:px-30px 2xl:py-55px 2xl:pl-50px 2xl:pr-70px border-r-2 border-borderColor dark:border-borderColor-dark space-y-[10px]">
                           <li>
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
-                              Instructor :
+                              Developed By :
                               <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {insName || "Aqeel.S"}
+                                Meridian
                               </span>
                             </p>
                           </li>
@@ -594,7 +599,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
                               Duration :
                               <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {duration ? duration : "0"}
+                                {duration ? duration : ""}
                               </span>
                             </p>
                           </li>
@@ -648,7 +653,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
                               Price Discount :
                               <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {discount ? discount : "-20%"}
+                                {discount ? `${discount}%` : "-20%"}
                               </span>
                             </p>
                           </li>
@@ -656,7 +661,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
                               Regular Price :
                               <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {price ? price : "$0"}
+                                {price ? `$${price}` : "$0"}
                               </span>
                             </p>
                           </li>
