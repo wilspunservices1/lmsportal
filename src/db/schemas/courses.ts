@@ -51,6 +51,7 @@ export const courses = pgTable("courses", {
     .default(sql`'[]'`)
     .notNull(),
   certificateId: uuid("certificateId"),
+  finalExamId: uuid("finalExamId"),
 });
 
 export type Course = InferSelectModel<typeof courses>;

@@ -66,15 +66,15 @@ const InstructorPrimary = ({ instructor }) => {
         <ul className="flex gap-10px items-center justify-center">
           <li>
             <a
-              href="#"
+              href="https://www.linkedin.com/company/meridian-quality-management/"
               className="text-primaryColor bg-primaryColor hover:bg-primaryColor hover:text-whiteColor hover:bg-opacity-100 bg-opacity-5 w-34px h-34px leading-34px text-center rounded-full"
             >
-              <i className="icofont-twitter"></i>
+              <i className="icofont-linkedin"></i>
             </a>
           </li>
           <li>
             <a
-              href="#"
+              href="https://www.facebook.com/meqmp.net/"
               className="text-primaryColor bg-primaryColor hover:bg-primaryColor hover:text-whiteColor hover:bg-opacity-100 bg-opacity-5 w-34px h-34px leading-34px text-center rounded-full"
             >
               <i className="icofont-facebook"></i>
@@ -82,18 +82,10 @@ const InstructorPrimary = ({ instructor }) => {
           </li>
           <li>
             <a
-              href="#"
+              href="https://www.youtube.com/@MeridianQMP"
               className="text-primaryColor bg-primaryColor hover:bg-primaryColor hover:text-whiteColor hover:bg-opacity-100 bg-opacity-5 w-34px h-34px leading-34px text-center rounded-full"
             >
-              <i className="icofont-instagram"></i>
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="text-primaryColor bg-primaryColor hover:bg-primaryColor hover:text-whiteColor hover:bg-opacity-100 bg-opacity-5 w-34px h-34px leading-34px text-center rounded-full"
-            >
-              <i className="icofont-twitter"></i>
+              <i className="icofont-youtube"></i>
             </a>
           </li>
         </ul>

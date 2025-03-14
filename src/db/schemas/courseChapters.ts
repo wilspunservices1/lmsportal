@@ -12,6 +12,8 @@ export const chapters = pgTable("chapters", {
 	title: varchar("title", { length: 255 }).notNull(),
 	description: text("description"),
 	questionnaireId: uuid("questionnaireId"),
+	finalExamId: uuid("finalExamId"),
+	// questionnaireId: uuid('questionnaireId').references(() => questionnaires.id),
 	order: varchar("order", { length: 50 }), // Order of the chapter in the course
 	duration: varchar("duration", { length: 100 }).notNull(), // Duration of the chapter
 });

@@ -79,9 +79,9 @@ const RecentCourses = () => {
                     <p>
                       <i className="icofont-book-alt"></i> {lesson} Lessons
                     </p>
-                    <p>
+                    {/* <p>
                       <i className="icofont-clock-time"></i> {totalDuration} hours
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               </div>

@@ -223,6 +223,7 @@ const LessonPrimary = ({ lessonId }) => {
 							isEnrolled={isEnrolled}
 							enrolledCourses={enrolledCourses}
 							courseOwnerId={courseCreatorId}
+							courseId={courseId}
 						/>
 					</div>
 

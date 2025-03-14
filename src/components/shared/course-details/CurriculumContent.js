@@ -21,10 +21,13 @@ const CurriculumContent = ({ chapters }) => {
     return true;
   };
 
+  // Sort chapters by their order property
+  const sortedChapters = chapters.sort((a, b) => a.order - b.order);
+
   return (
     <div className="w-full">
       <ul className="accordion-container curriculum">
-        {chapters.map((chapter, chapterIndex) => (
+        {sortedChapters.map((chapter, chapterIndex) => (
           <li key={chapter.id} className="accordion mb-6 overflow-hidden">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
               <div
@@ -35,7 +38,6 @@ const CurriculumContent = ({ chapters }) => {
                   <span>{chapter.title}</span>
                   <p className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 ml-3 bg-gray-100 dark:bg-gray-700 rounded-full">
                     {chapter.duration || "N/A"}
-
                   </p>
                 </div>
                 <svg

@@ -1,0 +1,1 @@
+ALTER TABLE "course_questionnaires" ADD COLUMN "type" varchar(20) DEFAULT 'quiz' NOT NULL;

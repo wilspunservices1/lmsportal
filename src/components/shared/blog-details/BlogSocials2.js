@@ -11,15 +11,15 @@ const BlogSocials2 = () => {
         </li>
         <li>
           <Link
-            href="https://x.com/"
+            href="https://www.linkedin.com/company/meridian-quality-management/"
             className="h-35px w-35px leading-35px md:w-38px md:h-38px md:leading-38px text-size-11 md:text-xs text-center border border-borderColor2 text-contentColor hover:text-whiteColor hover:bg-primaryColor dark:text-contentColor-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:border-borderColor2-dark rounded"
           >
-            <i className="icofont-twitter"></i>
+            <i className="icofont-linkedin"></i>
           </Link>
         </li>
         <li>
           <Link
-            href="https://www.facebook.com/"
+            href="https://www.facebook.com/meqmp.net/"
             className="h-35px w-35px leading-35px md:w-38px md:h-38px md:leading-38px text-size-11 md:text-xs text-center border border-borderColor2 text-contentColor hover:text-whiteColor hover:bg-primaryColor dark:text-contentColor-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:border-borderColor2-dark rounded"
           >
             <i className="icofont-facebook"></i>
@@ -28,10 +28,10 @@ const BlogSocials2 = () => {
 
         <li>
           <Link
-            href="https://www.instagram.com/"
+            href="https://www.youtube.com/@MeridianQMP"
             className="h-35px w-35px leading-35px md:w-38px md:h-38px md:leading-38px text-size-11 md:text-xs text-center border border-borderColor2 text-contentColor hover:text-whiteColor hover:bg-primaryColor dark:text-contentColor-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:border-borderColor2-dark rounded"
           >
-            <i className="icofont-instagram"></i>
+            <i className="icofont-youtube"></i>
           </Link>
         </li>
       </ul>

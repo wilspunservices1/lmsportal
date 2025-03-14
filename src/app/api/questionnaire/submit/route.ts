@@ -8,8 +8,6 @@ import { and, eq } from "drizzle-orm";
 import { user } from "@/db/schemas/user";
 import { options as authOptions } from "@/libs/auth";
 
-
-
 export async function POST(req: Request) {
 	try {
 		const session = await getServerSession(authOptions);
@@ -24,36 +22,20 @@ export async function POST(req: Request) {
 
 		const user_id = session.user.id;
 
-		// const user_id = userRecord[0].id; // Extract user ID
+		// Parse request body
 		const { questionnaire_id, answers } = await req.json();
+		console.log("Questionnaire ID:", questionnaire_id);
+		console.log("Answers:", answers);
 
-		//! --- New: Enforce the three-attempt rule ---
-
-		const existingAttempts = await db
-			.select({ id: quizAttempts.id })
-			.from(quizAttempts)
-			.where(
-				and(
-					eq(quizAttempts.user_id, user_id),
-					eq(quizAttempts.questionnaire_id, questionnaire_id)
-				)
-			);
-
-		const totalAttempts = existingAttempts.length;
-
-		if (totalAttempts >= 100) {  // Change this number to any limit you want
+		// Validate questionnaire_id
+		if (!questionnaire_id) {
 			return NextResponse.json(
-			{
-				error: "Maximum quiz attempts reached",
-				attemptCount: totalAttempts,
-			},
-			{ status: 400 }
+				{ error: "Missing questionnaire_id" },
+				{ status: 400 }
 			);
 		}
 
-		//! --- End New ---
-
-		/// Fetch questionnaire
+		// Check if the questionnaire exists
 		const questionnaire = await db
 			.select()
 			.from(questionnaires)
@@ -61,17 +43,19 @@ export async function POST(req: Request) {
 			.limit(1);
 
 		if (!questionnaire || questionnaire.length === 0) {
+			console.error("Questionnaire not found:", questionnaire_id);
 			return NextResponse.json(
 				{ error: "Questionnaire not found" },
 				{ status: 404 }
 			);
 		}
 
+		// Fetch questions for the questionnaire
 		const questionsList = await db
 			.select({
 				id: questions.id,
 				question: questions.question,
-				correct_answer: questions.correctAnswer, // Ensure correct answer is fetched
+				correct_answer: questions.correctAnswer,
 				options: questions.options,
 			})
 			.from(questions)
@@ -103,7 +87,7 @@ export async function POST(req: Request) {
 			}
 		});
 
-		// Store user answer data correctly
+		// Store user answer data
 		const answerDetails = questionsList.map((question) => {
 			const userAnswer = answers[question.id]
 				? answers[question.id].trim().toLowerCase()
@@ -116,20 +100,45 @@ export async function POST(req: Request) {
 			return {
 				questionId: question.id,
 				userAnswer,
-				correct_answer, // Include correct answer for debugging
+				correct_answer,
 				isCorrect,
 			};
 		});
 
 		const score = Math.round((correctAnswers / totalQuestions) * 100);
 
+		// Check existing attempts
+		const existingAttempts = await db
+			.select({ id: quizAttempts.id })
+			.from(quizAttempts)
+			.where(
+				and(
+					eq(quizAttempts.user_id, user_id),
+					eq(quizAttempts.questionnaire_id, questionnaire_id)
+				)
+			);
+
+		const totalAttempts = existingAttempts.length;
+
+		// Enforce attempt limit
+		if (totalAttempts >= 100) {
+			return NextResponse.json(
+				{
+					error: "Maximum quiz attempts reached",
+					attemptCount: totalAttempts,
+				},
+				{ status: 400 }
+			);
+		}
+
+		// Insert new attempt
 		const attempt = await db
 			.insert(quizAttempts)
 			.values({
 				user_id,
 				questionnaire_id,
 				score,
-				answers: JSON.stringify(answerDetails), // Ensure correct format
+				answers: JSON.stringify(answerDetails),
 				created_at: new Date(),
 				updated_at: new Date(),
 			})
@@ -144,9 +153,8 @@ export async function POST(req: Request) {
 			);
 		}
 
-		// After inserting a new attempt
-		const updatedAttemptCount = totalAttempts + 1; 
-
+		// Return success response
+		const updatedAttemptCount = totalAttempts + 1;
 		return NextResponse.json({
 			success: true,
 			score,

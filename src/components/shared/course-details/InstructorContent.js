@@ -55,22 +55,15 @@ const InstructorContent = ({ id }) => {
           {/* Instructor name */}
           <div className="mb-3">
             <h3 className="mb-7px">
+              <br></br>
               <Link
                 href={`/instructors/${id}`}
                 className="text-xl font-bold text-blackColor2 dark:text-blackColor2-dark hover:text-primaryColor dark:hover:text-primaryColor"
               >
-                {instructor.name ? instructor.name : "Unknown Instructor"}
+                Meridian
               </Link>
             </h3>
-            <p className="text-xs text-contentColor2 dark:text-contentColor2-dark">
-              {course?.title || "Instructor Designation"}
-            </p>
           </div>
-          {/* Description */}
-          <p className="text-sm text-contentColor dark:text-contentColor-dark mb-15px leading-26px">
-            {course?.description.replace(/<\/?[^>]+(>|$)/g, "") || "No description available."}
-          </p>
-          {/* Social Links */}
           <div>
             <ul className="flex gap-10px items-center">
               <li>

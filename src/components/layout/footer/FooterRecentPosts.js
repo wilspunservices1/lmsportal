@@ -32,13 +32,13 @@ const FooterRecentPosts = () => {
       data-aos="fade-up"
     >
       <FooterHeading className="text-size-22 font-bold text-whiteColor mb-3">
-        Recent Post
+        {/* Recent Post */}
       </FooterHeading>
-      <ul className="flex flex-col gap-y-5">
+      {/* <ul className="flex flex-col gap-y-5">
         {posts.map((post, idx) => (
           <FooterRecentPost key={idx} post={post} />
         ))}
-      </ul>
+      </ul> */}
     </div>
   );
 };

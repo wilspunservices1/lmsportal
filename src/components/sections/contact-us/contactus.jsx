@@ -62,15 +62,15 @@ const ContactUs = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Contact Form */}
-          <div className="bg-[#EB911E] p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          <div className="bg-[#0A616F] p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-yellow mb-4">
               Send Us a Message
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-yellow"
                 >
                   Name
                 </label>
@@ -88,7 +88,7 @@ const ContactUs = () => {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-yellow"
                 >
                   Email
                 </label>
@@ -106,7 +106,7 @@ const ContactUs = () => {
               <div>
                 <label
                   htmlFor="subject"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-yellow"
                 >
                   Subject
                 </label>
@@ -124,7 +124,7 @@ const ContactUs = () => {
               <div>
                 <label
                   htmlFor="message"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-yellow"
                 >
                   Message
                 </label>
@@ -143,7 +143,7 @@ const ContactUs = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-[#0A616F] text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-[#EB911E] text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>

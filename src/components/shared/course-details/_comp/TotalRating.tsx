@@ -5,7 +5,7 @@ const TotalRating = () => {
     <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-x-30px gap-y-5">
       <div className="lg:col-start-1 lg:col-span-4 px-10px py-30px bg-whiteColor dark:bg-whiteColor-dark shadow-review text-center">
         <p className="text-7xl font-extrabold text-blackColor dark:text-blackColor-dark leading-90px">
-          5.0
+          0.0
         </p>
         <div className="text-secondaryColor">
           {" "}
@@ -14,7 +14,7 @@ const TotalRating = () => {
           <i className="icofont-star"></i>
         </div>
         <p className="text-blackColor dark:text-blackColor-dark leading-26px font-medium">
-          (17 Reviews)
+          (0 Reviews)
         </p>
       </div>
       {/* progress bar  */}

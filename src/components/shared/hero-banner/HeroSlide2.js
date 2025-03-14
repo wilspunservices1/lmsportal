@@ -36,7 +36,7 @@ const HeroSlide2 = ({ slide, idx }) => {
                 <ul className="flex gap-3 items-center justify-center">
                   <li>
                     <a
-                      href="#"
+                      href="https://www.facebook.com/meqmp.net/"
                       className="w-50px h-50px md:w-15 md:h-15 leading-50px md:leading-15 text-whiteColor bg-white bg-opacity-10 hover:bg-primaryColor text-sm md:text-xl rounded-100"
                     >
                       <i className="icofont-facebook"></i>
@@ -44,23 +44,7 @@ const HeroSlide2 = ({ slide, idx }) => {
                   </li>
                   <li>
                     <a
-                      href="#"
-                      className="w-50px h-50px md:w-15 md:h-15 leading-50px md:leading-15 text-whiteColor bg-white bg-opacity-10 hover:bg-primaryColor text-sm md:text-xl rounded-100"
-                    >
-                      <i className="icofont-twitter"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-50px h-50px md:w-15 md:h-15 leading-50px md:leading-15 text-whiteColor bg-white bg-opacity-10 hover:bg-primaryColor text-sm md:text-xl rounded-100"
-                    >
-                      <i className="icofont-vimeo"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
+                      href="https://www.linkedin.com/company/meridian-quality-management/"
                       className="w-50px h-50px md:w-15 md:h-15 leading-50px md:leading-15 text-whiteColor bg-white bg-opacity-10 hover:bg-primaryColor text-sm md:text-xl rounded-100"
                     >
                       <i className="icofont-linkedin"></i>
@@ -68,10 +52,10 @@ const HeroSlide2 = ({ slide, idx }) => {
                   </li>
                   <li>
                     <a
-                      href="#"
+                      href="https://www.youtube.com/@MeridianQMP"
                       className="w-50px h-50px md:w-15 md:h-15 leading-50px md:leading-15 text-whiteColor bg-white bg-opacity-10 hover:bg-primaryColor text-sm md:text-xl rounded-100"
                     >
-                      <i className="icofont-skype"></i>
+                      <i className="icofont-youtube"></i>
                     </a>
                   </li>
                 </ul>

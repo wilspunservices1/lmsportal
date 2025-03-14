@@ -21,6 +21,7 @@ export interface Chapter {
   duration?: string;
   lectures?: Lecture[];
   questionnaireId?: string;
+  finalExamId?: string;
 }
 
 
