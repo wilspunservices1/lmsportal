@@ -5,11 +5,7 @@ import AccordionSkeleton from "@/components/Loaders/AccordianSkel";
 import { useSession } from "next-auth/react";
 import LessonRightSkeleton from "@/components/Loaders/LessonRightSkel";
 import VideoPlayer from "./_comp/vedioPlayer";
-import {
-	fetchEnrolledCourses,
-	fetchLessonById,
-	fetchCourseByChapterId,
-} from "@/actions/course";
+import { fetchEnrolledCourses, fetchLessonById, fetchCourseByChapterId } from "@/actions/course";
 import { convertLocalPathToUrl } from "@/actions/vedioPath";
 import UserCourses from "./_comp/UserCourses";
 import ProgressBannerSkeleton from "./_comp/ProgressBannerSkeleton";
@@ -17,8 +13,6 @@ import { BASE_URL } from "@/actions/constant";
 import useSweetAlert from "@/hooks/useSweetAlert";
 import EnrollButton from "./_comp/EnrollBtn";
 import { useRouter } from "next/navigation";
-
-import ProgressBar from "@/components/ProgressBar";
 
 const LessonPrimary = ({ lessonId }) => {
 	const { data: session } = useSession();
@@ -46,16 +40,28 @@ const LessonPrimary = ({ lessonId }) => {
 			}
 
 			try {
+				const progressResponse = await fetch(
+					`/api/lessons/${lessonId}/progress-markasdone`
+				);
+				const progressData = await progressResponse.json();
+
+				if (progressData.error) {
+					throw new Error(progressData.error);
+				}
+
+				const isChapterDone = progressData.isChapterDone;
+
 				const fetchedLesson = await fetchLessonById(lessonId);
 				if (!fetchedLesson) throw new Error("Lesson not found");
+
+				setIsCompleted(isChapterDone); // ✅ Update checkbox based on API response
+
 				setLesson(fetchedLesson);
 
 				const userEnrolledCourses = await fetchEnrolledCourses(user.id);
 				setEnrolledCourses(userEnrolledCourses);
 
-				const fetchedCourse = await fetchCourseByChapterId(
-					fetchedLesson.chapterId
-				);
+				const fetchedCourse = await fetchCourseByChapterId(fetchedLesson.chapterId);
 				if (!fetchedCourse) throw new Error("Course not found");
 				setCourse(fetchedCourse);
 
@@ -64,8 +70,7 @@ const LessonPrimary = ({ lessonId }) => {
 				);
 
 				if (enrolledCourse && enrolledCourse.completedLectures) {
-					const completedLesson =
-						enrolledCourse.completedLectures.includes(lessonId);
+					const completedLesson = enrolledCourse.completedLectures.includes(lessonId);
 					setIsCompleted(completedLesson);
 				}
 			} catch (err) {
@@ -133,13 +138,8 @@ const LessonPrimary = ({ lessonId }) => {
 			setProgressRefresh((prev) => prev + 1);
 		} catch (error) {
 			console.error("Error:", error);
-			showAlert(
-				"error",
-				"Failed to mark the lesson as complete. Please try again."
-			);
-			setCompletionError(
-				"Failed to mark the lesson as complete. Please try again."
-			);
+			showAlert("error", "Failed to mark the lesson as complete. Please try again.");
+			setCompletionError("Failed to mark the lesson as complete. Please try again.");
 		} finally {
 			setIsSaving(false);
 		}
@@ -156,10 +156,7 @@ const LessonPrimary = ({ lessonId }) => {
 						<div className="xl:col-start-1 xl:col-span-4">
 							<AccordionSkeleton />
 						</div>
-						<div
-							className="xl:col-start-5 xl:col-span-8 relative"
-							data-aos="fade-up"
-						>
+						<div className="xl:col-start-5 xl:col-span-8 relative" data-aos="fade-up">
 							<LessonRightSkeleton />
 						</div>
 					</div>
@@ -174,14 +171,11 @@ const LessonPrimary = ({ lessonId }) => {
 	}
 
 	if (!lesson || !course) {
-		return (
-			<p className="text-gray-500">No lesson or course data available.</p>
-		);
+		return <p className="text-gray-500">No lesson or course data available.</p>;
 	}
 
 	const courseId = course.courseId || course.id;
-	const courseCreatorId =
-		course.creatorId || course.ownerId || course.createdBy;
+	const courseCreatorId = course.creatorId || course.ownerId || course.createdBy;
 
 	const isUserEnrolledInCourse = enrolledCourses.some(
 		(enrolledCourse) => enrolledCourse.courseId === courseId
@@ -203,20 +197,8 @@ const LessonPrimary = ({ lessonId }) => {
 					/>
 				</div>
 
-				{/* Integrate the ProgressBar here */}
-				<div className="mb-8">
-					<ProgressBar
-						key={progressRefresh}
-						courseId={courseId}
-						refreshTrigger={progressRefresh}
-					/>
-				</div>
-
 				<div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-					<div
-						className="xl:col-start-1 xl:col-span-4"
-						data-aos="fade-up"
-					>
+					<div className="xl:col-start-1 xl:col-span-4" data-aos="fade-up">
 						<LessonAccordion
 							chapterId={lesson.chapterId}
 							extra={course.extras}
@@ -224,19 +206,14 @@ const LessonPrimary = ({ lessonId }) => {
 							enrolledCourses={enrolledCourses}
 							courseOwnerId={courseCreatorId}
 							courseId={courseId}
+							userId={user?.id}
 						/>
 					</div>
 
-					<div
-						className="xl:col-start-5 xl:col-span-8 relative"
-						data-aos="fade-up"
-					>
+					<div className="xl:col-start-5 xl:col-span-8 relative" data-aos="fade-up">
 						<div className="absolute top-0 left-0 w-full flex justify-between items-center px-5 py-2 bg-primaryColor text-white z-10">
 							<h3 className="text-lg font-bold">{title}</h3>
-							<a
-								href="/courses"
-								className="text-white hover:underline"
-							>
+							<a href="/courses" className="text-white hover:underline">
 								Close
 							</a>
 						</div>
@@ -246,8 +223,8 @@ const LessonPrimary = ({ lessonId }) => {
 								<div className="flex items-center justify-center bg-black aspect-video">
 									<div className="text-white text-center p-4">
 										<p>
-											This lesson is locked. Please enroll
-											in the course to access it.
+											This lesson is locked. Please enroll in the course to
+											access it.
 										</p>
 									</div>
 								</div>
@@ -258,15 +235,12 @@ const LessonPrimary = ({ lessonId }) => {
 											videoUrl={videoUrlFormatted}
 											title={lesson.title}
 											onComplete={handleMarkAsComplete}
-											onClose={() =>
-												setIsVideoVisible(false)
-											} // Handle close action
+											isCompleted={isCompleted}
+											videoDuration={parseInt(lesson.duration) * 60}
 										/>
 									) : (
 										<div className="flex items-center justify-center bg-black aspect-video">
-											<p className="text-white">
-												Video has been closed.
-											</p>
+											<p className="text-white">Video has been closed.</p>
 										</div>
 									)}
 
@@ -274,29 +248,20 @@ const LessonPrimary = ({ lessonId }) => {
 										<div className="h-1 w-full bg-green-500 my-4"></div>
 									)}
 									{completionError && (
-										<p className="text-red-500">
-											{completionError}
-										</p>
+										<p className="text-red-500">{completionError}</p>
 									)}
 
 									{isEnrolled ? (
 										<button
-											onClick={handleMarkAsComplete}
-											className={`mt-4 px-4 py-2 ${
-												isCompleted
-													? "bg-gray-500"
-													: "bg-green-500"
-											} text-white rounded hover:bg-green-600`}
-											disabled={isCompleted || isSaving}
+											className={`mt-4 px-4 py-2 text-white rounded ${
+												isCompleted ? "bg-green-500" : "bg-red-500"
+											}`}
+											disabled
 										>
-											{isSaving
-												? "Processing..."
-												: isCompleted
-												? "✔ Completed"
-												: "Mark as Complete"}
+											{isCompleted ? "✔ Completed" : "Incomplete"}
 										</button>
 									) : (
-										<div className="pt-8 flex justify-center items-center  max-w-md  ">
+										<div className="pt-8 flex justify-center items-center max-w-md">
 											<EnrollButton
 												currentCourseId={courseId}
 												course={course}

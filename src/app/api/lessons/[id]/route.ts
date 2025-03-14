@@ -25,6 +25,7 @@ export async function GET(
 				isLocked: lectures.isLocked,
 				isPreview: lectures.isPreview,
 				chapterId: lectures.chapterId, // Ensure chapterId is included
+				duration: lectures.duration, // ✅ Added this
 			})
 			.from(lectures)
 			.where(eq(lectures.id, lessonId))

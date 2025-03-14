@@ -1,134 +1,120 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
 interface VideoPlayerProps {
-  videoUrl: string;
-  title: string;
-  onClose?: () => void; 
-  onComplete?: () => void; // Callback when video is marked as complete
+	videoUrl: string;
+	title: string;
+	videoDuration: number;
+	isCompleted: boolean; // ✅ Now passed from LessonPrimary.js
+	onComplete?: () => void;
 }
 
 const getVideoSrc = (url: string): string => {
-
-  if (!/^https?:\/\//i.test(url)) {
-    return url;
-  }
-  try {
-    const parsedUrl = new URL(url);
-
-    if (parsedUrl.hostname.includes('youtube.com') || parsedUrl.hostname.includes('youtu.be')) {
-      let videoId = '';
-
-      if (parsedUrl.hostname.includes('youtu.be')) {
-        videoId = parsedUrl.pathname.slice(1);
-      } else {
-        videoId = parsedUrl.searchParams.get('v') || '';
-      }
-
-      if (videoId) {
-        return `https://www.youtube.com/embed/${videoId}`;
-      }
-    } else if (parsedUrl.hostname.includes('vimeo.com')) {
-      const videoId = parsedUrl.pathname.split('/').pop();
-      if (videoId) {
-        return `https://player.vimeo.com/video/${videoId}`;
-      }
-    }
-
-    return url;
-  } catch (error) {
-    console.error('Invalid URL:', url);
-    return url;
-  }
+	if (!/^https?:\/\//i.test(url)) return url;
+	try {
+		const parsedUrl = new URL(url);
+		if (parsedUrl.hostname.includes("youtube.com") || parsedUrl.hostname.includes("youtu.be")) {
+			let videoId = parsedUrl.hostname.includes("youtu.be")
+				? parsedUrl.pathname.slice(1)
+				: parsedUrl.searchParams.get("v") || "";
+			return `https://www.youtube.com/embed/${videoId}`;
+		} else if (parsedUrl.hostname.includes("vimeo.com")) {
+			const videoId = parsedUrl.pathname.split("/").pop();
+			return `https://player.vimeo.com/video/${videoId}`;
+		}
+		return url;
+	} catch (error) {
+		console.error("Invalid URL:", url);
+		return url;
+	}
 };
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, title, onClose, onComplete }) => {
-  const videoRef = useRef<HTMLIFrameElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [timeWatched, setTimeWatched] = useState(0);
-  const [isCompleted, setIsCompleted] = useState(false);
+const VideoPlayer: React.FC<VideoPlayerProps> = ({
+	videoUrl,
+	title,
+	videoDuration,
+	isCompleted,
+	onComplete,
+}) => {
+	const videoRef = useRef<HTMLIFrameElement>(null);
+	const [isPlaying, setIsPlaying] = useState(false);
+	const [timeWatched, setTimeWatched] = useState(0);
+	const [hasMarkedComplete, setHasMarkedComplete] = useState(isCompleted); // ✅ Initial state from LessonPrimary.js
 
-  const videoSrc = getVideoSrc(videoUrl);
+	const videoSrc = getVideoSrc(videoUrl);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (isPlaying) {
-        setTimeWatched((prev) => prev + 1);
-      }
-    }, 1000);
+	useEffect(() => {
+		let timer: NodeJS.Timeout | null = null;
 
-    if (timeWatched >= 10 && !isCompleted) {
-      clearInterval(timer);
-      setIsCompleted(true);
-      if (onComplete) {
-        onComplete(); // Check if onComplete is defined before invoking it
-      }
-    }
+		// ✅ Only track time if lesson is NOT already completed
+		if (isPlaying && !hasMarkedComplete) {
+			timer = setInterval(() => {
+				setTimeWatched((prev) => prev + 1);
+			}, 1000);
+		}
 
-    return () => clearInterval(timer);
-  }, [isPlaying, timeWatched, isCompleted, onComplete]);
+		// ✅ Mark as complete only if NOT already completed
+		if (timeWatched >= videoDuration * 0.01 && !hasMarkedComplete) {
+			setHasMarkedComplete(true);
+			onComplete?.(); // ✅ Calls `handleMarkAsComplete()` in LessonPrimary.js
+		}
 
-  const handlePlayVideo = () => {
-    if (videoRef.current && !isPlaying) {
-      setIsPlaying(true);
-      const autoplaySrc = videoSrc.includes('?') ? `${videoSrc}&autoplay=1` : `${videoSrc}?autoplay=1`;
-      videoRef.current.src = autoplaySrc;
-    }
-  };
+		return () => {
+			if (timer) clearInterval(timer);
+		};
+	}, [isPlaying, timeWatched, hasMarkedComplete, videoDuration, onComplete]);
 
-  const handleClose = () => {
-    if (videoRef.current) {
-      videoRef.current.src = videoSrc;
-    }
-    setIsPlaying(false);
-    if (onClose) {
-      onClose();
-    }
-  };
+	const handlePlayVideo = () => {
+		if (!isPlaying) {
+			setIsPlaying(true);
+		}
+	};
 
-  return (
-    <div className="relative w-full aspect-video bg-black">
-      <iframe
-        ref={videoRef}
-        src={videoSrc}
-        allowFullScreen
-        allow="autoplay; encrypted-media"
-        className="w-full h-full border-0"
-        title={title}
-      />
+	return (
+		<div className="relative w-full aspect-video bg-black">
+			<iframe
+				ref={videoRef}
+				src={videoSrc}
+				allowFullScreen
+				allow="autoplay; encrypted-media"
+				className="w-full h-full border-0"
+				title={title}
+			/>
 
-      {!isPlaying && (
-        <div
-          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 cursor-pointer"
-          onClick={handlePlayVideo}
-        >
-          <div className="w-16 h-16 flex items-center justify-center bg-white rounded-full bg-opacity-75">
-            <svg
-              className="w-8 h-8 text-black"
-              fill="currentColor"
-              viewBox="0 0 84 84"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="42" cy="42" r="42" fill="currentColor" />
-              <polygon points="33,25 63,42 33,59" fill="#fff" />
-            </svg>
-          </div>
-        </div>
-      )}
+			{!isPlaying && !hasMarkedComplete && (
+				<div
+					className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 cursor-pointer"
+					onClick={handlePlayVideo}
+				>
+					<div className="w-16 h-16 flex items-center justify-center bg-white rounded-full bg-opacity-75">
+						<svg className="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 84 84">
+							<circle cx="42" cy="42" r="42" fill="currentColor" />
+							<polygon points="33,25 63,42 33,59" fill="#fff" />
+						</svg>
+					</div>
+				</div>
+			)}
 
-      <div className="absolute top-4 left-4 flex items-center space-x-4 z-10">
-        <h3 className="text-lg font-bold text-white">{title}</h3>
-      </div>
+			<div className="absolute top-4 left-4 flex items-center space-x-4 z-10">
+				<h3 className="text-lg font-bold text-white">{title}</h3>
+			</div>
 
-      {isCompleted && (
-        <div className="absolute bottom-0 left-0 w-full h-2 bg-green-500" />
-      )}
-    </div>
-  );
+			<p className="mt-2 text-white text-center">
+				Watched: {Math.floor(timeWatched)} sec / {Math.floor(videoDuration)} sec
+			</p>
+
+			{/* {hasMarkedComplete && (
+				<div className="absolute bottom-0 left-0 w-full h-2 bg-green-500" />
+			)} */}
+			{/* {hasMarkedComplete && (
+				<p className="text-green-500 font-semibold mt-2 text-center">
+					✔ Lesson Completed
+				</p>
+			)} */}
+		</div>
+	);
 };
 
 export default VideoPlayer;
-
-
 
 // import React, { useEffect, useRef, useState } from 'react';
 
@@ -265,4 +251,3 @@ export default VideoPlayer;
 // };
 
 // export default VideoPlayer;
-
