@@ -53,7 +53,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 		}
 
 		// ✅ Mark as complete only if NOT already completed
-		if (timeWatched >= videoDuration * 0.01 && !hasMarkedComplete) {
+		if (timeWatched >= videoDuration * 0.5 && !hasMarkedComplete) {
 			setHasMarkedComplete(true);
 			onComplete?.(); // ✅ Calls `handleMarkAsComplete()` in LessonPrimary.js
 		}
@@ -98,9 +98,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 				<h3 className="text-lg font-bold text-white">{title}</h3>
 			</div>
 
-			<p className="mt-2 text-white text-center">
+			{/* <p className="mt-2 text-white text-center">
 				Watched: {Math.floor(timeWatched)} sec / {Math.floor(videoDuration)} sec
-			</p>
+			</p> */}
 
 			{/* {hasMarkedComplete && (
 				<div className="absolute bottom-0 left-0 w-full h-2 bg-green-500" />
