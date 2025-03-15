@@ -8,6 +8,8 @@ import { BASE_URL } from "@/actions/constant";
 import Swal from "sweetalert2";
 import QuizModal from "@/components/sections/quiz-modal/QuizModal";
 import PreQuizPopup from "@/components/sections/alert-quiz-modal/PreQuizPopup";
+import ExamModal from "@/components/sections/exam-modal/ExamModal";
+import PreExamPopup from "@/components/sections/alert-exam-modal/PreExamPopup";
 
 const fetchChaptersByChapterId = async (chapterId) => {
 	try {
@@ -76,6 +78,7 @@ const LessonAccordion = ({
 	const [isPreFinalExamOpen, setIsPreFinalExamOpen] = useState(false);
 	const [isExamBooked, setIsExamBooked] = useState(false);
 	const [bookedExams, setBookedExams] = useState({});
+	const [finalExamAttempted, setFinalExamAttempted] = useState(false);
 
 	const isSuperAdmin = userRoles.includes("superAdmin");
 	const isInstructor = userRoles.includes("instructor");
@@ -100,6 +103,7 @@ const LessonAccordion = ({
 		}
 	}, [courseId]);
 
+	// Fetch quiz attempts and check if the final exam has been attempted
 	useEffect(() => {
 		const fetchQuizAttempts = async () => {
 			try {
@@ -112,6 +116,10 @@ const LessonAccordion = ({
 				const data = await response.json();
 				if (response.ok && data.attempts) {
 					setQuizAttempts(data.attempts);
+					// Check if the final exam has been attempted
+					if (finalExamId && data.attempts[finalExamId] >= 1) {
+						setFinalExamAttempted(true); // Final exam has been attempted
+					}
 				} else {
 					console.error("Failed to fetch quiz attempts");
 				}
@@ -123,7 +131,7 @@ const LessonAccordion = ({
 		};
 
 		fetchQuizAttempts();
-	}, [progressRefresh]);
+	}, [progressRefresh, finalExamId]);
 
 	// Fetch user progress (scores)
 	useEffect(() => {
@@ -149,6 +157,7 @@ const LessonAccordion = ({
 		fetchProgress();
 	}, [chapterId, progressRefresh]);
 
+	// Fetch chapters and questionnaires
 	useEffect(() => {
 		const loadChaptersAndQuestionnaires = async () => {
 			setLoading(true);
@@ -182,7 +191,6 @@ const LessonAccordion = ({
 										`/api/lessons/${lesson.id}/progress-markasdone`
 									);
 									const progressData = await response.json();
-									// return progressData.isChapterDone; // ✅ Lesson is marked done if both conditions are met
 									return progressData.isChapterDone === true;
 								} catch (error) {
 									console.error(
@@ -292,7 +300,7 @@ const LessonAccordion = ({
 	};
 
 	const handleFinalExamStart = async () => {
-		if (!finalExamId) return;
+		if (!finalExamId || finalExamAttempted) return;
 
 		try {
 			console.log("Fetching final exam data for finalExamId:", finalExamId);
@@ -360,12 +368,6 @@ const LessonAccordion = ({
 									aria-expanded={activeIndex === index}
 									aria-controls={`chapter-content-${index}`}
 								>
-									{console.log(
-										"Checkbox Debug:",
-										chapter.id,
-										chapterCompletion[chapter.id]
-									)}
-
 									<div className="checkbox-wrapper-33">
 										<label className="checkbox">
 											<input
@@ -391,7 +393,6 @@ const LessonAccordion = ({
 										</label>
 									</div>
 
-									{/* <span>{chapter.title}</span> */}
 									<svg
 										className={`transition-all duration-500 ${
 											activeIndex === index ? "rotate-180" : "rotate-0"
@@ -627,24 +628,35 @@ const LessonAccordion = ({
 											<h3 className="text-lg font-semibold mb-3">
 												Final Exam
 											</h3>
-											<button
-												onClick={handleFinalExamStart}
-												className="bg-blue-600 text-black font-bold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center space-x-2 hover:bg-blue-700"
-											>
-												<span>Start Final Exam</span>
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													className="h-5 w-5"
-													viewBox="0 0 20 20"
-													fill="currentColor"
+											{finalExamAttempted ? (
+												<p
+													style={{
+														color: "red",
+														fontWeight: "bold",
+													}}
 												>
-													<path
-														fillRule="evenodd"
-														d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-														clipRule="evenodd"
-													/>
-												</svg>
-											</button>
+													You have already attempted the final exam.
+												</p>
+											) : (
+												<button
+													onClick={handleFinalExamStart}
+													className="bg-blue-600 text-black font-bold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center space-x-2 hover:bg-blue-700"
+												>
+													<span>Start Final Exam</span>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														className="h-5 w-5"
+														viewBox="0 0 20 20"
+														fill="currentColor"
+													>
+														<path
+															fillRule="evenodd"
+															d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+															clipRule="evenodd"
+														/>
+													</svg>
+												</button>
+											)}
 										</div>
 									</div>
 								</li>
@@ -680,16 +692,36 @@ const LessonAccordion = ({
 			)}
 
 			{isPreFinalExamOpen && (
-				<PreQuizPopup
-					title="Final Examination"
-					message="Are you ready to start your final exam? Make sure you have enough time to complete it."
+				<PreExamPopup
+					examInfo={{
+						duration: 60, // Example: 60 minutes
+						questionsCount: currentQuizData?.questions?.length || 0,
+						passingScore: 70, // Example: 70% passing score
+						attempts: 1, // Only 1 attempt allowed
+					}}
 					onConfirm={() => {
 						setIsPreFinalExamOpen(false);
-						setIsQuizModalOpen(true);
+						setIsFinalExamModalOpen(true);
 					}}
 					onCancel={() => {
 						setIsPreFinalExamOpen(false);
 					}}
+				/>
+			)}
+
+			{isFinalExamModalOpen && (
+				<ExamModal
+					examData={currentQuizData}
+					onClose={() => {
+						setIsFinalExamModalOpen(false);
+						setFinalExamAttempted(true); // Mark final exam as attempted
+					}}
+					quizScores={quizScores}
+					setQuizScores={setQuizScores}
+					quizAttempts={quizAttempts}
+					setQuizAttempts={setQuizAttempts}
+					setProgressRefresh={setProgressRefresh}
+					BASE_URL={BASE_URL}
 				/>
 			)}
 		</div>
