@@ -10,19 +10,19 @@ const CounterInstructor = () => {
     {
       name: "Enrolled Courses",
       image: counter1,
-      data: 27,
+      data: 1,
       symbol: "+",
     },
     {
       name: "Active Courses",
       image: counter2,
-      data: 8,
+      data: 1,
       symbol: "+",
     },
     {
       name: "Complete Courses",
       image: counter3,
-      data: 5,
+      data: 1,
       symbol: "k",
     },
     {

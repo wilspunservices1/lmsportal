@@ -9,13 +9,13 @@ const CounterStudent = () => {
     {
       name: "Enrolled Courses",
       image: counter1,
-      data: 27,
+      data: 1,
       symbol: "+",
     },
     {
       name: "Active Courses",
       image: counter2,
-      data: 8,
+      data: 1,
       symbol: "+",
     },
     {
@@ -26,7 +26,7 @@ const CounterStudent = () => {
   ];
   return (
     <CounterDashboard counts={counts}>
-      <HeadingDashboard>Summery</HeadingDashboard>
+      <HeadingDashboard>Summary</HeadingDashboard>
     </CounterDashboard>
   );
 };

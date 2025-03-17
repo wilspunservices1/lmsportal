@@ -8,11 +8,6 @@ const FooterTopLeft = () => {
 
   return (
     <div data-aos="fade-up">
-      {isSecondary ? (
-        <Link href="#">
-          <Image src={logoImage} alt="" />
-        </Link>
-      ) : (
         <>
           <h4 className="text-4xl md:text-size-25 lg:text-size-40 font-bold text-whiteColor leading-50px md:leading-10 lg:leading-16">
           Need further support?{" "}
@@ -22,7 +17,6 @@ const FooterTopLeft = () => {
           Get an instant quote now—it's quick and easy!
           </p>
         </>
-      )}
     </div>
   );
 };
