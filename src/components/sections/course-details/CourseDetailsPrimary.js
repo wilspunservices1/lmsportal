@@ -560,7 +560,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
                         <i className="icofont-star text-size-15 text-yellow"></i>
                         <i className="icofont-star text-size-15 text-yellow"></i>{" "}
                         <span className=" text-blackColor dark:text-blackColor-dark">
-                          (44)
+                          (0)
                         </span>
                       </div>
                     </div>
@@ -591,7 +591,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails }) => {
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
                               Lectures :
                               <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {lesson ? lesson : 0} sub
+                                {lesson ? lesson : 0} Modules
                               </span>
                             </p>
                           </li>

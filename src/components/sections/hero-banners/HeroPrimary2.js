@@ -80,7 +80,7 @@ const HeroPrimary2 = ({ type }) => {
                   <i className="icofont-star text-size-15 text-yellow"></i>{" "}
                   <i className="icofont-star text-size-15 text-yellow"></i>{" "}
                   <span className="text-xs text-blackColor dark:text-blackColor-dark">
-                    (44)
+                    (0)
                   </span>
                 </div>
                 <div>

@@ -74,8 +74,9 @@ const RecentCourses = () => {
                   </h5>
                   <div className="flex flex-wrap items-center justify-between text-sm text-darkblack dark:text-darkblack-dark gap-x-15px gap-y-10px leading-1.8">
                     <p>
-                      <i className="icofont-teacher"></i> {insName}
+                      <i className="icofont-teacher"></i> Meridian 
                     </p>
+                    <br></br>
                     <p>
                       <i className="icofont-book-alt"></i> {lesson} Lessons
                     </p>

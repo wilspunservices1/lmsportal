@@ -63,7 +63,7 @@ const Testimonials3 = ({ isInsTructorDetails, id: cidx }) => {
                     <i className="icofont-star text-size-15 text-yellow"></i>{" "}
                     <i className="icofont-star text-size-15 text-yellow"></i>{" "}
                     <i className="icofont-star text-size-15 text-yellow"></i>{" "}
-                    <span className="text-xs text-lightGrey6">(44)</span>
+                    <span className="text-xs text-lightGrey6">(0)</span>
                   </div>
                 </div>
                 <div>
