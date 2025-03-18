@@ -190,9 +190,9 @@ export async function PATCH(
 export async function GET(
 	req: NextRequest,
 	{ params }: { params: { id: string } }
-) {
+  ) {
 	try {
-		const { id } = await params;
+	  const { id } = params;
 
 		// Fetch the course by ID
 		const courseResult = await db
