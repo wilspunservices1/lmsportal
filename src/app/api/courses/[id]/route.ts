@@ -129,6 +129,7 @@ export async function PATCH(
 			"slug",
 			"lesson",
 			"duration",
+			"description",
 			"featured",
 			"price",
 			"estimatedPrice",
