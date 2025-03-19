@@ -7,13 +7,13 @@ import { Navigation } from "swiper/modules";
 const TestimonialsSlider = () => {
   const testimonials = [
     {
-      name: "Aqeel Shahzad",
+      name: "Arman Bhatti",
       image: testimonialImage1,
       desig: "Ui/Ux Designer",
       desc: "The other hand we denounce with righteou indg ation men who are so beguiled and demoraliz ed by the of the mo ment.Dislike men who are so beguiled and dems ed by the charms of pleas ure of the moment. Lorem ",
     },
     {
-      name: "Ali Hassan",
+      name: "Jayesh",
       image: testimonialImage1,
       desig: "Software Engineer",
       desc: "The other hand we denounce with righteou indg ation men who are so beguiled and demoraliz ed by the of the mo ment.Dislike men who are so beguiled and dems ed by the charms of pleas ure of the moment. Lorem ",

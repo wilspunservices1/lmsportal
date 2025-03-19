@@ -10,7 +10,7 @@ const FilterController = () => {
             data-filter="*"
             className="is-checked dark:is-checked pr-5 md:pr-10 lg:pr-17px 2xl:pr-10 text-contentColor font-medium hover:text-primaryColor dark:text-contentColor-dark dark:hover:text-primaryColor"
           >
-            See All
+            All Courses
           </button>
         </li>
         <li>
@@ -18,7 +18,7 @@ const FilterController = () => {
             data-filter=".filter1"
             className="pr-5 md:pr-10 lg:pr-17px 2xl:pr-10 text-contentColor font-medium hover:text-primaryColor dark:text-contentColor-dark dark:hover:text-primaryColor"
           >
-            Data science
+            Six Sigma
           </button>
         </li>
         <li>
@@ -26,7 +26,7 @@ const FilterController = () => {
             data-filter=".filter2"
             className="pr-5 md:pr-10 lg:pr-17px 2xl:pr-10 text-contentColor font-medium hover:text-primaryColor dark:text-contentColor-dark dark:hover:text-primaryColor"
           >
-            Engineering
+            Project Management
           </button>
         </li>
         <li>
@@ -34,7 +34,7 @@ const FilterController = () => {
             data-filter=".filter3"
             className="pr-5 md:pr-10 lg:pr-17px 2xl:pr-10 text-contentColor font-medium hover:text-primaryColor dark:text-contentColor-dark dark:hover:text-primaryColor"
           >
-            Featured
+            Food & Safety
           </button>
         </li>
         <li>
@@ -42,7 +42,7 @@ const FilterController = () => {
             data-filter=".filter4"
             className="text-contentColor font-medium hover:text-primaryColor dark:text-contentColor-dark dark:hover:text-primaryColor"
           >
-            Architecture
+            Environmental Management
           </button>
         </li>
       </ul>

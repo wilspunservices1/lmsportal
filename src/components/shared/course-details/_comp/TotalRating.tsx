@@ -29,10 +29,10 @@ const TotalRating = () => {
             </div>
             <div className="flex-grow relative mx-10px md:mr-10 lg:mr-10px">
               <span className="h-10px w-full bg-borderColor dark:bg-borderColor-dark rounded-full block"></span>
-              <span className="absolute left-0 top-0 h-10px w-full bg-secondaryColor rounded-full"></span>
+              <span className="absolute left-0 top-0 h-10px w-0 bg-secondaryColor rounded-full"></span>
             </div>
             <div>
-              <span>10</span>
+              <span>0</span>
             </div>
           </li>
           <li className="flex items-center text-blackColor dark:text-blackColor-dark">
@@ -44,10 +44,10 @@ const TotalRating = () => {
             </div>
             <div className="flex-grow relative mx-10px md:mr-10 lg:mr-10px">
               <span className="h-10px w-full bg-borderColor dark:bg-borderColor-dark rounded-full block"></span>
-              <span className="absolute left-0 top-0 h-10px w-4/5 bg-secondaryColor rounded-full"></span>
+              <span className="absolute left-0 top-0 h-10px w-0 bg-secondaryColor rounded-full"></span>
             </div>
             <div>
-              <span>5</span>
+              <span>0</span>
             </div>
           </li>
           <li className="flex items-center text-blackColor dark:text-blackColor-dark">
@@ -59,10 +59,10 @@ const TotalRating = () => {
             </div>
             <div className="flex-grow relative mx-10px md:mr-10 lg:mr-10px">
               <span className="h-10px w-full bg-borderColor dark:bg-borderColor-dark rounded-full block"></span>
-              <span className="absolute left-0 top-0 h-10px w-60% bg-secondaryColor rounded-full"></span>
+              <span className="absolute left-0 top-0 h-10px w-0 bg-secondaryColor rounded-full"></span>
             </div>
             <div>
-              <span>3</span>
+              <span>0</span>
             </div>
           </li>
           <li className="flex items-center text-blackColor dark:text-blackColor-dark">
@@ -74,10 +74,10 @@ const TotalRating = () => {
             </div>
             <div className="flex-grow relative mx-10px md:mr-10 lg:mr-10px">
               <span className="h-10px w-full bg-borderColor dark:bg-borderColor-dark rounded-full block"></span>
-              <span className="absolute left-0 top-0 h-10px w-30% bg-secondaryColor rounded-full"></span>
+              <span className="absolute left-0 top-0 h-10px w-0 bg-secondaryColor rounded-full"></span>
             </div>
             <div>
-              <span>2</span>
+              <span>0</span>
             </div>
           </li>
           <li className="flex items-center text-blackColor dark:text-blackColor-dark">
@@ -89,10 +89,10 @@ const TotalRating = () => {
             </div>
             <div className="flex-grow relative mx-10px md:mr-10 lg:mr-10px">
               <span className="h-10px w-full bg-borderColor dark:bg-borderColor-dark rounded-full block"></span>
-              <span className="absolute left-0 top-0 h-10px w-10% bg-secondaryColor rounded-full"></span>
+              <span className="absolute left-0 top-0 h-10px w-0 bg-secondaryColor rounded-full"></span>
             </div>
             <div>
-              <span>1</span>
+              <span>0</span>
             </div>
           </li>
         </ul>

@@ -17,7 +17,7 @@ const AboutMeridian = () => {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Our Mission</h3>
             <p className="text-gray-600">
-              We aim to bridge the gap between knowledge and accessibility by offering a robust platform that simplifies course management, enhances learner engagement, and ensures seamless collaboration.
+            We aim to transform online learning by offering a seamless platform that simplifies course management, enhances learner engagement, and enables effortless collaboration.
             </p>
           </div>
 
@@ -25,9 +25,9 @@ const AboutMeridian = () => {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Why Choose Meridian?</h3>
             <ul className="list-disc pl-6 space-y-2 text-gray-600">
-              <li>User-Centric Design – An intuitive interface for effortless navigation.</li>
-              <li>Scalable Solutions – Adaptable for schools, universities, and corporate training.</li>
-              <li>Secure & Reliable – Cutting-edge security for data protection and compliance.</li>
+              <li>Seamless Experience – Our intuitive, user-friendly interface ensures smooth navigation, minimizing learning curves and maximizing efficiency.</li>
+              <li>Built to Scale – Whether for schools, universities, or corporate training, our platform adapts to your needs, growing with you effortlessly.</li>
+              <li>Uncompromising Security – Enterprise-grade protection ensures your data stays safe, meeting the highest compliance standards with zero compromises.</li>
             </ul>
           </div>
         </div>

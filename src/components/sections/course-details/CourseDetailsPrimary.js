@@ -28,20 +28,21 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 	const [showQuiz, setShowQuiz] = useState(false);
 	const showAlert = useSweetAlert();
 
-	const [isBrowser, setIsBrowser] = useState(false);
-	const [isPurchased, setIsPurchased] = useState(false);
-	const [error, setError] = useState(null);
-	const [courseDetails, setCourseDetails] = useState(initialCourseDetails);
+  const [isBrowser, setIsBrowser] = useState(false);
+  const [isPurchased, setIsPurchased] = useState(false);
+  const [error, setError] = useState(null);
+  const [courseDetails, setCourseDetails] = useState(initialCourseDetails);
 
-	const pdfUrl = "/uploads/files/trainingprograme.pdf";
+  const pdfUrl = "/uploads/files/trainingprograme.pdf";
 
-	useEffect(() => {
-		const fetchCourseDetails = async () => {
-			try {
-				const response = await fetch(`/api/courses/${currentId}`, {
-					method: "GET",
-					headers: { "Content-Type": "application/json" },
-				});
+  // Fetch course details and enrolled students count
+  const fetchCourseDetails = async () => {
+    try {
+      // Fetch course details
+      const courseResponse = await fetch(`/api/courses/${currentId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
 
 				if (!response.ok) {
 					throw new Error("Failed to fetch course details");

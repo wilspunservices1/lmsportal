@@ -15,20 +15,16 @@ const ItemsDashboard = ({ item }) => {
         ))}
         <li className="flex hover:cursor-pointer items-center py-10px border-b border-borderColor dark:border-borderColor-dark">
           <div className="hover:text-primaryColor text-contentColor dark:text-contentColor-dark items-center dark:hover:text-primaryColor leading-1.8 flex gap-3 text-nowrap">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
+          <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              viewBox="0 0 24 24" 
+              fill="currentColor"
+              width="16" 
               height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="feather feather-volume-1"
+              className="feather feather-log-out"
             >
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              <path d="M16 13v-2H7V9l-5 4 5 4v-2h9z"/>
+              <path d="M20 3H12v2h8v14h-8v2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/>
             </svg>
             <button onClick={() => signOut()}>Logout</button>
           </div>

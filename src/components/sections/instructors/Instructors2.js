@@ -11,13 +11,13 @@ const Instructors2 = () => {
   const instructors = [
     {
       id: 1,
-      name: "Aqeel Shahzad",
+      name: "Jayesh",
       image: teamImage1,
       desig: "Full Stack Developer",
     },
     {
       id: 2,
-      name: "Ali Hassan",
+      name: "Arman Bhatti",
       image: teamImage2,
       desig: "Software Engineer",
     },
