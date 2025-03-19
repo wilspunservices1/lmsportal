@@ -24,6 +24,7 @@ export const placeholders = pgTable(
     x: decimal("x", { precision: 10, scale: 2 }).default("0").notNull(),
     y: decimal("y", { precision: 10, scale: 2 }).default("0").notNull(),
     font_size: decimal("font_size").default("12").notNull(),
+    font_family: text("font_family").notNull().default("Arial"),
     is_visible: boolean("is_visible").default(true).notNull(),
     label: text("label").default("PlaceHolderLabel").notNull(),
     color: text("color").default("#000000").notNull(),
