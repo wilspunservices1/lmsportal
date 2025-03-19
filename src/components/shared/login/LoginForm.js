@@ -150,14 +150,6 @@ const LoginForm = ({ csrfToken }) => {
           >
             <i className="icofont-google-plus text-red-500 text-lg"></i> Google
           </button>
-          <button
-            type="button"
-            onClick={() => signInOAuth("github")}
-            className="text-size-15   px-5 py-6px border border-primaryColor hover:text-primaryColor hover:bg-whiteColor inline-block rounded-full group dark:hover:text-whiteColor dark:hover:bg-whiteColor-dark"
-          >
-            <i className="icofont-github icofont-facebook text-lg text-primaryColor"></i>{" "}
-            GitHub
-          </button>
         </div>
       </form>
     </div>
