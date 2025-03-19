@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CourseDetailsSidebar from "@/components/shared/courses/CourseDetailsSidebar";
 import Image from "next/image";
 import blogImag8 from "@/assets/images/blog/blog_8.png";
@@ -20,8 +20,6 @@ import useSweetAlert from "@/hooks/useSweetAlert";
 import ManageQuestionnaire from "../questionnaire/ManageQuestionnaire";
 import { Autoplay } from "swiper/modules";
 
-import { useEffect } from "react";
-
 let cid = 0;
 
 const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCourseDetails }) => {
@@ -32,8 +30,8 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 
 	const [isBrowser, setIsBrowser] = useState(false);
 	const [isPurchased, setIsPurchased] = useState(false);
-	const [error, setError] = useState(null); // Track errors
-	const [courseDetails, setCourseDetails] = useState(initialCourseDetails); // State to manage course details
+	const [error, setError] = useState(null);
+	const [courseDetails, setCourseDetails] = useState(initialCourseDetails);
 
 	const pdfUrl = "/uploads/files/trainingprograme.pdf";
 
@@ -50,7 +48,21 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 				}
 
 				const data = await response.json();
-				setCourseDetails(data.data); // Update the state with the latest course details
+				const courseData = data.data;
+
+				// Calculate total duration
+				const totalDuration = courseData.chapters.reduce((total, chapter) => {
+					const chapterDuration = chapter.lectures.reduce((chapTotal, lecture) => {
+						return chapTotal + (parseInt(lecture.duration) || 0);
+					}, 0);
+					return total + chapterDuration;
+				}, 0);
+
+				// Update courseDetails with total duration
+				setCourseDetails({
+					...courseData,
+					duration: `${totalDuration} minutes`,
+				});
 			} catch (error) {
 				console.error("Error fetching course details:", error);
 				setError(error.message);
@@ -58,7 +70,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 		};
 
 		fetchCourseDetails();
-	}, [currentId]); // Re-run this effect whenever `currentId` changes
+	}, [currentId]);
 
 	const FAQItem = ({ question, answer }) => {
 		const [isOpen, setIsOpen] = useState(false);
@@ -185,7 +197,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 		};
 
 		checkPurchaseStatus();
-	}, [session, currentId]); // Runs when session or course ID changes
+	}, [session, currentId]);
 
 	// A helper to build the HTML for the certificate + placeholders
 	function buildCertificateHTML(
@@ -438,6 +450,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 		thumbnail,
 		categories,
 		duration,
+		enrolled,
 		updatedAt,
 		insName,
 		title,
@@ -450,7 +463,6 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 		extras,
 	} = courseDetails;
 
-	// console.log("thumbnail course courseDetails", extras?.languages)
 	const allCourses = getAllCourses();
 	const course = allCourses?.find(({ id }) => parseInt(currentId) === id);
 	const { id } = course || {};
@@ -600,7 +612,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 														<p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
 															Enrolled :
 															<span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-																0 students
+																{enrolled ? enrolled : "0"} students
 															</span>
 														</p>
 													</li>

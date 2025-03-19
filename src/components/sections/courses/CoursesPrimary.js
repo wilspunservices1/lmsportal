@@ -247,7 +247,7 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
 				ref={coursesRef}
 			>
 				{/* Courses Header */}
-				<div
+				{/* <div
 					className="courses-header flex justify-between items-center flex-wrap px-13px py-5px border border-borderColor dark:border-borderColor-dark mb-30px gap-y-5"
 					data-aos="fade-up"
 				>
@@ -295,17 +295,17 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
 					</div>
 				</div>
 
-				<div
+				<
 					className={`grid grid-cols-1 ${
 						isNotSidebar ? "" : "md:grid-cols-12"
 					} gap-30px`}
 				>
-					{/* Courses Sidebar */}
+					Courses Sidebar
 					{!isNotSidebar && (
 						<div className="md:col-start-1 md:col-span-4 lg:col-span-3">
 							<div className="flex flex-col">
 								{/* Dynamic categories and filters from API */}
-								{Array.isArray(filters) &&
+								{/* {Array.isArray(filters) &&
 								filters.length > 0 ? (
 									filters?.map(({ name, inputs }, idx) => (
 										<div
@@ -381,7 +381,7 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
 								)}
 							</div>
 						</div>
-					)}
+					)}  */}
 
 					{/* Courses Main Section */}
 					<div
@@ -439,7 +439,7 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
 							<NoData message={"No Courses Found"} />
 						)}
 					</div>
-				</div>
+				
 			</div>
 		</div>
 	);
