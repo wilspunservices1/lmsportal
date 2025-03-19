@@ -78,6 +78,21 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
 
 	const categoryWithColors = assignColorsToCategories(categories, depBgs);
 
+	// Function to convert "1 Minutes" format to hours and minutes
+	const convertDurationToHours = (durationStr) => {
+		if (!durationStr) return "0m"; // Handle empty values
+
+		const minutes = parseInt(durationStr.replace(/\D/g, ""), 10); // Extract numeric value
+		if (isNaN(minutes)) return "0m"; // Ensure it's a valid number
+
+		const hours = Math.floor(minutes / 60);
+		const remainingMinutes = minutes % 60;
+
+		return hours > 0
+			? `${hours}hr ${remainingMinutes > 0 ? `${remainingMinutes}min` : ""}`.trim()
+			: `${remainingMinutes}m`;
+	};
+
 	return (
 		<div
 			className={`group h-full ${
@@ -151,7 +166,7 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
 								</div>
 								<div>
 									<span className="text-sm text-black dark:text-blackColor-dark">
-										{duration}
+										{convertDurationToHours(duration)}
 									</span>
 								</div>
 							</div>
