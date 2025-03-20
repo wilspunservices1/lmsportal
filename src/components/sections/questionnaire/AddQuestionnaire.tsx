@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import useSweetAlert from '@/hooks/useSweetAlert';
 
 interface AddQuestionnaireProps {
@@ -9,21 +9,20 @@ interface AddQuestionnaireProps {
 }
 
 const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
-  const [quizId, setQuizId] = useState<string>('');
-  const [selectedQuiz, setSelectedQuiz] = useState('');
   const [quizTitle, setQuizTitle] = useState('');
-  const [quizzes, setQuizzes] = useState<Array<{ id: string; title: string; }>>([]);
-  const router = useRouter();
-  const showAlert = useSweetAlert();
+  const [selectedCourse, setSelectedCourse] = useState('');
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState<string[]>(['', '']);
   const [correctAnswer, setCorrectAnswer] = useState('');
-  const [questions, setQuestions] = useState<{ id: string; question: string; options: string; correctAnswer: string; }[]>([]);
+  const [questions, setQuestions] = useState<{ id: string; question: string; options: string[]; correctAnswer: string; }[]>([]);
   const [courses, setCourses] = useState<Array<{ id: string; title: string; }>>([]);
-  const [selectedCourse, setSelectedCourse] = useState('');
-  const [title, setTitle] = useState('');
   const [questionnaireId, setQuestionnaireId] = useState<string>('');
+  const router = useRouter();
+  const showAlert = useSweetAlert();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get('edit'); // Get the editId from the URL query params
 
+  // Fetch courses on component mount
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -36,7 +35,38 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
       }
     };
     fetchCourses();
-  }, [showAlert]);
+  }, []);
+
+ // Fetch questionnaire data if in edit mode
+useEffect(() => {
+  if (editId) {
+    console.log('Fetching questionnaire with editId:', editId);
+
+    const fetchQuestionnaire = async () => {
+      try {
+        const response = await fetch(`/api/questionnaire/${editId}`);
+        if (!response.ok) throw new Error('Failed to fetch questionnaire');
+        const data = await response.json();
+
+        setQuizTitle(data.title);
+        setSelectedCourse(data.courseId);
+        setQuestions(data.questions.map((q) => ({
+          id: q.id,
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+        })));
+      } catch (error) {
+        console.error('Error fetching questionnaire:', error);
+        showAlert('error', 'Failed to load questionnaire');
+      }
+    };
+
+    fetchQuestionnaire();
+  }
+}, [editId]); // Removed showAlert from the dependencies
+
+  
 
   // Add new option field
   const handleAddOption = () => {
@@ -84,10 +114,10 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
     }
 
     const newQuestion = {
-      id: Date.now().toString(),
+      id: Date.now().toString(), // Generate a unique ID for the new question
       question,
-      options: JSON.stringify(filledOptions),
-      correctAnswer
+      options: filledOptions, // No need to stringify, as options is already an array
+      correctAnswer,
     };
 
     setQuestions([...questions, newQuestion]);
@@ -98,38 +128,45 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
     setCorrectAnswer('');
   };
 
+  const handleDeleteQuestion = (id: string) => {
+    setQuestions(questions.filter(q => q.id !== id));
+  };
+
   const handleSaveQuestionnaire = async () => {
     if (!quizTitle.trim()) {
-      showAlert("error", "Quiz title is required");
+      showAlert('error', 'Quiz title is required');
       return;
     }
 
     if (!selectedCourse) {
-      showAlert("error", "Please select a course");
+      showAlert('error', 'Please select a course');
       return;
     }
 
     if (questions.length === 0) {
-      showAlert("error", "Please add at least one question");
+      showAlert('error', 'Please add at least one question');
       return;
     }
 
     try {
-      const saveResponse = await fetch("/api/questionnaire/save", {
-        method: "POST",
+      const method = editId ? 'PUT' : 'POST'; // Use PUT for edit mode, POST for create mode
+      const url = editId ? `/api/questionnaire/${editId}` : '/api/questionnaire/save';
+
+      const saveResponse = await fetch(url, {
+        method,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           title: quizTitle,
           courseId: selectedCourse,
           questions: questions.map(q => ({
             question: q.question,
-            options: JSON.parse(q.options),
-            correctAnswer: q.correctAnswer
+            options: q.options, // No need to parse, as options is already an array
+            correctAnswer: q.correctAnswer,
           })),
           isRequired: true,
-          minPassScore: 80
+          minPassScore: 80,
         }),
       });
 
@@ -143,15 +180,15 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
 
       if (savedData.success) {
         setQuestionnaireId(savedData.data.questionnaireId);
-        showAlert("success", "Questionnaire saved successfully");
+        showAlert('success', 'Questionnaire saved successfully');
         onClose?.();
         router.refresh();
       } else {
         throw new Error(savedData.error || 'Failed to save questionnaire');
       }
     } catch (error) {
-      console.error("Error saving questionnaire:", error);
-      showAlert("error", error.message || "Failed to save questionnaire");
+      console.error('Error saving questionnaire:', error);
+      showAlert('error', error.message || 'Failed to save questionnaire');
     }
   };
 
@@ -211,6 +248,7 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
           />
         </div>
 
+        {/* Options Input */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2">Options</label>
           {options.map((option, index) => (
@@ -272,15 +310,6 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
             Save Questionnaire
           </button>
         </div>
-        {/* Save Quiz Button
-        <div className="mt-4">
-          <button
-            onClick={handleSaveQuestionnaire}
-            className="w-full px-4 py-2 text-white rounded-md bg-primaryColor hover:bg-primaryColor-dark"
-          >
-            Save Quiz
-          </button>
-        </div> */}
       </div>
 
       {/* Display added questions */}
@@ -291,7 +320,7 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
             <div key={q.id} className="mb-4 p-4 border rounded">
               <p className="font-medium">Question {index + 1}: {q.question}</p>
               <ul className="ml-4 mt-2">
-                {JSON.parse(q.options).map((opt, i) => (
+                {q.options.map((opt, i) => (
                   <li
                     key={i}
                     className={opt === q.correctAnswer ? 'text-green-600 font-medium' : ''}
@@ -300,6 +329,13 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
                   </li>
                 ))}
               </ul>
+              <button
+                type="button"
+                onClick={() => handleDeleteQuestion(q.id)}
+                className="mt-2 text-red-500 hover:text-red-700"
+              >
+                Delete Question
+              </button>
             </div>
           ))}
         </div>

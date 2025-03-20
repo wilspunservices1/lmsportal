@@ -1,7 +1,8 @@
 "use client";
 
-import React, {useCallback, useEffect, useState, FC } from 'react';
+import React, { useCallback, useEffect, useState, FC } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import useSweetAlert from '@/hooks/useSweetAlert';
 import EditQuiz from './EditQuiz';
 
@@ -57,52 +58,49 @@ const ManageQuestionnaire: FC<ManageQuestionnaireProps> = ({
   const [editingQuizId, setEditingQuizId] = useState<string | null>(null);
   const [questionnaire, setQuestionnaire] = useState<Questionnaire | null>(null);
   const [userAnswers, setUserAnswers] = useState<{ [key: string]: string }>({});
+  const router = useRouter();
 
-
-const fetchQuestionnaires = useCallback(async () => {
-    setLoading(true); // Ensure loading state is updated before fetching
+  const fetchQuestionnaires = useCallback(async () => {
+    setLoading(true);
     try {
-        const response = await fetch("/api/questionnaire/list");
-        if (!response.ok) throw new Error(`Failed to fetch questionnaires: ${response.status} - ${response.statusText}`);
+      const response = await fetch("/api/questionnaire/list");
+      if (!response.ok) throw new Error(`Failed to fetch questionnaires: ${response.status} - ${response.statusText}`);
 
-        const data = await response.json();
-        setQuestionnaires(data.questionnaires);
+      const data = await response.json();
+      setQuestionnaires(data.questionnaires);
     } catch (error) {
-        console.error("Error fetching questionnaires:", error);
-        showAlert("error", error instanceof Error ? error.message : "Failed to load questionnaires");
+      console.error("Error fetching questionnaires:", error);
+      showAlert("error", error instanceof Error ? error.message : "Failed to load questionnaires");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-}, [showAlert]); // Empty dependency array since it doesn't rely on external variables
+  }, [showAlert]);
 
-const fetchSingleQuestionnaire = useCallback(async () => {
-    if (!questionnaireId) return; // Prevent API call if ID is missing
+  const fetchSingleQuestionnaire = useCallback(async () => {
+    if (!questionnaireId) return;
 
     setLoading(true);
     try {
-        const response = await fetch(`/api/courses/chapters/lectures/questionnaires/${questionnaireId}`);
-        if (!response.ok) throw new Error(`Failed to fetch questionnaire: ${response.status} - ${response.statusText}`);
+      const response = await fetch(`/api/courses/chapters/lectures/questionnaires/${questionnaireId}`);
+      if (!response.ok) throw new Error(`Failed to fetch questionnaire: ${response.status} - ${response.statusText}`);
 
-        const data = await response.json();
-        setQuestionnaire(data.questionnaire);
+      const data = await response.json();
+      setQuestionnaire(data.questionnaire);
     } catch (error) {
-        console.error("Error fetching questionnaire:", error);
-        showAlert("error", error instanceof Error ? error.message : "Failed to load quiz");
+      console.error("Error fetching questionnaire:", error);
+      showAlert("error", error instanceof Error ? error.message : "Failed to load quiz");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-}, [questionnaireId, showAlert]); // Depend on `questionnaireId` since it determines the fetch
+  }, [questionnaireId, showAlert]);
 
-// Automatically fetch data when `mode`, `questionnaireId`, or related functions change
-useEffect(() => {
+  useEffect(() => {
     if (mode === "take") {
-        fetchSingleQuestionnaire();
+      fetchSingleQuestionnaire();
     } else {
-        fetchQuestionnaires();
+      fetchQuestionnaires();
     }
-// eslint-disable-next-line react-hooks/exhaustive-deps    
-}, [mode, questionnaireId]); // All dependencies are included safely
-
+  }, [mode, questionnaireId]);
 
   const toggleQuestionnaireExpansion = (id: string) => {
     setExpandedQuestionnaire(expandedQuestionnaire === id ? null : id);
@@ -114,13 +112,13 @@ useEffect(() => {
         const response = await fetch(`/api/courses/chapters/lectures/questionnaires/?id=${id}`, {
           method: 'DELETE',
         });
-  
+
         const result = await response.json();
-  
+
         if (!response.ok) {
           throw new Error(result.error || 'Failed to delete questionnaire');
         }
-  
+
         if (result.success) {
           setQuestionnaires(questionnaires.filter(q => q.id !== id));
           showAlert('success', 'Questionnaire deleted successfully');
@@ -134,24 +132,26 @@ useEffect(() => {
     }
   };
 
+  const handleEdit = (id: string) => {
+    router.push(`/dashboards/questionnaire/add?edit=${id}`);
+  };
+
   const fetchCourses = useCallback(async () => {
-      try {
-          const response = await fetch("/api/courses");
-          if (!response.ok) throw new Error(`Failed to fetch courses: ${response.status} - ${response.statusText}`);
-  
-          const data = await response.json();
-          setCourses(data.courses);
-      } catch (error) {
-          console.error("Error fetching courses:", error);
-          showAlert("error", error instanceof Error ? error.message : "Failed to load courses");
-      }
-  }, [showAlert]); // Empty dependency array ensures function is memoized and does not change on re-renders
-  
-  // Fetch courses when the component mounts
+    try {
+      const response = await fetch("/api/courses");
+      if (!response.ok) throw new Error(`Failed to fetch courses: ${response.status} - ${response.statusText}`);
+
+      const data = await response.json();
+      setCourses(data.courses);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      showAlert("error", error instanceof Error ? error.message : "Failed to load courses");
+    }
+  }, [showAlert]);
+
   useEffect(() => {
-      fetchCourses();
-  }, [fetchCourses]); // Now `fetchCourses` is safely included
-  
+    fetchCourses();
+  }, [fetchCourses]);
 
   const handleAnswerSelect = (questionId: string, answer: string) => {
     setUserAnswers(prev => ({
@@ -289,7 +289,7 @@ useEffect(() => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setEditingQuizId(questionnaire.id);
+                      handleEdit(questionnaire.id);
                     }}
                     className="text-blue-600 hover:text-blue-800"
                   >
