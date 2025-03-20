@@ -22,7 +22,7 @@ const CourseDetailsSidebar = ({ type, course }) => {
       {/* <BlogContactForm /> */}
 
       {/* tags */}
-      <BlogTags />
+      {/* <BlogTags /> */}
     </div>
   );
 };

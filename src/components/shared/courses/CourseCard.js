@@ -78,19 +78,18 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
 
 	const categoryWithColors = assignColorsToCategories(categories, depBgs);
 
-	// Function to convert "1 Minutes" format to hours and minutes
-	const convertDurationToHours = (durationStr) => {
-		if (!durationStr) return "0m"; // Handle empty values
+	// Function to calculate total duration from chapters and lectures
+	const calculateTotalDuration = () => {
+		if (!chapters) return "0m";
 
-		const minutes = parseInt(durationStr.replace(/\D/g, ""), 10); // Extract numeric value
-		if (isNaN(minutes)) return "0m"; // Ensure it's a valid number
+		const totalMinutes = chapters.reduce((total, chapter) => {
+			const chapterMinutes = chapter.lectures?.reduce((chapTotal, lecture) => {
+				return chapTotal + (parseInt(lecture.duration) || 0)
+			}, 0) || 0;
+			return total + chapterMinutes;
+		}, 0);
 
-		const hours = Math.floor(minutes / 60);
-		const remainingMinutes = minutes % 60;
-
-		return hours > 0
-			? `${hours}hr ${remainingMinutes > 0 ? `${remainingMinutes}min` : ""}`.trim()
-			: `${remainingMinutes}m`;
+		return `${totalMinutes}m`;
 	};
 
 	return (
@@ -166,7 +165,7 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
 								</div>
 								<div>
 									<span className="text-sm text-black dark:text-blackColor-dark">
-										{convertDurationToHours(duration)}
+										{calculateTotalDuration()}
 									</span>
 								</div>
 							</div>
@@ -233,18 +232,6 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
 									</div>
 								</div>
 							)}
-							{/* {progress === 100 && (
-                <div>
-                  {isPurchased && (
-                    <button
-                      onClick={handleCertificateSelect}
-                      className="text-sm text-whiteColor bg-primaryColor border border-primaryColor px-26px py-0.5 leading-23px font-semibold hover:text-primaryColor hover:bg-whiteColor rounded inline-block dark:hover:bg-whiteColor-dark dark:hover:text-whiteColor"
-                    >
-                      Get Certificate
-                    </button>
-                  )}
-                </div>
-              )} */}
 						</div>
 					)}
 				</div>

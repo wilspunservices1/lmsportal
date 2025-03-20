@@ -494,7 +494,7 @@ const PopularSubjects2 = () => {
           >
             <div>
               <ButtonPrimary color="secondary" path="/courses" arrow={true}>
-                All Catagories
+                All Categories
               </ButtonPrimary>
             </div>
           </div>
