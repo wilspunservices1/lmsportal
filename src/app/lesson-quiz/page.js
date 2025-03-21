@@ -1,6 +1,6 @@
 "use client";
 import LessonQuizMain from "@/components/layout/main/LessonQuizMain";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 
 // export const metadata = {
@@ -12,7 +12,6 @@ const Lesson_Quiz = () => {
     <PageWrapper>
       <main>
         <LessonQuizMain />
-        <ThemeController />
       </main>
     </PageWrapper>
   );

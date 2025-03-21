@@ -1,5 +1,5 @@
 import BlogsMain from "@/components/layout/main/BlogsMain";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 import React from "react";
 export const metadata = {
@@ -11,7 +11,6 @@ const Blog_Dark = () => {
     <PageWrapper>
       <main className="is-dark">
         <BlogsMain />
-        <ThemeController />
       </main>
     </PageWrapper>
   );

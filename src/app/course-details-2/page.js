@@ -1,5 +1,5 @@
 import CourseDetails2Main from "@/components/layout/main/CourseDetails2Main";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 
 export const metadata = {
@@ -12,7 +12,6 @@ const Course_Details_2 = async () => {
     <PageWrapper>
       <main>
         <CourseDetails2Main />
-        <ThemeController />
       </main>
     </PageWrapper>
   );

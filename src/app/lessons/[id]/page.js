@@ -1,11 +1,10 @@
-import ThemeController from "@/components/shared/others/ThemeController";
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 import LessonMain from "@/components/layout/main/LessonMain";
 import { notFound } from "next/navigation";
 import { BASE_URL_API } from "@/actions/constant";
 import { isUUID } from "validator"; // Use a UUID validator
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // Fetch lesson data from the API
 const fetchLessonById = async (id) => {
@@ -16,9 +15,7 @@ const fetchLessonById = async (id) => {
   }
 
   try {
-
     const res = await fetch(`${BASE_URL_API}/lessons/${id}`, { method: "GET" });
-
 
     const contentType = res.headers.get("content-type");
 
@@ -39,7 +36,6 @@ const fetchLessonById = async (id) => {
 export async function generateMetadata({ params }) {
   const lesson = await fetchLessonById(params.id);
 
-
   if (!lesson) {
     return {
       title: "Lesson Not Found",
@@ -49,7 +45,9 @@ export async function generateMetadata({ params }) {
 
   const { title, id } = lesson;
   return {
-    title: `Lesson ${id == 1 ? "" : id < 10 ? "0" + id : id} | Meridian LMS - Education LMS Template`,
+    title: `Lesson ${
+      id == 1 ? "" : id < 10 ? "0" + id : id
+    } | Meridian LMS - Education LMS Template`,
     description: `${title} | Meridian LMS - Education LMS Template`,
   };
 }
@@ -57,7 +55,7 @@ export async function generateMetadata({ params }) {
 // The main lesson component that renders lesson data or 404 if not found
 const Lesson = async ({ params }) => {
   const { id } = params;
-  console.log("✅✅params", params)
+  console.log("✅✅params", params);
 
   // Fetch lesson data from the API
   const lesson = await fetchLessonById(id);
@@ -71,7 +69,6 @@ const Lesson = async ({ params }) => {
     <PageWrapper>
       <main>
         <LessonMain lesson={lesson} />
-        <ThemeController />
       </main>
     </PageWrapper>
   );

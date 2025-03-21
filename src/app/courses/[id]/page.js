@@ -1,5 +1,5 @@
 import CourseDetailsMain from "@/components/layout/main/CourseDetailsMain";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 import courses from "@/../public/fakedata/courses.json";
 import { notFound } from "next/navigation";
@@ -11,7 +11,8 @@ export const metadata = {
 };
 
 const isUUID = (id) => {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(id);
 };
 
@@ -27,7 +28,10 @@ const existingCourse = async (id) => {
     }
     return null;
   } catch (error) {
-    console.error("An error occurred while fetching the course details:", error);
+    console.error(
+      "An error occurred while fetching the course details:",
+      error
+    );
     return null;
   }
 };
@@ -37,7 +41,6 @@ const Course_Details = async ({ params }) => {
 
   const isExistCourse = await existingCourse(id);
 
-
   if (!isExistCourse) {
     return notFound();
   }
@@ -46,7 +49,6 @@ const Course_Details = async ({ params }) => {
     <PageWrapper>
       <main>
         <CourseDetailsMain id={id} course={isExistCourse} />
-        <ThemeController />
       </main>
     </PageWrapper>
   );
@@ -58,10 +60,8 @@ export async function generateStaticParams() {
 
 export default Course_Details;
 
-
-
 // import CourseDetailsMain from "@/components/layout/main/CourseDetailsMain";
-// import ThemeController from "@/components/shared/others/ThemeController";
+//
 // import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 // import courses from "@/../public/fakedata/courses.json";
 // import { notFound } from "next/navigation";
@@ -102,7 +102,7 @@ export default Course_Details;
 //     <PageWrapper>
 //       <main>
 //         <CourseDetailsMain id={id} course={isExistCourse}/>
-//         <ThemeController />
+//
 //       </main>
 //     </PageWrapper>
 //   );

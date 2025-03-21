@@ -1,5 +1,5 @@
 import Home2 from "@/components/layout/main/Home2";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 import React from "react";
 export const metadata = {
@@ -11,7 +11,6 @@ const Home_2_Dark = () => {
     <PageWrapper>
       <main className="is-dark">
         <Home2 />
-        <ThemeController />
       </main>
     </PageWrapper>
   );

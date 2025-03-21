@@ -8,7 +8,6 @@ import Home7 from "@/components/layout/main/Home7";
 import Home8 from "@/components/layout/main/Home8";
 import Home9 from "@/components/layout/main/Home9";
 import Home10 from "@/components/layout/main/Home10";
-import ThemeController from "@/components/shared/others/ThemeController";
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 
 export default function Home() {
@@ -17,7 +16,6 @@ export default function Home() {
       <main>
         {/* home 10 */}
         <Home3 />
-        <ThemeController />
       </main>
     </PageWrapper>
   );

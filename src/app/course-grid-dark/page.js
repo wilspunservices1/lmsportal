@@ -1,5 +1,5 @@
 import CourseGridMain from "@/components/layout/main/CourseGridMain";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 export const metadata = {
   title: "Course Grid - Dark | Meridian LMS - Education LMS Template",
@@ -10,7 +10,6 @@ const Course_Grid_Dark = () => {
     <PageWrapper>
       <main className="is-dark">
         <CourseGridMain />
-        <ThemeController />
       </main>
     </PageWrapper>
   );

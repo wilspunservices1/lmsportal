@@ -1,5 +1,5 @@
 import InstructorMain from "@/components/layout/main/InstructorMain";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 
 export const metadata = {
@@ -11,7 +11,6 @@ const Instructors_Dark = () => {
     <PageWrapper>
       <main className="is-dark">
         <InstructorMain />
-        <ThemeController />
       </main>
     </PageWrapper>
   );

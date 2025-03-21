@@ -1,5 +1,5 @@
 import BlogDetailsMain from "@/components/layout/main/BlogDetailsMain";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 import blogs from "@/../public/fakedata/blogs.json";
 import { notFound } from "next/navigation";
@@ -17,7 +17,6 @@ const Blog_Details_Dark = ({ params }) => {
     <PageWrapper>
       <main className="is-dark">
         <BlogDetailsMain />
-        <ThemeController />
       </main>
     </PageWrapper>
   );

@@ -1,6 +1,5 @@
 import Home10 from "@/components/layout/main/Home10";
 
-import ThemeController from "@/components/shared/others/ThemeController";
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 
 export const metadata = {
@@ -14,7 +13,6 @@ const Home_10_Dark = () => {
     <PageWrapper>
       <main className="is-dark">
         <Home10 />
-        <ThemeController />
       </main>
     </PageWrapper>
   );

@@ -1,6 +1,6 @@
 import StudentMessageMain from "@/components/layout/main/dashboards/StudentMessageMain";
 import DashboardContainer from "@/components/shared/containers/DashboardContainer";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import DsahboardWrapper from "@/components/shared/wrappers/DsahboardWrapper";
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 export const metadata = {
@@ -16,7 +16,6 @@ const Student_Message = () => {
             <StudentMessageMain />
           </DashboardContainer>
         </DsahboardWrapper>
-        <ThemeController />
       </main>
     </PageWrapper>
   );

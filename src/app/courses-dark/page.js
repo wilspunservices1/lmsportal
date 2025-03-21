@@ -1,5 +1,5 @@
 import CoursesMain from "@/components/layout/main/CoursesMain";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 import React from "react";
 export const metadata = {
@@ -11,7 +11,6 @@ const Courses_Dark = () => {
     <PageWrapper>
       <main className="is-dark">
         <CoursesMain />
-        <ThemeController />
       </main>
     </PageWrapper>
   );

@@ -1,6 +1,6 @@
 "use client"
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import CreateCerMain from "../_comp/CreateCerMain";
 
 const page: React.FC = () => {
@@ -11,7 +11,7 @@ const page: React.FC = () => {
       <main>
         <CreateCerMain />
       </main>
-      <ThemeController />
+      
     </PageWrapper>
   );
 };

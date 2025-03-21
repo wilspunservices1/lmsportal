@@ -1,5 +1,5 @@
 import ContactMain from "@/components/layout/main/ContactMain";
-import ThemeController from "@/components/shared/others/ThemeController";
+
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 
 export const metadata = {
@@ -12,7 +12,6 @@ const Contact_Dark = async () => {
     <PageWrapper>
       <main className="is-dark">
         <ContactMain />
-        <ThemeController />
       </main>
     </PageWrapper>
   );
