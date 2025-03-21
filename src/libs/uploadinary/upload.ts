@@ -3,10 +3,7 @@ const uploadToCloudinary = async (
 ): Promise<{ success: boolean; imgUrl?: string; error?: string }> => {
 	const formData = new FormData();
 	formData.append("file", file);
-
-	// Extract filename without extension to prevent duplicates
-	const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, ""); // Removes extension
-	formData.append("public_id", fileNameWithoutExt);
+	formData.append("public_id", file.name); // Preserve the original filename
 
 	try {
 		const response = await fetch("/api/upload", {
@@ -17,9 +14,10 @@ const uploadToCloudinary = async (
 		const data = await response.json();
 
 		if (response.ok) {
-			// Append `fl_attachment` **only when downloading**
-			const downloadUrl = `${data.imgUrl}?fl_attachment=${encodeURIComponent(file.name)}`;
-			return { success: true, imgUrl: downloadUrl };
+			return {
+				success: true,
+				imgUrl: `${data.imgUrl}`, // `fl_attachment` is already added in the API
+			};
 		} else {
 			return { success: false, error: data.error || "Unknown error occurred" };
 		}

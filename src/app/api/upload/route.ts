@@ -3,7 +3,6 @@ import { cloudinary } from "@/libs/uploadinary/cloudinary";
 
 export async function POST(req: NextRequest) {
 	try {
-		// Step 1: Read form data and get file
 		const formData = await req.formData();
 		const file = formData.get("file") as File;
 
@@ -11,42 +10,48 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ message: "No file provided" }, { status: 400 });
 		}
 
-		// Step 2: Convert file to buffer
 		const arrayBuffer = await file.arrayBuffer();
 		const buffer = Buffer.from(arrayBuffer);
 
-		// Step 3: Upload file to Cloudinary using buffer
+		// Extract filename and extension correctly
+		const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+		const fileExtension = file.name.split(".").pop();
+
+		// Upload file to Cloudinary
 		const result = await new Promise((resolve, reject) => {
 			const uploadStream = cloudinary.uploader.upload_stream(
 				{
-					folder: "courses", // Store in "courses" folder
-					resource_type: "auto", // Auto-detect file type
-					use_filename: true, // Preserve original filename
-					unique_filename: false, // Ensure filename stays the same
-					filename_override: file.name, // Set correct filename
-					flags: "attachment", // Force download behavior
+					folder: "courses",
+					resource_type: "auto",
+					use_filename: true,
+					unique_filename: false,
+					filename_override: file.name, // Retain correct filename & extension
+					flags: "attachment",
+					public_id: `${fileNameWithoutExt}`, // Preserve filename without extension
+					format: fileExtension, // Ensure the correct extension is preserved
 				},
 				(error, uploadResult) => {
-					if (error) reject(error);
-					else resolve(uploadResult);
+					if (error) {
+						console.error("Cloudinary upload error:", error);
+						reject(error);
+					} else {
+						resolve(uploadResult);
+					}
 				}
 			);
 
 			uploadStream.end(buffer);
 		});
 
-		// Step 4: Return Cloudinary file URL
+		// Return Cloudinary file URL with forced download
 		return NextResponse.json({
 			message: "success",
-			imgUrl: (result as any).secure_url,
+			imgUrl: `${(result as any).secure_url}?fl_attachment=${encodeURIComponent(file.name)}`,
 		});
 	} catch (error) {
 		console.error("Error during file upload:", error);
 		return NextResponse.json(
-			{
-				message: "Upload failed",
-				error: error.message,
-			},
+			{ message: "Upload failed", error: error.message },
 			{ status: 500 }
 		);
 	}

@@ -161,8 +161,12 @@ const CourseRight: React.FC<Props> = ({ courseId, extras }) => {
 										<div>
 											{/* Extract and display the file name */}
 											<p className="font-semibold">
-												{filePath.split("/").pop()}
+												{decodeURIComponent(
+													filePath.split("/").pop()?.split("?")[0] ||
+														"File"
+												)}
 											</p>
+
 											<button
 												type="button"
 												className="text-blue-500 underline"
