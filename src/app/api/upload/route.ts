@@ -19,9 +19,12 @@ export async function POST(req: NextRequest) {
 		const result = await new Promise((resolve, reject) => {
 			const uploadStream = cloudinary.uploader.upload_stream(
 				{
-					folder: "courses", // Change folder if needed
-					resource_type: "auto", // Automatically detects file type
-					use_filename: true,
+					folder: "courses", // Store in "courses" folder
+					resource_type: "auto", // Auto-detect file type
+					use_filename: true, // Preserve original filename
+					unique_filename: false, // Ensure filename stays the same
+					filename_override: file.name, // Set correct filename
+					flags: "attachment", // Force download behavior
 				},
 				(error, uploadResult) => {
 					if (error) reject(error);
