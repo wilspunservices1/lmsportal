@@ -2,6 +2,7 @@ import { useState } from "react";
 import ClientsReviews from "./_comp/ClientsReviews";
 import ReviewForm from "./_comp/reviewForm";
 import TotalRating from "./_comp/TotalRating";
+import CourseReviews from "./_comp/CourseReviews";
 
 const ReviewsContent = ({ reviews: initialReviews, courseId }) => {
   // Initialize state with existing reviews
@@ -14,13 +15,7 @@ const ReviewsContent = ({ reviews: initialReviews, courseId }) => {
 
   return (
     <div>
-      <TotalRating />
-      
-      {/* Display existing reviews */}
-      <ClientsReviews reviews={reviews} />
-
-      {/* Review form to add new reviews */}
-      <ReviewForm courseId={courseId} addReview={addReview} />
+      <CourseReviews courseId={courseId} />
     </div>
   );
 };

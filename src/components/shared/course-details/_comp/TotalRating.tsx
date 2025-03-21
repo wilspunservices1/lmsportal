@@ -1,100 +1,49 @@
 import React from "react";
 
-const TotalRating = () => {
+const TotalRating = ({ reviews, averageRating, ratingDistribution }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-x-30px gap-y-5">
       <div className="lg:col-start-1 lg:col-span-4 px-10px py-30px bg-whiteColor dark:bg-whiteColor-dark shadow-review text-center">
         <p className="text-7xl font-extrabold text-blackColor dark:text-blackColor-dark leading-90px">
-          0.0
+          {averageRating.toFixed(1)}
         </p>
         <div className="text-secondaryColor">
-          {" "}
-          <i className="icofont-star"></i> <i className="icofont-star"></i>{" "}
-          <i className="icofont-star"></i> <i className="icofont-star"></i>{" "}
-          <i className="icofont-star"></i>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <i
+              key={star}
+              className={`icofont-star ${
+                star <= Math.round(averageRating) ? "text-primaryColor" : ""
+              }`}
+            ></i>
+          ))}
         </div>
         <p className="text-blackColor dark:text-blackColor-dark leading-26px font-medium">
-          (0 Reviews)
+          ({reviews.length} Reviews)
         </p>
       </div>
       {/* progress bar  */}
       <div className="lg:col-start-5 lg:col-span-8 px-15px">
         <ul className="flex flex-col gap-y-3">
-          <li className="flex items-center text-blackColor dark:text-blackColor-dark">
-            <div>
-              <span>5</span>{" "}
-              <span>
-                <i className="icofont-star text-secondaryColor"></i>
-              </span>
-            </div>
-            <div className="flex-grow relative mx-10px md:mr-10 lg:mr-10px">
-              <span className="h-10px w-full bg-borderColor dark:bg-borderColor-dark rounded-full block"></span>
-              <span className="absolute left-0 top-0 h-10px w-0 bg-secondaryColor rounded-full"></span>
-            </div>
-            <div>
-              <span>0</span>
-            </div>
-          </li>
-          <li className="flex items-center text-blackColor dark:text-blackColor-dark">
-            <div>
-              <span>4</span>{" "}
-              <span>
-                <i className="icofont-star text-secondaryColor"></i>
-              </span>
-            </div>
-            <div className="flex-grow relative mx-10px md:mr-10 lg:mr-10px">
-              <span className="h-10px w-full bg-borderColor dark:bg-borderColor-dark rounded-full block"></span>
-              <span className="absolute left-0 top-0 h-10px w-0 bg-secondaryColor rounded-full"></span>
-            </div>
-            <div>
-              <span>0</span>
-            </div>
-          </li>
-          <li className="flex items-center text-blackColor dark:text-blackColor-dark">
-            <div>
-              <span>3</span>{" "}
-              <span>
-                <i className="icofont-star text-secondaryColor"></i>
-              </span>
-            </div>
-            <div className="flex-grow relative mx-10px md:mr-10 lg:mr-10px">
-              <span className="h-10px w-full bg-borderColor dark:bg-borderColor-dark rounded-full block"></span>
-              <span className="absolute left-0 top-0 h-10px w-0 bg-secondaryColor rounded-full"></span>
-            </div>
-            <div>
-              <span>0</span>
-            </div>
-          </li>
-          <li className="flex items-center text-blackColor dark:text-blackColor-dark">
-            <div>
-              <span>2</span>{" "}
-              <span>
-                <i className="icofont-star text-secondaryColor"></i>
-              </span>
-            </div>
-            <div className="flex-grow relative mx-10px md:mr-10 lg:mr-10px">
-              <span className="h-10px w-full bg-borderColor dark:bg-borderColor-dark rounded-full block"></span>
-              <span className="absolute left-0 top-0 h-10px w-0 bg-secondaryColor rounded-full"></span>
-            </div>
-            <div>
-              <span>0</span>
-            </div>
-          </li>
-          <li className="flex items-center text-blackColor dark:text-blackColor-dark">
-            <div>
-              <span>1</span>{" "}
-              <span>
-                <i className="icofont-star text-secondaryColor"></i>
-              </span>
-            </div>
-            <div className="flex-grow relative mx-10px md:mr-10 lg:mr-10px">
-              <span className="h-10px w-full bg-borderColor dark:bg-borderColor-dark rounded-full block"></span>
-              <span className="absolute left-0 top-0 h-10px w-0 bg-secondaryColor rounded-full"></span>
-            </div>
-            <div>
-              <span>0</span>
-            </div>
-          </li>
+          {ratingDistribution.map(({ star, count }) => (
+            <li key={star} className="flex items-center text-blackColor dark:text-blackColor-dark">
+              <div>
+                <span>{star}</span>{" "}
+                <span>
+                  <i className="icofont-star text-secondaryColor"></i>
+                </span>
+              </div>
+              <div className="flex-grow relative mx-10px md:mr-10 lg:mr-10px">
+                <span className="h-10px w-full bg-borderColor dark:bg-borderColor-dark rounded-full block"></span>
+                <span
+                  className="absolute left-0 top-0 h-10px bg-secondaryColor rounded-full"
+                  style={{ width: `${(count / reviews.length) * 100}%` }}
+                ></span>
+              </div>
+              <div>
+                <span>{count}</span>
+              </div>
+            </li>
+          ))}
         </ul>
       </div>
     </div>

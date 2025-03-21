@@ -71,13 +71,13 @@ const ReviewForm = ({ courseId, addReview }) => {
         };
         addReview(newReview); // Call the addReview function to update state
 
-        showAlert("success", "Review submitted successfully", );
+        showAlert("success", "Review submitted successfully");
       } else {
-        showAlert("error" , result.message || "Failed to submit the review" );
+        showAlert("error", result.message || "Failed to submit the review");
       }
     } catch (error) {
       console.error("Error submitting review:", error);
-      showAlert("error submitting review. Please try again.", "error");
+      showAlert("error", "Error submitting review. Please try again.");
     } finally {
       setLoading(false);
     }

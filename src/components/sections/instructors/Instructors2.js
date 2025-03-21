@@ -11,19 +11,19 @@ const Instructors2 = () => {
   const instructors = [
     {
       id: 1,
-      name: "Mr Khizer",
+      name: "Mr. Khizer",
       image: teamImage1,
       desig: "INSTRUCTOR",
     },
     {
       id: 2,
-      name: "Mr kamran",
+      name: "Mr. Kamran",
       image: teamImage2,
       desig: "INSTRUCTOR",
     },
     {
       id: 3,
-      name: "Mr Sheharyar",
+      name: "Mr. Sheharyar",
       image: teamImage3,
       desig: "INSTRUCTOR",
     },

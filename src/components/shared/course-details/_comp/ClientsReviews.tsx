@@ -6,8 +6,6 @@ type Props = {
 };
 
 const ClientsReviews: React.FC<Props> = ({ reviews }) => {
-  console.log("reviews from client reviews", reviews);
-
   return (
     <div className="mt-60px mb-10">
       <h4 className="text-lg text-blackColor dark:text-blackColor-dark font-bold pl-2 before:w-0.5 relative before:h-[21px] before:bg-secondaryColor before:absolute before:bottom-[5px] before:left-0 leading-1.2 mb-25px">
