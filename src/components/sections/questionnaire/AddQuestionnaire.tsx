@@ -8,15 +8,23 @@ interface AddQuestionnaireProps {
   onClose?: () => void;
 }
 
+interface Question {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+}
+
 const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
   const [quizTitle, setQuizTitle] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('');
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState<string[]>(['', '']);
   const [correctAnswer, setCorrectAnswer] = useState('');
-  const [questions, setQuestions] = useState<{ id: string; question: string; options: string[]; correctAnswer: string; }[]>([]);
-  const [courses, setCourses] = useState<Array<{ id: string; title: string; }>>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [courses, setCourses] = useState<Array<{ id: string; title: string }>>([]);
   const [questionnaireId, setQuestionnaireId] = useState<string>('');
+  const [isEditingQuestion, setIsEditingQuestion] = useState<string | null>(null); // Track which question is being edited
   const router = useRouter();
   const showAlert = useSweetAlert();
   const searchParams = useSearchParams();
@@ -37,36 +45,34 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
     fetchCourses();
   }, []);
 
- // Fetch questionnaire data if in edit mode
-useEffect(() => {
-  if (editId) {
-    console.log('Fetching questionnaire with editId:', editId);
+  // Fetch questionnaire data if in edit mode
+  useEffect(() => {
+    if (editId) {
+      console.log('Fetching questionnaire with editId:', editId);
 
-    const fetchQuestionnaire = async () => {
-      try {
-        const response = await fetch(`/api/questionnaire/${editId}`);
-        if (!response.ok) throw new Error('Failed to fetch questionnaire');
-        const data = await response.json();
+      const fetchQuestionnaire = async () => {
+        try {
+          const response = await fetch(`/api/questionnaire/${editId}`);
+          if (!response.ok) throw new Error('Failed to fetch questionnaire');
+          const data = await response.json();
 
-        setQuizTitle(data.title);
-        setSelectedCourse(data.courseId);
-        setQuestions(data.questions.map((q) => ({
-          id: q.id,
-          question: q.question,
-          options: q.options,
-          correctAnswer: q.correctAnswer,
-        })));
-      } catch (error) {
-        console.error('Error fetching questionnaire:', error);
-        showAlert('error', 'Failed to load questionnaire');
-      }
-    };
+          setQuizTitle(data.title);
+          setSelectedCourse(data.courseId);
+          setQuestions(data.questions.map((q) => ({
+            id: q.id,
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+          })));
+        } catch (error) {
+          console.error('Error fetching questionnaire:', error);
+          showAlert('error', 'Failed to load questionnaire');
+        }
+      };
 
-    fetchQuestionnaire();
-  }
-}, [editId]); // Removed showAlert from the dependencies
-
-  
+      fetchQuestionnaire();
+    }
+  }, [editId]);
 
   // Add new option field
   const handleAddOption = () => {
@@ -96,6 +102,7 @@ useEffect(() => {
     setOptions(newOptions);
   };
 
+  // Add or update a question
   const handleAddQuestion = () => {
     if (!question.trim()) {
       showAlert('error', 'Please enter a question');
@@ -114,13 +121,20 @@ useEffect(() => {
     }
 
     const newQuestion = {
-      id: Date.now().toString(), // Generate a unique ID for the new question
+      id: isEditingQuestion || Date.now().toString(), // Use existing ID if editing
       question,
-      options: filledOptions, // No need to stringify, as options is already an array
+      options: filledOptions,
       correctAnswer,
     };
 
-    setQuestions([...questions, newQuestion]);
+    if (isEditingQuestion) {
+      // Update the existing question
+      setQuestions(questions.map(q => (q.id === isEditingQuestion ? newQuestion : q)));
+      setIsEditingQuestion(null); // Exit edit mode
+    } else {
+      // Add a new question
+      setQuestions([...questions, newQuestion]);
+    }
 
     // Reset form
     setQuestion('');
@@ -128,30 +142,51 @@ useEffect(() => {
     setCorrectAnswer('');
   };
 
+  // Delete a question
   const handleDeleteQuestion = (id: string) => {
     setQuestions(questions.filter(q => q.id !== id));
   };
 
+  // Edit a question
+  const handleEditQuestion = (id: string) => {
+    const questionToEdit = questions.find(q => q.id === id);
+    if (questionToEdit) {
+      setQuestion(questionToEdit.question);
+      setOptions(questionToEdit.options);
+      setCorrectAnswer(questionToEdit.correctAnswer);
+      setIsEditingQuestion(id); // Enter edit mode
+    }
+  };
+
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setQuestion('');
+    setOptions(['', '']);
+    setCorrectAnswer('');
+    setIsEditingQuestion(null); // Exit edit mode
+  };
+
+  // Save or update the questionnaire
   const handleSaveQuestionnaire = async () => {
     if (!quizTitle.trim()) {
       showAlert('error', 'Quiz title is required');
       return;
     }
-
+  
     if (!selectedCourse) {
       showAlert('error', 'Please select a course');
       return;
     }
-
+  
     if (questions.length === 0) {
       showAlert('error', 'Please add at least one question');
       return;
     }
-
+  
     try {
       const method = editId ? 'PUT' : 'POST'; // Use PUT for edit mode, POST for create mode
       const url = editId ? `/api/questionnaire/${editId}` : '/api/questionnaire/save';
-
+  
       const saveResponse = await fetch(url, {
         method,
         headers: {
@@ -162,27 +197,28 @@ useEffect(() => {
           courseId: selectedCourse,
           questions: questions.map(q => ({
             question: q.question,
-            options: q.options, // No need to parse, as options is already an array
+            options: q.options,
             correctAnswer: q.correctAnswer,
           })),
           isRequired: true,
           minPassScore: 80,
         }),
       });
-
+  
       if (!saveResponse.ok) {
         const errorData = await saveResponse.json();
         throw new Error(errorData.error || 'Failed to save questionnaire');
       }
-
+  
       const savedData = await saveResponse.json();
       console.log('Saved questionnaire data:', savedData);
-
+  
       if (savedData.success) {
         setQuestionnaireId(savedData.data.questionnaireId);
         showAlert('success', 'Questionnaire saved successfully');
-        onClose?.();
-        router.refresh();
+  
+        // Redirect to the ManageQuestionnaire page after saving
+        router.push('/dashboards/questionnaire/manage'); // Update the path as needed
       } else {
         throw new Error(savedData.error || 'Failed to save questionnaire');
       }
@@ -300,15 +336,17 @@ useEffect(() => {
             onClick={handleAddQuestion}
             className="bg-secondaryColor text-white px-4 py-2 rounded hover:bg-opacity-90"
           >
-            Add Question
+            {isEditingQuestion ? 'Update Question' : 'Add Question'}
           </button>
-          <button
-            type="button"
-            onClick={handleSaveQuestionnaire}
-            className="bg-primaryColor text-white px-4 py-2 rounded hover:bg-opacity-90"
-          >
-            Save Questionnaire
-          </button>
+          {isEditingQuestion && (
+            <button
+              type="button"
+              onClick={handleCancelEdit}
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            >
+              Cancel Edit
+            </button>
+          )}
         </div>
       </div>
 
@@ -329,17 +367,37 @@ useEffect(() => {
                   </li>
                 ))}
               </ul>
-              <button
-                type="button"
-                onClick={() => handleDeleteQuestion(q.id)}
-                className="mt-2 text-red-500 hover:text-red-700"
-              >
-                Delete Question
-              </button>
+              <div className="flex space-x-2 mt-2">
+                <button
+                  type="button"
+                  onClick={() => handleEditQuestion(q.id)}
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteQuestion(q.id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* Save Questionnaire Button */}
+      <div className="flex justify-end mt-6">
+        <button
+          type="button"
+          onClick={handleSaveQuestionnaire}
+          className="bg-primaryColor text-white px-4 py-2 rounded hover:bg-opacity-90"
+        >
+          Save Questionnaire
+        </button>
+      </div>
     </div>
   );
 };

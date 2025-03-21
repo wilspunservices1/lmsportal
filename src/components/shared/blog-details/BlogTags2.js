@@ -15,7 +15,7 @@ const BlogTags2 = () => {
             href={`/courses?category=business`}
             className="px-2 py-5px md:px-3 md:py-9px text-contentColor text-size-11 md:text-xs font-medium uppercase border border-borderColor2 hover:text-whiteColor hover:bg-primaryColor hover:border-primaryColor dark:text-contentColor-dark dark:border-borderColor2-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:hover:border-primaryColor rounded"
           >
-            Business
+            Food & Safety
           </Link>
         </li>
         <li>
@@ -23,7 +23,7 @@ const BlogTags2 = () => {
             href={`/courses?category=design`}
             className="px-2 py-5px md:px-3 md:py-9px text-contentColor text-size-11 md:text-xs font-medium uppercase border border-borderColor2 hover:text-whiteColor hover:bg-primaryColor hover:border-primaryColor dark:text-contentColor-dark dark:border-borderColor2-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:hover:border-primaryColor rounded"
           >
-            DESIGN
+            Health & Safety
           </Link>
         </li>
         <li>
@@ -31,7 +31,7 @@ const BlogTags2 = () => {
             href={`/courses?category=app`}
             className="px-2 py-5px md:px-3 md:py-9px text-contentColor text-size-11 md:text-xs font-medium uppercase border border-borderColor2 hover:text-whiteColor hover:bg-primaryColor hover:border-primaryColor dark:text-contentColor-dark dark:border-borderColor2-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:hover:border-primaryColor rounded"
           >
-            APPS
+            Six Sigma
           </Link>
         </li>
         <li>
@@ -39,7 +39,7 @@ const BlogTags2 = () => {
             href={`/courses?category=data`}
             className="px-2 py-5px md:px-3 md:py-9px text-contentColor text-size-11 md:text-xs font-medium uppercase border border-borderColor2 hover:text-whiteColor hover:bg-primaryColor hover:border-primaryColor dark:text-contentColor-dark dark:border-borderColor2-dark dark:hover:text-whiteColor dark:hover:bg-primaryColor dark:hover:border-primaryColor rounded"
           >
-            DATA
+            Quality Management
           </Link>
         </li>
       </ul>

@@ -11,21 +11,21 @@ const Instructors2 = () => {
   const instructors = [
     {
       id: 1,
-      name: "Jayesh",
+      name: "Mr Khizer",
       image: teamImage1,
-      desig: "Full Stack Developer",
+      desig: "INSTRUCTOR",
     },
     {
       id: 2,
-      name: "Arman Bhatti",
+      name: "Mr kamran",
       image: teamImage2,
-      desig: "Software Engineer",
+      desig: "INSTRUCTOR",
     },
     {
       id: 3,
-      name: "Bilal Ijaz",
+      name: "Mr Sheharyar",
       image: teamImage3,
-      desig: "Zoho Crm Developer",
+      desig: "INSTRUCTOR",
     },
   ];
   return (
