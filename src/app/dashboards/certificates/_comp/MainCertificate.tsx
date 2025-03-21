@@ -36,7 +36,7 @@ const MainCertificate = () => {
               href="/dashboards/certificates/edit"
               className="block p-4 border rounded hover:border-primaryColor transition-colors"
             >
-              Edit Existing Certificates
+              Existing Certificates
             </Link>
           </div>
         </div>
