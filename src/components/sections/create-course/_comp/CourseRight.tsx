@@ -75,10 +75,10 @@ const CourseRight: React.FC<Props> = ({ courseId, extras }) => {
     setLinks(updatedLinks);
   };
 
-  // Handle multiple file uploads and update file paths
-  const handleMultipleFiles = (paths: string[]) => {
-    setFilePaths(paths);
-  };
+ // Handle multiple file uploads and update file paths
+	const handleMultipleFiles = (paths: string[]) => {
+		setFilePaths((prevPaths) => [...prevPaths, ...paths]); // Append new files instead of replacing
+	};
 
   const handleOpenModal = (filePath: string) => {
     const fileType = filePath.split(".").pop()?.toLowerCase() || "unknown";
@@ -126,49 +126,7 @@ const CourseRight: React.FC<Props> = ({ courseId, extras }) => {
     }
   };
 
-  // const handleSave = async () => {
-  //   setIsSaving(true);
-
-  //   // Filter out empty links before saving
-  //   const validLinks = links.filter((link) => link.trim() !== "");
-
-  //   const courseExtras = {
-  //     languages: languages.map((lang) => lang.value),
-  //     links: validLinks, // Use filtered links to remove empty strings
-  //     filePaths,
-  //   };
-
-  //   const formData = new FormData();
-  //   formData.append("extras", JSON.stringify(courseExtras));
-
-  //   try {
-  //     const response = await fetch(`/api/courses/${courseId}`, {
-  //       method: "PATCH",
-  //       body: formData,
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-  //       showAlert("success", "Course extras updated successfully.");
-  //       if (data.updatedFilePaths) {
-  //         setFilePaths(data.updatedFilePaths);
-  //       }
-  //     } else {
-  //       showAlert(
-  //         "error",
-  //         `Failed to update course: ${data.error || "Unknown error"}`
-  //       );
-  //     }
-  //   } catch (error: any) {
-  //     console.error("Error updating course extras:", error);
-  //     showAlert("error", `An unexpected error occurred: ${error.message}`);
-  //   } finally {
-  //     setIsSaving(false);
-  //   }
-  // };
-
-  return (
+   return (
     <div className="lg:col-start-9 lg:col-span-4" data-aos="fade-up">
       <div className="p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
         <h3 className="text-xl font-semibold text-blue-600 mb-4">
