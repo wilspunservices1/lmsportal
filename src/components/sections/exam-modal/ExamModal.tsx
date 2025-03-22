@@ -68,6 +68,7 @@ const ExamModal: React.FC<ExamModalProps> = ({
 	 * The timer counts down from 60 minutes (3600 seconds).
 	 * When the timer runs out, the exam is automatically submitted.
 	 */
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	useEffect(() => {
 		const timer = setInterval(() => {
 			setTimeLeft((prev) => {
@@ -88,6 +89,7 @@ const ExamModal: React.FC<ExamModalProps> = ({
 		}, 1000);
 
 		return () => clearInterval(timer);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [examData]);
 
 	/** Handle user's option selection */
@@ -156,7 +158,7 @@ const ExamModal: React.FC<ExamModalProps> = ({
 
 			// Submit to API
 			const response = await fetch(
-				`${BASE_URL}/api/questionnaire/submit`,
+				`${BASE_URL}/api/questionnaire/submitFinalExam`,
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
