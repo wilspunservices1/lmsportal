@@ -54,7 +54,14 @@ const CourseDetailsPrimary = ({
         }
 
         const data = await response.json();
-        setCourseDetails(data.data); // Update the state with the latest course details
+        setCourseDetails(data.data);
+
+        // Calculate total duration
+        const totalDuration = calculateTotalDuration(data.data.chapters);
+        setCourseDetails((prev) => ({
+          ...prev,
+          duration: totalDuration,
+        }));
       } catch (error) {
         console.error("Error fetching course details:", error);
         setError(error.message);
@@ -62,7 +69,22 @@ const CourseDetailsPrimary = ({
     };
 
     fetchCourseDetails();
-  }, [currentId]); // Re-run this effect whenever `currentId` changes
+  }, [currentId]);
+
+  const calculateTotalDuration = (chapters) => {
+    if (!chapters) return "0 minutes";
+
+    let totalMinutes = 0;
+    chapters.forEach((chapter) => {
+      if (chapter.lectures) {
+        chapter.lectures.forEach((lecture) => {
+          totalMinutes += parseInt(lecture.duration) || 0;
+        });
+      }
+    });
+
+    return `${totalMinutes} minutes`;
+  };
 
   const FAQItem = ({ question, answer }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -509,7 +531,7 @@ const CourseDetailsPrimary = ({
                     width="600"
                     height="600"
                     alt=""
-                    src={thumbnail}
+                    src={courseDetails.thumbnail}
                     sizes={"60w"}
                   />
                 </div>
@@ -533,7 +555,7 @@ const CourseDetailsPrimary = ({
                           Course Description
                         </a>
                         <button className="text-sm text-whiteColor bg-indigo border border-indigo px-22px py-0.5 leading-23px font-semibold hover:text-indigo hover:bg-whiteColor rounded inline-block dark:hover:bg-whiteColor-dark dark:hover:text-indigo">
-                          {categories}
+                          {courseDetails.categories}
                         </button>
                         {isPurchased && (
                           <button
@@ -548,7 +570,7 @@ const CourseDetailsPrimary = ({
                         <p className="text-sm text-contentColor dark:text-contentColor-dark font-medium">
                           Last Update:{" "}
                           <span className="text-blackColor dark:text-blackColor-dark">
-                            {formatDate(updatedAt)}
+                            {formatDate(courseDetails.updatedAt)}
                           </span>
                         </p>
                       </div>
@@ -559,7 +581,7 @@ const CourseDetailsPrimary = ({
                       className="text-size-32 md:text-4xl font-bold text-blackColor dark:text-blackColor-dark mb-15px leading-43px md:leading-14.5"
                       data-aos="fade-up"
                     >
-                      {title || "Making inspiration with Other People"}
+                      {courseDetails.title || "Making inspiration with Other People"}
                     </h4>
                     {/* price and rating  */}
                     <div
@@ -567,9 +589,9 @@ const CourseDetailsPrimary = ({
                       data-aos="fade-up"
                     >
                       <div className="text-size-21 font-medium text-primaryColor font-inter leading-25px">
-                        ${price ? parseFloat(price).toFixed(2) : "0.00"}{" "}
+                        ${courseDetails.price ? parseFloat(courseDetails.price).toFixed(2) : "0.00"}{" "}
                         <del className="text-sm text-lightGrey4 font-semibold">
-                          / ${parseFloat(estimatedPrice).toFixed(2)}
+                          / ${parseFloat(courseDetails.estimatedPrice).toFixed(2)}
                         </del>
                       </div>
                       <div className="flex items-center">
@@ -578,7 +600,7 @@ const CourseDetailsPrimary = ({
                         </div>
                         <div>
                           <span className=" text-black dark:text-blackColor-dark">
-                            {lesson || "23 Lesson"}
+                            {courseDetails.lesson || "23 Lesson"}
                           </span>
                         </div>
                       </div>
@@ -620,7 +642,7 @@ const CourseDetailsPrimary = ({
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
                               Lectures :
                               <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {lesson ? lesson : 0} Modules
+                                {courseDetails.lesson ? courseDetails.lesson : 0} Modules
                               </span>
                             </p>
                           </li>
@@ -628,7 +650,7 @@ const CourseDetailsPrimary = ({
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
                               Duration :
                               <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {duration ? duration : ""}
+                                {courseDetails.duration || "0 minutes"}
                               </span>
                             </p>
                           </li>
@@ -654,7 +676,7 @@ const CourseDetailsPrimary = ({
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
                               Course level :
                               <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {skillLevel ? skillLevel : "Intermediate"}
+                                {courseDetails.skillLevel ? courseDetails.skillLevel : "Intermediate"}
                               </span>
                             </p>
                           </li>
@@ -662,18 +684,16 @@ const CourseDetailsPrimary = ({
                             <p className="text-contentColor2  dark:text-contentColor2-dark flex justify-between items-center">
                               <span>Languages :</span>
                               <span className="text-xs pl-1 lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {/* Dynamically map and join languages */}
-                                {extras?.languages &&
-                                extras.languages.length > 0
-                                  ? extras.languages
+                                {courseDetails.extras?.languages &&
+                                courseDetails.extras.languages.length > 0
+                                  ? courseDetails.extras.languages
                                       .map(
                                         (lang, index) =>
                                           lang.charAt(0).toUpperCase() +
                                           lang.slice(1)
                                       )
                                       .join(", ")
-                                  : "English"}{" "}
-                                {/* Default to "English" if no languages available */}
+                                  : "English"}
                               </span>
                             </p>
                           </li>
@@ -682,7 +702,7 @@ const CourseDetailsPrimary = ({
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
                               Price Discount :
                               <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {discount ? `${discount}%` : "-20%"}
+                                {courseDetails.discount ? `${courseDetails.discount}%` : "-20%"}
                               </span>
                             </p>
                           </li>
@@ -690,7 +710,7 @@ const CourseDetailsPrimary = ({
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
                               Regular Price :
                               <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {price ? `$${price}` : "$0"}
+                                {courseDetails.price ? `$${courseDetails.price}` : "$0"}
                               </span>
                             </p>
                           </li>
