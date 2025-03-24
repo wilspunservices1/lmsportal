@@ -58,7 +58,7 @@ const About3 = () => {
               <li className="flex items-center group">
                 <i className="icofont-check px-2 py-2 text-primaryColor bg-whitegrey3 bg-opacity-40 group-hover:bg-primaryColor group-hover:text-white group-hover:opacity-100 mr-15px dark:bg-whitegrey1-dark"></i>
                 <p className="text-sm md:text-base font-medium text-blackColor dark:text-blackColor-dark">
-                Upgrade your skills with the latest industry-relevant resources.
+                Upgrade your skills with the latest industry-relevant resources
                 </p>
               </li>
             </ul>

@@ -13,10 +13,10 @@ const CoursesFilter = () => {
             {/* courses Left */}
             <div className="basis-full lg:basis-[500px]" data-aos="fade-up">
               <HeadingPrimaryXl>
-                Our <br className="hidden lg:block" /> Courses
+                Our  Courses
               </HeadingPrimaryXl>
               <div>
-                <p>Flexible Learning, Courses made by Experts, and Career-Defining Growth.</p>
+                <p>Flexible Learning, Courses made by Experts, and <br></br>Career-Defining Growth.</p>
               </div>
             </div>
             {/* courses right */}

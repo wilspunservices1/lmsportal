@@ -31,15 +31,15 @@ const Hero3 = () => {
                   <div data-aos="fade-up">
                     <HreoName>EDUCATION SOLUTION</HreoName>
                     <HeadingXl>
-                    Cloud-Based LMS. <br className="hidden md:block" />
-                    Trusted by 1,000+ Organizations
+                    Cloud-Based LMS <br className="hidden md:block" />
+                    Trusted by Many Organizations
                     </HeadingXl>
                     <p className="text-size-15 md:text-lg text-blackColor dark:text-blackColor-dark font-medium mb-45px">
                     For <strong>educators</strong>, it's a powerful platform to create, manage, and
                     deliver engaging courses with ease. <br></br>
                     For <strong>learners</strong>, it's a seamless way to gain new skills anytime,
                     anywhere. Scalable, intuitive, and built for success—experience
-                    learning without limits
+                    learning without limits.
                     </p>
 
                     <div className="space-x-5 md:space-x-30px">

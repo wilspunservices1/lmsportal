@@ -89,8 +89,9 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 
 	// Fetch certificates data from the API
 	useEffect(() => {
+
 		if (!courseId || courseId.trim() === "") {
-			showAlert("error", "Course ID is missing.");
+			showAlert("error", "Welcome.");
 			return;
 		}
 

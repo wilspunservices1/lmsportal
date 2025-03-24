@@ -31,7 +31,7 @@ const Instructors2 = () => {
   return (
     <section>
       <div className="container py-30px md:pt-10 md:pb-50px 2xl:pt-50px 2xl:pb-100px">
-        {/* heading */}
+        {/* heading
 
         <div data-aos="fade-up" className="text-center mb-15px">
           <SectionNameSecondary>EXPERT TEACHER</SectionNameSecondary>
@@ -40,10 +40,10 @@ const Instructors2 = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-30px">
           {/* teachers */}
 
-          {instructors.map((instructor, idx) => (
+          {/* {instructors.map((instructor, idx) => (
             <Instructor key={idx} instructor={instructor} />
-          ))}
-        </div>
+          ))} */}
+        {/* </div> */} 
       </div>
     </section>
   );

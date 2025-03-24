@@ -8,7 +8,7 @@ const AboutMeridian = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">About Meridian</h2>
           <p className="text-gray-600 mb-8">
-            At Meridian, we are revolutionizing the way learning happens. Our cutting-edge Learning Management System (LMS) is designed to empower educators, businesses, and learners by providing an intuitive, efficient, and engaging digital learning experience.
+          We are redefining learning with a futuristic LMS that empowers educators, businesses, and learners. Designed for maximum efficiency and engagement, our intuitive platform ensures seamless knowledge transfer and an unparalleled digital learning experience.
           </p>
         </div>
 
@@ -36,7 +36,7 @@ const AboutMeridian = () => {
         <div className="mt-12 text-center">
           <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Vision</h3>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            To be a global leader in digital learning by continually innovating and redefining the e-learning landscape.
+          To revolutionize digital learning through continuous innovation, setting new standards in engagement, accessibility, and technology-driven education worldwide.
           </p>
           <p className="mt-6 text-lg font-semibold text-blue-600">
             Join Meridian and experience the future of learning today!

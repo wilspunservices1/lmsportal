@@ -193,7 +193,7 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
 										isFree ? "text-greencolor" : "text-secondaryColor3"
 									}`}
 								>
-									{isFree ? "Free" : <span>Paid</span>}
+									{isFree ? "Free" : <span></span>}
 								</span>
 							</div>
 						) : (

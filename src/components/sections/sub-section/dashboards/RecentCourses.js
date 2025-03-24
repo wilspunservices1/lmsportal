@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import HeadingDashboard from "@/components/shared/headings/HeadingDashboard";
 import Image from "next/image";
@@ -43,10 +43,11 @@ const RecentCourses = () => {
           ) => (
             <li
               key={idx}
-              className={`flex items-center flex-wrap  ${idx === courses?.length - 1
+              className={`flex items-center flex-wrap  ${
+                idx === courses?.length - 1
                   ? "pt-5"
                   : "py-5 border-b border-borderColor dark:border-borderColor-dark"
-                }`}
+              }`}
             >
               {/* Thumbnail */}
               <div className="w-full md:w-30% md:pr-5">
@@ -74,7 +75,10 @@ const RecentCourses = () => {
                   </h5>
                   <div className="flex flex-wrap items-center justify-between text-sm text-darkblack dark:text-darkblack-dark gap-x-15px gap-y-10px leading-1.8">
                     <p>
-                      <i className="icofont-teacher"></i> Meridian 
+                      <i className="icofont-teacher"></i>{" "}
+                      <Link href="/contact-us-form" className="hover:text-primaryColor">
+                        Meridian Co-ordinator
+                      </Link>
                     </p>
                     <br></br>
                     <p>
@@ -95,7 +99,6 @@ const RecentCourses = () => {
 };
 
 export default RecentCourses;
-
 
 // import HeadingDashboard from "@/components/shared/headings/HeadingDashboard";
 // import Image from "next/image";

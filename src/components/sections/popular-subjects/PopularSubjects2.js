@@ -14,7 +14,7 @@ const PopularSubjects2 = () => {
       navButton: false,
       category: "Food & Safety",
       svg: (
-        <div className="relative w-20 h-[60px]">
+        <div className="relative w-20 h-[70px]">
           <svg
             className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px]"
             fill="none"
@@ -190,7 +190,7 @@ const PopularSubjects2 = () => {
     },
     {
       id: 4,
-      title: "Six Sigma", 
+      title: "Six Sigma",
       desc: "",
       navButton: false,
       category: "Sigma Development",
@@ -493,9 +493,11 @@ const PopularSubjects2 = () => {
             data-aos="fade-up"
           >
             <div>
-              <ButtonPrimary color="secondary" path="/courses" arrow={true}>
-                All Categories
-              </ButtonPrimary>
+              <Link href="/courses" passHref>
+                <ButtonPrimary color="secondary" arrow={true}>
+                  All Categories
+                </ButtonPrimary>
+              </Link>
             </div>
           </div>
         </div>

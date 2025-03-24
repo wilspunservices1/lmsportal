@@ -581,7 +581,8 @@ const CourseDetailsPrimary = ({
                       className="text-size-32 md:text-4xl font-bold text-blackColor dark:text-blackColor-dark mb-15px leading-43px md:leading-14.5"
                       data-aos="fade-up"
                     >
-                      {courseDetails.title || "Making inspiration with Other People"}
+                      {courseDetails.title ||
+                        "Making inspiration with Other People"}
                     </h4>
                     {/* price and rating  */}
                     <div
@@ -589,9 +590,13 @@ const CourseDetailsPrimary = ({
                       data-aos="fade-up"
                     >
                       <div className="text-size-21 font-medium text-primaryColor font-inter leading-25px">
-                        ${courseDetails.price ? parseFloat(courseDetails.price).toFixed(2) : "0.00"}{" "}
+                        $
+                        {courseDetails.price
+                          ? parseFloat(courseDetails.price).toFixed(2)
+                          : "0.00"}{" "}
                         <del className="text-sm text-lightGrey4 font-semibold">
-                          / ${parseFloat(courseDetails.estimatedPrice).toFixed(2)}
+                          / $
+                          {parseFloat(courseDetails.estimatedPrice).toFixed(2)}
                         </del>
                       </div>
                       <div className="flex items-center">
@@ -631,41 +636,44 @@ const CourseDetailsPrimary = ({
                       >
                         <ul className="p-10px md:py-55px md:pl-50px md:pr-70px lg:py-35px lg:px-30px 2xl:py-55px 2xl:pl-50px 2xl:pr-70px border-r-2 border-borderColor dark:border-borderColor-dark space-y-[10px]">
                           <li>
-                            <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
-                              Developed By :
-                              <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
+                            <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
+                              <span className="w-1/2">Developed By:</span>
+                              <span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
                                 Meridian
                               </span>
                             </p>
                           </li>
                           <li>
-                            <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
-                              Lectures :
-                              <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {courseDetails.lesson ? courseDetails.lesson : 0} Modules
+                            <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
+                              <span className="w-1/2">Modules:</span>
+                              <span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
+                                {courseDetails.lesson
+                                  ? courseDetails.lesson
+                                  : 0}{" "}
+                                Modules
                               </span>
                             </p>
                           </li>
                           <li>
-                            <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
-                              Duration :
-                              <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
+                            <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
+                              <span className="w-1/2">Duration:</span>
+                              <span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
                                 {courseDetails.duration || "0 minutes"}
                               </span>
                             </p>
                           </li>
                           <li>
-                            <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
-                              Final Exam :
-                              <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
+                            <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
+                              <span className="w-1/2">Final Exam:</span>
+                              <span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
                                 60 Minutes
                               </span>
                             </p>
                           </li>
                           <li>
-                            <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
-                              Enrolled :
-                              <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
+                            <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
+                              <span className="w-1/2">Enrolled:</span>
+                              <span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
                                 0 students
                               </span>
                             </p>
@@ -673,18 +681,20 @@ const CourseDetailsPrimary = ({
                         </ul>
                         <ul className="p-10px md:py-55px md:pl-50px md:pr-70px lg:py-35px lg:px-30px 2xl:py-55px 2xl:pl-50px 2xl:pr-70px border-r-2 border-borderColor dark:border-borderColor-dark space-y-[10px]">
                           <li>
-                            <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
-                              Course level :
-                              <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {courseDetails.skillLevel ? courseDetails.skillLevel : "Intermediate"}
+                            <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
+                              <span className="w-1/2">Course level:</span>
+                              <span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
+                                {courseDetails.skillLevel
+                                  ? courseDetails.skillLevel
+                                  : "Intermediate"}
                               </span>
                             </p>
                           </li>
                           <li>
-                            <p className="text-contentColor2  dark:text-contentColor2-dark flex justify-between items-center">
-                              <span>Languages :</span>
-                              <span className="text-xs pl-1 lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {courseDetails.extras?.languages &&
+                            <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
+                              <span className="w-1/2">Languages:</span>
+                              <span className="w-1/2 text-xs pl-1 lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
+                              {courseDetails.extras?.languages &&
                                 courseDetails.extras.languages.length > 0
                                   ? courseDetails.extras.languages
                                       .map(
@@ -693,31 +703,34 @@ const CourseDetailsPrimary = ({
                                           lang.slice(1)
                                       )
                                       .join(", ")
-                                  : "English"}
-                              </span>
-                            </p>
-                          </li>
-
-                          <li>
-                            <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
-                              Price Discount :
-                              <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {courseDetails.discount ? `${courseDetails.discount}%` : "-20%"}
+                                :"English"}
                               </span>
                             </p>
                           </li>
                           <li>
-                            <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
-                              Regular Price :
-                              <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                {courseDetails.price ? `$${courseDetails.price}` : "$0"}
+                            <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
+                              <span className="w-1/2">Price Discount:</span>
+                              <span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
+                                {courseDetails.discount
+                                  ? `${courseDetails.discount}%`
+                                  : "-20%"}
                               </span>
                             </p>
                           </li>
                           <li>
-                            <p className="text-contentColor2 dark:text-contentColor2-dark flex justify-between items-center">
-                              Course Status :
-                              <span className="text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
+                            <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
+                              <span className="w-1/2">Regular Price:</span>
+                              <span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
+                                {courseDetails.price
+                                  ? `$${courseDetails.price}`
+                                  : "$0"}
+                              </span>
+                            </p>
+                          </li>
+                          <li>
+                            <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
+                              <span className="w-1/2">Course Status:</span>
+                              <span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
                                 Available
                               </span>
                             </p>
