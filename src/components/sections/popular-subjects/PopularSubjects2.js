@@ -58,7 +58,7 @@ const PopularSubjects2 = () => {
       title: "Environmental Management",
       desc: "",
       navButton: false,
-      category: "Mobile Application",
+      category: "Environmental System",
       svg: (
         <div className="relative w-20 h-[60px]">
           <svg
@@ -129,7 +129,7 @@ const PopularSubjects2 = () => {
       title: " Health & Safety",
       desc: "",
       navButton: false,
-      category: "Art & Design",
+      category: "Fitness & Health",
       svg: (
         <div className="relative w-20 h-[90px]">
           <svg
@@ -193,7 +193,7 @@ const PopularSubjects2 = () => {
       title: "Six Sigma", 
       desc: "",
       navButton: false,
-      category: "Development",
+      category: "Sigma Development",
       svg: (
         <div className="relative w-20 h-[90px]">
           <svg
@@ -260,7 +260,7 @@ const PopularSubjects2 = () => {
       title: "Quality Management",
       desc: "",
       navButton: false,
-      category: "Business",
+      category: "Business Quality",
       svg: (
         <div className="relative w-20 h-[90px]">
           <svg
@@ -329,7 +329,7 @@ const PopularSubjects2 = () => {
       title: "Project Management",
       desc: "",
       navButton: false,
-      category: "Marketing",
+      category: "Management",
       svg: (
         <div className="relative w-20 h-[90px]">
           <svg

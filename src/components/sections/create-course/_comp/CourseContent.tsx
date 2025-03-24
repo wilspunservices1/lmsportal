@@ -258,14 +258,14 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 								/>
 								<datalist id="categories">
 									<option value="All" />
-									<option value="Web Design" />
-									<option value="Graphic" />
-									<option value="English" />
-									<option value="Spoken English" />
-									<option value="Art Painting" />
+									<option value="Food & Safety" />
+									<option value="Health & Safety" />
+									<option value="Six Sigma" />
+									<option value="Quality Management" />
+									<option value="Project Management" />
 									<option value="App Development" />
 									<option value="Web Application" />
-									<option value="Php Development" />
+									<option value="Business Continuity" />
 								</datalist>
 								<i className="icofont-simple-down absolute top-1/2 right-3 -translate-y-1/2 block text-lg z-10"></i>
 							</div>
