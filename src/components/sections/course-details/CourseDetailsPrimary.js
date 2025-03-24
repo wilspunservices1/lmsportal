@@ -693,8 +693,8 @@ const CourseDetailsPrimary = ({
                           <li>
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
                               <span className="w-1/2">Languages:</span>
-                              <span className="w-1/2 text-xs pl-1 lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                              {courseDetails.extras?.languages &&
+                              <span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
+                                {courseDetails.extras?.languages &&
                                 courseDetails.extras.languages.length > 0
                                   ? courseDetails.extras.languages
                                       .map(
@@ -703,7 +703,7 @@ const CourseDetailsPrimary = ({
                                           lang.slice(1)
                                       )
                                       .join(", ")
-                                :"English"}
+                                  : "English"}
                               </span>
                             </p>
                           </li>
