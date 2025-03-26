@@ -166,9 +166,9 @@ const ContactUs = () => {
               <div>
                 <h3 className="text-lg font-semibold text-gray-700">Canada</h3>
                 <p className="text-gray-600">
-                  Unit 400, 111 2nd Avenue South
+                  Suite 306-3100 Kirwin Ave,
                   <br />
-                  Saskatoon, SK, S7K 1K6
+                  Mississauga, Ontario, L5A 3S6
                   <br />
                   Phone: +1 (647) 705 7675
                 </p>

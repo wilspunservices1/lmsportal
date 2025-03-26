@@ -50,7 +50,7 @@ const PrivacyComp = () => {
             </h2>
             <div className="space-y-4 text-gray-600">
               <p>
-                Learning Management System of Meridian Quality Management
+                The Learning Management System of Meridian Quality Management
                 Professionals,{" "}
                 <a
                   href="https://meridian-lms.com"

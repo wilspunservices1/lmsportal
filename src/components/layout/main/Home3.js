@@ -21,7 +21,7 @@ const Home3 = () => {
       {/* <Registration /> */}
       <BecomeAnInstructorPrimary />
       {/* <Instructors2 /> */}
-      {/* <Testimonials2 /> */}
+      <Testimonials2 />
       {/* <Blogs2 /> */}
     </>
   );

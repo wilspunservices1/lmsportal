@@ -4,6 +4,7 @@ import TiltWrapper from "@/components/shared/wrappers/TiltWrapper";
 import TestimonialsSlider2 from "@/components/shared/testimonials/TestimonialsSlider2";
 import SectionNameSecondary from "@/components/shared/section-names/SectionNameSecondary";
 import HeadingPrimaryXl from "@/components/shared/headings/HeadingPrimaryXl ";
+
 const Testimonials2 = () => {
   return (
     <section>
@@ -12,9 +13,9 @@ const Testimonials2 = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-30px lg:gap-0">
             {/* testimonial Left */}
             <div data-aos="fade-up">
-              <SectionNameSecondary>EDUCATION SOLUTION</SectionNameSecondary>
+              <SectionNameSecondary>Reviews</SectionNameSecondary>
               <HeadingPrimaryXl>
-                Client Testimonial About Our Lms Agency
+                What Our Project Say About Us
               </HeadingPrimaryXl>
 
               {/* Swiper */}
@@ -27,7 +28,7 @@ const Testimonials2 = () => {
                   <Image
                     className="w-full"
                     src={TestimonialGroupImage1}
-                    alt=""
+                    alt="Happy students"
                     placeholder="blur"
                   />
                 </div>
