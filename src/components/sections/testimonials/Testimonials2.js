@@ -15,7 +15,7 @@ const Testimonials2 = () => {
             <div data-aos="fade-up">
               <SectionNameSecondary>Reviews</SectionNameSecondary>
               <HeadingPrimaryXl>
-                What Our Project Say About Us
+              What Our Clients Say
               </HeadingPrimaryXl>
 
               {/* Swiper */}
