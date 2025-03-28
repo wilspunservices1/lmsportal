@@ -91,7 +91,7 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 	useEffect(() => {
 
 		if (!courseId || courseId.trim() === "") {
-			showAlert("error", "Welcome.");
+			console.log("error", "Welcome.");
 			return;
 		}
 

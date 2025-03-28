@@ -148,7 +148,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
@@ -160,13 +159,14 @@ export async function GET(req: NextRequest) {
     const skillLevel = searchParams.get("skillLevel") || "";
     const languageFilter = searchParams.get("language") || "";
     const slug = searchParams.get("slug") || "";
+    const status = searchParams.get("status") || "published"; // Default to published
 
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "12", 10);
     const offset = (page - 1) * limit;
 
-    const isPublished = true; // Always fetch only published courses
-    const whereConditions: any[] = [eq(courses.isPublished, isPublished)];
+    // Always filter by published status unless explicitly requested otherwise
+    const whereConditions: any[] = [eq(courses.isPublished, true)];
 
     // Handle search
     if (search) {
@@ -221,6 +221,20 @@ export async function GET(req: NextRequest) {
       .offset(offset)
       .orderBy(desc(courses.createdAt));
 
+    // If no courses found, return empty array
+    if (allCourses.length === 0) {
+      return NextResponse.json({
+        message: "No published courses found",
+        length: 0,
+        total: 0,
+        page,
+        perPage: limit,
+        hasNext: false,
+        hasPrevious: offset > 0,
+        data: [],
+      });
+    }
+
     const courseIds = allCourses.map((course) => course.id);
 
     // Fetch related chapters and lectures
@@ -272,6 +286,7 @@ export async function GET(req: NextRequest) {
         chapters: courseChapters,
         duration: `${courseDuration} minutes`,
         lesson: totalCourseLectures,
+        status: course.isPublished ? "published" : "draft", // Explicit status field
       };
     });
 
@@ -286,7 +301,7 @@ export async function GET(req: NextRequest) {
     const hasPrevious = offset > 0;
 
     return NextResponse.json({
-      message: "Courses fetched successfully",
+      message: "Published courses fetched successfully",
       length: allCourses.length,
       total: totalCourses,
       page,

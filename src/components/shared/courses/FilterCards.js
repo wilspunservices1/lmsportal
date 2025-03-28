@@ -21,8 +21,9 @@ const FilterCards = ({ type }) => {
     "filter4",
   ];
 
-  // Filters the courses based on the type and limits the number
-  const displayedCourses = type === "lg" ? courses.slice(0, 8) : courses.slice(0, 6);
+  // Directly use the courses from API (already filtered to published only)
+  const displayedCourses =
+    type === "lg" ? courses.slice(0, 8) : courses.slice(0, 6);
 
   // Fetch courses on component mount
   useEffect(() => {
@@ -30,13 +31,12 @@ const FilterCards = ({ type }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`/api/courses`);
+        const response = await fetch(`/api/courses?status=published`); // Explicitly request published courses
         if (!response.ok) {
           throw new Error("Failed to fetch courses");
         }
         const data = await response.json();
-        console.log("Fetched courses:", data.data); // Log fetched data
-        setCourses(data.data || []); // Ensure data is an array
+        setCourses(data.data || []);
       } catch (err) {
         setError(err.message || "An unknown error occurred");
       } finally {
@@ -63,29 +63,27 @@ const FilterCards = ({ type }) => {
   }, [courses, loading, error]);
 
   if (loading) {
-    return <div>Loading courses...</div>; // Simple loading state
+    return <div>Loading courses...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>; // Error handling
+    return <div>Error: {error}</div>;
   }
 
   if (displayedCourses.length === 0) {
-    return <div>No courses available</div>; // Handle no courses scenario
+    return <div>No published courses available</div>;
   }
 
   return (
-    <div
-      className="filter-contents flex flex-wrap sm:-mx-15px box-content mt-7 lg:mt-25px"
-    >
+    <div className="filter-contents flex flex-wrap sm:-mx-15px box-content mt-7 lg:mt-25px">
       {displayedCourses.map((course, idx) => (
         <CourseCard
-          key={idx}
+          key={course.id} // Better to use course.id instead of idx
           idx={idx}
           type={type}
           course={{
             ...course,
-            filterOption: filterOptions[idx] || "default-filter", // Ensure filterOption exists
+            filterOption: filterOptions[idx] || "default-filter",
           }}
         />
       ))}
@@ -94,8 +92,6 @@ const FilterCards = ({ type }) => {
 };
 
 export default FilterCards;
-
-
 
 // "use client";
 
@@ -176,4 +172,3 @@ export default FilterCards;
 // };
 
 // export default FilterCards;
-
