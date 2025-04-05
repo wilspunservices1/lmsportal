@@ -117,11 +117,13 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
   useEffect(() => {
     fetchFilters(); // Fetch filters
     fetchCourses(); // Fetch initial courses
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Trigger course fetching when filters or sorting changes
   useEffect(() => {
     fetchCourses();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     currentCategories,
     currentSkillLevels,

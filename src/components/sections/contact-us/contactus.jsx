@@ -20,34 +20,28 @@ const ContactUs = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    setSubmitStatus("");
+  
     try {
-      // Create a FormData object
-      const formDataObj = new FormData();
-      formDataObj.append('name', formData.name);
-      formDataObj.append('email', formData.email);
-      formDataObj.append('subject', formData.subject);
-      formDataObj.append('message', formData.message);
-
-      // Send the form data to Formspree
-      const response = await fetch('https://formspree.io/f/xjkyvrwa', {
-        method: 'POST',
-        body: formDataObj,
+      const response = await fetch("/api/contact", {
+        method: "POST",
         headers: {
-          Accept: 'application/json',
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify(formData),
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to send email');
-      }
-
+  
       const data = await response.json();
-      setSubmitStatus('Email sent successfully!');
-      console.log(data);
+  
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to send message");
+      }
+  
+      setSubmitStatus("Message sent successfully!");
+      setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
-      setSubmitStatus('Error sending email. Please try again.');
-      console.error('Error:', error);
+      console.error("Error:", error);
+      setSubmitStatus("Error sending message. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

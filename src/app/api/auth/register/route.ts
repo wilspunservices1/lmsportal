@@ -75,8 +75,7 @@ export async function POST(req: Request) {
       password: hashPassword,
       username,
       name: username.trim(),
-      roles: sql`'["user"]'::json`,
-      isVerified: false,
+	  roles: JSON.stringify(["user"]),      isVerified: false,
       activationToken,
     });
 

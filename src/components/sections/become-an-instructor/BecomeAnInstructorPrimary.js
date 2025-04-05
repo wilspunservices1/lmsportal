@@ -275,9 +275,9 @@ const BecomeAnInstructorPrimary = () => {
                     className="form-checkbox h-5 w-5 text-primaryColor"
                   />
                   <span className="ml-2 text-size-15 text-contentColor dark:text-contentColor-dark">
-                    You agree to our friendly{" "}
+                    You agree to our {" "}
                     <Link
-                      href="#"
+                      href="/privacy-policy"
                       className="text-base text-blackColor dark:text-blackColor-dark hover:text-primaryColor dark:hover:text-primaryColor font-bold leading-1 relative before:w-full before:h-1px before:bg-blackColor dark:before:bg-blackColor-dark before:absolute before:left-0 before:-bottom-0.5"
                     >
                       Privacy Policy

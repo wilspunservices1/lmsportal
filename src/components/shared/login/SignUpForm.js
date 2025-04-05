@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const SignUpForm = () => {
+const SignUpForm = ({ switchToLogin }) => {
 	const [formState, setFormState] = useState({
 		username: "",
 		email: "",
@@ -76,8 +76,7 @@ const SignUpForm = () => {
 				}, 5000);
 			} else {
 				if (
-					data.message ===
-					"Email already registered. Please login or verify your email."
+					data.message === "Email already registered. Please login or verify your email."
 				) {
 					setFormState({
 						...formState,
@@ -88,9 +87,7 @@ const SignUpForm = () => {
 				} else {
 					setFormState({
 						...formState,
-						error:
-							data.message ||
-							"An error occurred during registration.",
+						error: data.message || "An error occurred during registration.",
 						isLoading: false,
 					});
 				}
@@ -118,8 +115,7 @@ const SignUpForm = () => {
 			if (res.ok) {
 				setFormState({
 					...formState,
-					success:
-						"A new activation link has been sent to your email!",
+					success: "A new activation link has been sent to your email!",
 					showResend: false,
 					isLoading: false,
 				});
@@ -148,12 +144,13 @@ const SignUpForm = () => {
 				</h3>
 				<p className="text-contentColor dark:text-contentColor-dark mb-5px">
 					Already have an account?
-					<Link
-						href="/login"
-						className="hover:text-primaryColor relative after:absolute after:left-0 after:bottom-0.5 after:w-0 after:h-0.5 after:bg-primaryColor after:transition-all after:duration-300 hover:after:w-full"
+					<button
+						type="button"
+						onClick={switchToLogin}
+						className="ml-1 text-primaryColor underline"
 					>
 						Log In
-					</Link>
+					</button>
 				</p>
 			</div>
 
@@ -162,7 +159,7 @@ const SignUpForm = () => {
 					<div>
 						<input
 							type="text"
-							placeholder="Username"
+							placeholder="Full Name"
 							value={formState.username}
 							onChange={(e) =>
 								setFormState({
@@ -247,16 +244,21 @@ const SignUpForm = () => {
 						}
 						className="w-18px h-18px mr-2 block box-content"
 					/>
-					<label htmlFor="accept-pp">
-						Accept the Terms and Privacy Policy
+					<label htmlFor="accept-pp" className="flex flex-wrap gap-1">
+						Accept the{" "}
+						<Link href="/privacy-policy" className="text-primaryColor underline">
+							Terms
+						</Link>{" "}
+						and{" "}
+						<Link href="/privacy-policy" className="text-primaryColor underline">
+							Privacy Policy
+						</Link>
 					</label>
 				</div>
 
 				{/* Error Message */}
 				{formState.error && (
-					<p className="text-red-500 text-center mt-4">
-						{formState.error}
-					</p>
+					<p className="text-red-500 text-center mt-4">{formState.error}</p>
 				)}
 
 				{/* Resend Verification Email Button (Only show if needed) */}
@@ -275,9 +277,7 @@ const SignUpForm = () => {
 
 				{/* Success Message */}
 				{formState.success && (
-					<p className="text-green-500 text-center mt-4">
-						{formState.success}
-					</p>
+					<p className="text-green-500 text-center mt-4">{formState.success}</p>
 				)}
 
 				{/* Loader */}
