@@ -121,18 +121,18 @@ const AccordionPages = () => {
     {
       name: "Contact Us",
       status: null,
-      path: "/about",
+      path: "/contact-us-form",
     },
     // {
     //   name: "About (Dark)",
     //   status: "New",
     //   path: "/about-dark",
     // },
-    {
-      name: "Daily Updates",
-      status: null,
-      path: "/blogs",
-    },
+    // {
+    //   name: "Privacy Policy",
+    //   status: null,
+    //   path: "/privacy-policy",
+    // },
     // {
     //   name: "Get Started 1",
     //   path: "#",

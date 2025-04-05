@@ -127,7 +127,7 @@ const DropdownPages = () => {
         {
           name: "Privacy Policy",
           status: null,
-          path: "#",
+          path: "privacy-policy",
         },
 
         // {

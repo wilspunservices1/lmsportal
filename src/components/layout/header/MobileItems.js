@@ -6,6 +6,7 @@ import AccordionPages from "./AccordionPages";
 import AccordionCourses from "./AccordionCourses";
 import AccordionDashboard from "./AccordionDashboard";
 import AccordionEcommerce from "./AccordionEcommerce";
+import Link from "next/link";
 
 const MobileMenuItems = () => {
   const items = [
@@ -33,7 +34,7 @@ const MobileMenuItems = () => {
     {
       id: 4,
       name: "Privacy Policy",
-      path: "/courses#privacy",
+      path: "/privacy-policy",
       // accordion: "accordion",
       // children: <AccordionPages />,
     },
@@ -60,6 +61,16 @@ const MobileMenuItems = () => {
           <MobileMenuItem key={idx} item={item} />
         ))}
       </AccordionContainer>
+      
+      {/* Add Get Started button for mobile */}
+      <div className="mt-4 px-4">
+        <Link
+          href="/login"
+          className="text-size-12 text-whiteColor bg-primaryColor block border-primaryColor border hover:text-primaryColor hover:bg-white px-4 py-2 rounded-standard dark:hover:bg-whiteColor-dark dark:hover:text-whiteColor text-center"
+        >
+          Get Started
+        </Link>
+      </div>
     </div>
   );
 };
