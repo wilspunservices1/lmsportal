@@ -6,7 +6,7 @@ import { user } from "@/db/schemas/user";
 import { instructorApplications } from "@/db/schemas/instructor"; // Import the new schema
 import { eq, sql } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import { sendEmail } from "@/libs/emial/emailService";
+import { sendEmail } from "@/libs/email/emailService";
 import { BASE_URL } from "@/actions/constant";
 import { generateUniqueIdentifier } from "@/utils/generateUniqueIdentifier";
 

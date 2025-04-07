@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "../../../../db/index";
 import { user } from "../../../../db/schemas/user";
 import { eq } from "drizzle-orm";
-import { sendEmail } from "@/libs/emial/emailService"; // Adjust path as needed
+import { sendEmail } from "@/libs/email/emailService"; // Adjust path as needed
 import { BASE_URL_API } from "@/actions/constant";
 import { v4 as uuidv4 } from "uuid"; // Import UUID for generating new tokens
 
@@ -11,10 +11,7 @@ export async function POST(req) {
 		const { email } = await req.json();
 
 		if (!email) {
-			return NextResponse.json(
-				{ message: "Email is required" },
-				{ status: 400 }
-			);
+			return NextResponse.json({ message: "Email is required" }, { status: 400 });
 		}
 
 		// Find user by email
@@ -25,10 +22,7 @@ export async function POST(req) {
 			.then((res) => res[0]);
 
 		if (!foundUser) {
-			return NextResponse.json(
-				{ message: "User not found" },
-				{ status: 404 }
-			);
+			return NextResponse.json({ message: "User not found" }, { status: 404 });
 		}
 
 		if (foundUser.isVerified) {
@@ -65,9 +59,6 @@ export async function POST(req) {
 		);
 	} catch (error) {
 		console.error("Error resending activation email:", error);
-		return NextResponse.json(
-			{ message: "Error", error: error.message },
-			{ status: 500 }
-		);
+		return NextResponse.json({ message: "Error", error: error.message }, { status: 500 });
 	}
 }
