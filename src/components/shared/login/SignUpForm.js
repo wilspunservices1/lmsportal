@@ -3,320 +3,425 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import meridianBackground from "@/assets/images/about/meridian-background.png";
+import meridianLogo from "@/assets/images/logo/favicon.png";
 
 const SignUpForm = ({ switchToLogin }) => {
-	const [formState, setFormState] = useState({
-		username: "",
-		email: "",
-		password: "",
-		confirmPassword: "",
-		error: "",
-		success: "",
-		isLoading: false,
-		acceptedTerms: false,
-		showResend: false,
-	});
+  const [formState, setFormState] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    error: "",
+    success: "",
+    isLoading: false,
+    acceptedTerms: false,
+    showResend: false,
+  });
 
-	const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
-	const togglePasswordVisibility = () => {
-		setShowPassword((prev) => !prev);
-	};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormState({ ...formState, isLoading: true, error: "", success: "" });
 
-	const router = useRouter();
+    if (formState.password !== formState.confirmPassword) {
+      setFormState({
+        ...formState,
+        error: "Passwords do not match.",
+        isLoading: false,
+      });
+      return;
+    }
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setFormState({ ...formState, isLoading: true, error: "", success: "" });
+    if (!formState.acceptedTerms) {
+      setFormState({
+        ...formState,
+        error: "You must accept the Terms and Privacy Policy.",
+        isLoading: false,
+      });
+      return;
+    }
 
-		// Basic validation
-		if (formState.password !== formState.confirmPassword) {
-			setFormState({
-				...formState,
-				error: "Passwords do not match.",
-				isLoading: false,
-			});
-			return;
-		}
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: formState.username,
+          email: formState.email,
+          password: formState.password,
+        }),
+      });
 
-		if (!formState.acceptedTerms) {
-			setFormState({
-				...formState,
-				error: "You must accept the Terms and Privacy Policy.",
-				isLoading: false,
-			});
-			return;
-		}
+      const data = await res.json();
 
-		try {
-			const res = await fetch("/api/auth/register", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					username: formState.username,
-					email: formState.email,
-					password: formState.password,
-				}),
-			});
+      if (res.ok) {
+        setFormState({
+          ...formState,
+          success:
+            "Registration successful! Please check your email to activate your account.",
+          isLoading: false,
+        });
+        setTimeout(() => {
+          router.push("/login");
+        }, 5000);
+      } else {
+        if (
+          data.message ===
+          "Email already registered. Please login or verify your email."
+        ) {
+          setFormState({
+            ...formState,
+            error: data.message,
+            showResend: true,
+            isLoading: false,
+          });
+        } else {
+          setFormState({
+            ...formState,
+            error: data.message || "An error occurred during registration.",
+            isLoading: false,
+          });
+        }
+      }
+    } catch (error) {
+      setFormState({
+        ...formState,
+        error: "An error occurred. Please try again later.",
+        isLoading: false,
+      });
+    }
+  };
 
-			const data = await res.json();
+  const handleResendEmail = async () => {
+    setFormState({ ...formState, isLoading: true, error: "", success: "" });
 
-			if (res.ok) {
-				setFormState({
-					...formState,
-					success:
-						"Registration successful! Please check your email to activate your account.",
-					isLoading: false,
-				});
+    try {
+      const res = await fetch("/api/auth/resend-activation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formState.email }),
+      });
 
-				setTimeout(() => {
-					router.push("/login");
-				}, 5000);
-			} else {
-				if (
-					data.message === "Email already registered. Please login or verify your email."
-				) {
-					setFormState({
-						...formState,
-						error: data.message,
-						showResend: true,
-						isLoading: false,
-					});
-				} else {
-					setFormState({
-						...formState,
-						error: data.message || "An error occurred during registration.",
-						isLoading: false,
-					});
-				}
-			}
-		} catch (error) {
-			setFormState({
-				...formState,
-				error: "An error occurred. Please try again later.",
-				isLoading: false,
-			});
-		}
-	};
+      const data = await res.json();
+      if (res.ok) {
+        setFormState({
+          ...formState,
+          success: "A new activation link has been sent to your email!",
+          showResend: false,
+          isLoading: false,
+        });
+      } else {
+        setFormState({
+          ...formState,
+          error: data.message || "Failed to resend activation email.",
+          isLoading: false,
+        });
+      }
+    } catch (error) {
+      setFormState({
+        ...formState,
+        error: "An error occurred. Please try again.",
+        isLoading: false,
+      });
+    }
+  };
 
-	const handleResendEmail = async () => {
-		setFormState({ ...formState, isLoading: true, error: "", success: "" });
+  return (
+    <div className="flex min-h-screen">
+      {/* Left Section - Background Image with Overlay Content */}
+      <div className="hidden md:flex relative w-[750px] h-[700px] rounded-[20px] overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <Image
+            src={meridianBackground}
+            alt="Meridian Background"
+            layout="fill"
+            objectFit="cover"
+            objectPosition="center"
+            quality={100}
+            priority
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+        </div>
 
-		try {
-			const res = await fetch("/api/auth/resend-activation", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email: formState.email }),
-			});
+        {/* Logo Container - Positioned in middle left with centered logo */}
+        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-20">
+        <div className="bg-white h-[160px] w-[600px] flex items-center justify-center rounded-r-[100px]">
+            <Image
+              src={meridianLogo}
+              alt="Meridian Logo"
+              width={300}
+              height={80}
+              className="object-contain"
+              priority
+            />
+          </div>
+        </div>
 
-			const data = await res.json();
-			if (res.ok) {
-				setFormState({
-					...formState,
-					success: "A new activation link has been sent to your email!",
-					showResend: false,
-					isLoading: false,
-				});
-			} else {
-				setFormState({
-					...formState,
-					error: data.message || "Failed to resend activation email.",
-					isLoading: false,
-				});
-			}
-		} catch (error) {
-			setFormState({
-				...formState,
-				error: "An error occurred. Please try again.",
-				isLoading: false,
-			});
-		}
-	};
+        {/* Content Overlay - Centered below logo */}
+        <div className="absolute left-0 top-[65%] z-10 w-full">
+          <div className="max-w-md mx-auto text-center px-8">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Welcome to Meridian
+            </h2>
+            <p className="text-lg text-white">
+              Access your courses, collaborate with peers, and track your
+              progress—all in one place.
+            </p>
+          </div>
+        </div>
+      </div>
 
-	return (
-		<div className="transition-opacity duration-150 ease-linear">
-			{/* heading */}
-			<div className="text-center">
-				<h3 className="text-size-32 font-bold text-blackColor dark:text-blackColor-dark mb-2 leading-normal">
-					Sign Up
-				</h3>
-				<p className="text-contentColor dark:text-contentColor-dark mb-5px">
-					Already have an account?
-					<button
-						type="button"
-						onClick={switchToLogin}
-						className="ml-1 text-primaryColor underline"
-					>
-						Log In
-					</button>
-				</p>
-			</div>
+      {/* Right Section - Sign Up Form */}
+      <div className="w-[900px] h-[700px] md:w-auto bg-white flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          {/* Mobile header (hidden on desktop) */}
+          <div className="md:hidden text-center mb-8">
+            <div className="mb-4">
+              <Image
+                src={meridianLogo}
+                alt="Meridian Logo"
+                width={80}
+                height={80}
+                className="mx-auto"
+                priority
+              />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              MERIDIAN LMS
+            </h1>
+            <h2 className="text-xl text-gray-700 mb-4">Create Your Account</h2>
+          </div>
 
-			<form onSubmit={handleSubmit} className="pt-5px" data-aos="fade-up">
-				<div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-30px gap-y-25px mb-25px">
-					<div>
-						<input
-							type="text"
-							placeholder="Full Name"
-							value={formState.username}
-							onChange={(e) =>
-								setFormState({
-									...formState,
-									username: e.target.value,
-								})
-							}
-							className="w-full h-52px leading-52px pl-5 bg-transparent text-sm focus:outline-none text-contentColor dark:text-contentColor-dark border dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 font-medium rounded"
-							required
-						/>
-					</div>
-					<div>
-						<input
-							type="email"
-							placeholder="Your Email"
-							value={formState.email}
-							onChange={(e) =>
-								setFormState({
-									...formState,
-									email: e.target.value,
-								})
-							}
-							className="w-full h-52px leading-52px pl-5 bg-transparent text-sm focus:outline-none text-contentColor dark:text-contentColor-dark border dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 font-medium rounded"
-							required
-						/>
-					</div>
-				</div>
-				<div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-30px gap-y-25px mb-25px">
-					<div>
-						<input
-							type={showPassword ? "text" : "password"} // Toggle input type
-							placeholder="Password"
-							value={formState.password}
-							onChange={(e) =>
-								setFormState({
-									...formState,
-									password: e.target.value,
-								})
-							}
-							className="w-full h-52px leading-52px pl-5 bg-transparent text-sm focus:outline-none text-contentColor dark:text-contentColor-dark border dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 font-medium rounded"
-							required
-						/>
-					</div>
-					<div>
-						<input
-							type={showPassword ? "text" : "password"} // Toggle input type
-							placeholder="Confirm Password"
-							value={formState.confirmPassword}
-							onChange={(e) =>
-								setFormState({
-									...formState,
-									confirmPassword: e.target.value,
-								})
-							}
-							className="w-full h-52px leading-52px pl-5 bg-transparent text-sm focus:outline-none text-contentColor dark:text-contentColor-dark border dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 font-medium rounded"
-							required
-						/>
-					</div>
-				</div>
+          <div className="mb-6">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-2 ml-20">
+              SIGN UP
+            </h3>
+            <p className="text-gray-600">
+              Already have an account?{" "}
+              <button
+                onClick={switchToLogin}
+                className="text-yellow hover:underline font-medium"
+              >
+                Log In
+              </button>
+            </p>
+          </div>
 
-				<div className="text-contentColor dark:text-contentColor-dark flex items-center">
-					<input
-						type="checkbox"
-						id="show-password"
-						checked={showPassword}
-						onChange={() => setShowPassword((prev) => !prev)}
-						className="w-18px h-18px mr-2 block box-content"
-					/>
-					<label htmlFor="show-password">Show Password</label>
-				</div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {formState.error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {formState.error}
+              </div>
+            )}
 
-				<div className="text-contentColor dark:text-contentColor-dark flex items-center">
-					<input
-						type="checkbox"
-						id="accept-pp"
-						checked={formState.acceptedTerms}
-						onChange={(e) =>
-							setFormState({
-								...formState,
-								acceptedTerms: e.target.checked,
-							})
-						}
-						className="w-18px h-18px mr-2 block box-content"
-					/>
-					<label htmlFor="accept-pp" className="flex flex-wrap gap-1">
-						Accept the{" "}
-						<Link href="/privacy-policy" className="text-primaryColor underline">
-							Terms
-						</Link>{" "}
-						and{" "}
-						<Link href="/privacy-policy" className="text-primaryColor underline">
-							Privacy Policy
-						</Link>
-					</label>
-				</div>
+            {formState.success && (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                {formState.success}
+              </div>
+            )}
 
-				{/* Error Message */}
-				{formState.error && (
-					<p className="text-red-500 text-center mt-4">{formState.error}</p>
-				)}
+            <div>
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Full Name
+              </label>
+              <input
+                id="username"
+                type="text"
+                placeholder="Enter your full name"
+                value={formState.username}
+                onChange={(e) =>
+                  setFormState({
+                    ...formState,
+                    username: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-				{/* Resend Verification Email Button (Only show if needed) */}
-				{formState.showResend && (
-					<div className="text-center mt-4">
-						<button
-							onClick={handleResendEmail}
-							type="button"
-							className="text-blue-500 underline"
-							disabled={formState.isLoading}
-						>
-							Resend Verification Email
-						</button>
-					</div>
-				)}
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={formState.email}
+                onChange={(e) =>
+                  setFormState({
+                    ...formState,
+                    email: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-				{/* Success Message */}
-				{formState.success && (
-					<p className="text-green-500 text-center mt-4">{formState.success}</p>
-				)}
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Create a password"
+                value={formState.password}
+                onChange={(e) =>
+                  setFormState({
+                    ...formState,
+                    password: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-				{/* Loader */}
-				{formState.isLoading && (
-					<div className="flex justify-center my-4">
-						<div role="status">
-							<svg
-								aria-hidden="true"
-								className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue"
-								viewBox="0 0 100 101"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-									fill="currentColor"
-								/>
-								<path
-									d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-									fill="currentFill"
-								/>
-							</svg>
-							<span className="sr-only">Loading...</span>
-						</div>
-					</div>
-				)}
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirm your password"
+                value={formState.confirmPassword}
+                onChange={(e) =>
+                  setFormState({
+                    ...formState,
+                    confirmPassword: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-				<div className="mt-25px text-center">
-					<button
-						type="submit"
-						className="text-size-15 text-whiteColor bg-primaryColor px-25px py-10px w-full border border-primaryColor hover:text-primaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-whiteColor dark:hover:bg-whiteColor-dark"
-						disabled={formState.isLoading}
-					>
-						Sign Up
-					</button>
-				</div>
-			</form>
-		</div>
-	);
+            <div className="flex items-center justify-between space-x-4">
+              <div className="flex items-center space-x-8">
+                <div className="flex items-center">
+                  <input
+                    id="showPassword"
+                    type="checkbox"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    checked={showPassword}
+                    onChange={() => setShowPassword(!showPassword)}
+                  />
+                  <label
+                    htmlFor="showPassword"
+                    className="ml-2 block text-sm text-gray-700 whitespace-nowrap"
+                  >
+                    Show password
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <div className="flex items-center h-5">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  checked={formState.acceptedTerms}
+                  onChange={(e) =>
+                    setFormState({
+                      ...formState,
+                      acceptedTerms: e.target.checked,
+                    })
+                  }
+                  required
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <label htmlFor="terms" className="font-medium text-gray-700">
+                  I agree to the{" "}
+                  <Link href="/terms" className="text-yellow hover:underline">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="/privacy" className="text-yellow hover:underline">
+                    Privacy Policy
+                  </Link>
+                </label>
+              </div>
+            </div>
+
+            {formState.showResend && (
+              <div className="text-center">
+                <button
+                  onClick={handleResendEmail}
+                  type="button"
+                  className="text-yellow hover:underline font-medium"
+                  disabled={formState.isLoading}
+                >
+                  Resend Verification Email
+                </button>
+              </div>
+            )}
+
+            <div>
+              <button
+                type="submit"
+                className="w-full bg-yellow hover:bg-yellow-dark text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                disabled={formState.isLoading}
+              >
+                {formState.isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  "Sign Up"
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default SignUpForm;
