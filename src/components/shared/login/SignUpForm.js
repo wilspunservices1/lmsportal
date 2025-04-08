@@ -200,7 +200,7 @@ const SignUpForm = ({ switchToLogin }) => {
           </div>
 
           <div className="mb-6">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-2 ml-20">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-2 ml-40">
               SIGN UP
             </h3>
             <p className="text-gray-600">
@@ -245,7 +245,7 @@ const SignUpForm = ({ switchToLogin }) => {
                     username: e.target.value,
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-[400px] px-6 py-4 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow placeholder-gray-400"
                 required
               />
             </div>
@@ -268,7 +268,7 @@ const SignUpForm = ({ switchToLogin }) => {
                     email: e.target.value,
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-[400px] px-6 py-4 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow placeholder-gray-400"
                 required
               />
             </div>
@@ -291,7 +291,7 @@ const SignUpForm = ({ switchToLogin }) => {
                     password: e.target.value,
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-[400px] px-6 py-4 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow placeholder-gray-400"
                 required
               />
             </div>
@@ -314,7 +314,7 @@ const SignUpForm = ({ switchToLogin }) => {
                     confirmPassword: e.target.value,
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-[400px] px-6 py-4 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow placeholder-gray-400"
                 required
               />
             </div>
@@ -358,13 +358,9 @@ const SignUpForm = ({ switchToLogin }) => {
               <div className="ml-3 text-sm">
                 <label htmlFor="terms" className="font-medium text-gray-700">
                   I agree to the{" "}
-                  <Link href="/terms" className="text-yellow hover:underline">
-                    Terms of Service
+                  <Link href="/privacy-policy" className="text-yellow hover:underline">
+                    Terms and Conditions
                   </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy" className="text-yellow hover:underline">
-                    Privacy Policy
-                  </Link>
                 </label>
               </div>
             </div>
