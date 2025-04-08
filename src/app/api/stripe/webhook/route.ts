@@ -10,8 +10,8 @@ import { user } from "@/db/schemas/user";
 import { cart } from "@/db/schemas/cart"; // Import the cart schema
 import { chapters } from "@/db/schemas/courseChapters";
 import { lectures } from "@/db/schemas/lectures";
-import { sendEmail } from "@/libs/emial/emailService"; // Corrected import path
-import { eq, inArray } from "drizzle-orm";
+import { sendEmail } from "@/libs/email/emailService"; // Corrected import path
+import { eq, inArray, sql } from "drizzle-orm";
 import { courses } from "@/db/schemas/courses";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -19,8 +19,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function POST(req: NextRequest) {
-
-	const body = await req.text(); 
+	const body = await req.text();
 	const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
 	const headersList = await headers();
 	const sig = headersList.get("stripe-signature") as string;
@@ -59,9 +58,7 @@ export async function POST(req: NextRequest) {
 		// Convert the comma-separated string back into an array
 		const purchasedCourseIds = courseIdsString.split(",").filter(Boolean);
 
-		const totalAmount = session.amount_total
-			? session.amount_total / 100
-			: 0;
+		const totalAmount = session.amount_total ? session.amount_total / 100 : 0;
 		const paymentMethod = session.payment_method_types[0] ?? "unknown";
 
 		try {
@@ -102,6 +99,18 @@ export async function POST(req: NextRequest) {
 				items, // Insert the constructed JSON object
 			});
 
+			// Increment enrolledCount for each purchased course
+			await Promise.all(
+				purchasedCourseIds.map(async (courseId) => {
+					await db
+						.update(courses)
+						.set({
+							enrolledCount: sql`${courses.enrolledCount} + 1`,
+						})
+						.where(eq(courses.id, courseId));
+				})
+			);
+
 			// **Prepare the Courses to be Added to EnrolledCourses**
 			const newCourses = purchasedCourseIds.map((courseId: string) => ({
 				courseId,
@@ -133,8 +142,7 @@ export async function POST(req: NextRequest) {
 				...newCourses.filter(
 					(newCourse) =>
 						!existingCourses.some(
-							(existingCourse: any) =>
-								existingCourse.courseId === newCourse.courseId
+							(existingCourse: any) => existingCourse.courseId === newCourse.courseId
 						)
 				),
 			];
@@ -167,9 +175,7 @@ export async function POST(req: NextRequest) {
 				.set({ isLocked: false })
 				.where(inArray(lectures.chapterId, chapterIds));
 
-			console.log(
-				`Lectures unlocked for user ${userId} and courses ${purchasedCourseIds}`
-			);
+			console.log(`Lectures unlocked for user ${userId} and courses ${purchasedCourseIds}`);
 
 			// **Remove Purchased Courses from Cart**
 
@@ -188,26 +194,18 @@ export async function POST(req: NextRequest) {
 			);
 
 			// Extract cart item IDs to remove
-			const cartItemIdsToRemove = cartItemsToRemove.map(
-				(item) => item.id
-			);
+			const cartItemIdsToRemove = cartItemsToRemove.map((item) => item.id);
 
 			// Delete the purchased courses from the cart
 			if (cartItemIdsToRemove.length > 0) {
-				await db
-					.delete(cart)
-					.where(inArray(cart.id, cartItemIdsToRemove));
+				await db.delete(cart).where(inArray(cart.id, cartItemIdsToRemove));
 			}
 
-			console.log(
-				`Removed purchased courses from cart for user ${userId}`
-			);
+			console.log(`Removed purchased courses from cart for user ${userId}`);
 
 			// **Prepare Email Template Data**
 
-			const courseNames = courseDetails
-				.map((course) => course.name)
-				.join(", ");
+			const courseNames = courseDetails.map((course) => course.name).join(", ");
 
 			const emailTemplateData = {
 				userName: session.customer_details?.name || "Customer",
@@ -229,12 +227,9 @@ export async function POST(req: NextRequest) {
 				templateData: emailTemplateData,
 			});
 
-			return new Response(
-				"Order saved, lectures unlocked, cart updated, and email sent",
-				{
-					status: 200,
-				}
-			);
+			return new Response("Order saved, lectures unlocked, cart updated, and email sent", {
+				status: 200,
+			});
 		} catch (error) {
 			console.error("Error processing order or email:", error);
 			return new Response("Error processing order", { status: 500 });

@@ -4,27 +4,20 @@ import { db } from "@/db/index";
 import { instructorApplications } from "@/db/schemas/instructor";
 import { user as users } from "@/db/schemas/user";
 import { eq } from "drizzle-orm";
-import { sendEmail } from "@/libs/emial/emailService"; // Adjust the path
+import { sendEmail } from "@/libs/email/emailService"; // Adjust the path
 import { BASE_URL } from "@/actions/constant"; // Adjust the path
 import { getSession } from "@/libs/auth";
 
 export async function GET(req: NextRequest, context: any) {
-  try {
-   // @ts-expect-error - Override Next.js route type mismatch
-	const session = await getSession();
-		if (
-			!session ||
-			!session.user ||
-			!session.user.roles.includes("admin")
-		) {
-			return NextResponse.json(
-				{ message: "Unauthorized" },
-				{ status: 401 }
-			);
+	try {
+		// @ts-expect-error - Override Next.js route type mismatch
+		const session = await getSession();
+		if (!session || !session.user || !session.user.roles.includes("admin")) {
+			return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 		}
- // @ts-expect-error - Override Next.js route type mismatch
-     const { id } = context.params;
-  	const { action } = await req.json();
+		// @ts-expect-error - Override Next.js route type mismatch
+		const { id } = context.params;
+		const { action } = await req.json();
 
 		// Fetch the instructor application
 		const [application] = await db
@@ -33,23 +26,14 @@ export async function GET(req: NextRequest, context: any) {
 			.where(eq(instructorApplications.id, id));
 
 		if (!application) {
-			return NextResponse.json(
-				{ message: "Application not found" },
-				{ status: 404 }
-			);
+			return NextResponse.json({ message: "Application not found" }, { status: 404 });
 		}
 
 		// Fetch the user
-		const [user] = await db
-			.select()
-			.from(users)
-			.where(eq(users.id, application.userId));
+		const [user] = await db.select().from(users).where(eq(users.id, application.userId));
 
 		if (!user) {
-			return NextResponse.json(
-				{ message: "User not found" },
-				{ status: 404 }
-			);
+			return NextResponse.json({ message: "User not found" }, { status: 404 });
 		}
 
 		if (action === "approve") {
@@ -78,10 +62,7 @@ export async function GET(req: NextRequest, context: any) {
 				},
 			});
 
-			return NextResponse.json(
-				{ message: "Application approved" },
-				{ status: 200 }
-			);
+			return NextResponse.json({ message: "Application approved" }, { status: 200 });
 		} else if (action === "reject") {
 			// Update the application status
 			await db
@@ -100,15 +81,9 @@ export async function GET(req: NextRequest, context: any) {
 				},
 			});
 
-			return NextResponse.json(
-				{ message: "Application rejected" },
-				{ status: 200 }
-			);
+			return NextResponse.json({ message: "Application rejected" }, { status: 200 });
 		} else {
-			return NextResponse.json(
-				{ message: "Invalid action" },
-				{ status: 400 }
-			);
+			return NextResponse.json({ message: "Invalid action" }, { status: 400 });
 		}
 	} catch (error) {
 		console.error("Error updating instructor application:", error);
