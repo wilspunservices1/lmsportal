@@ -1,9 +1,14 @@
 const uploadToCloudinary = async (
 	file: File
 ): Promise<{ success: boolean; imgUrl?: string; error?: string }> => {
+	// Helper to remove all whitespace from file name
+	const getSafeFileName = (name: string): string => {
+		return name.replace(/\s+/g, ""); // Remove all spaces
+	};
+
 	const formData = new FormData();
 	formData.append("file", file);
-	formData.append("public_id", file.name); // Preserve the original filename
+	formData.append("public_id", getSafeFileName(file.name)); // Use cleaned filename
 
 	try {
 		const response = await fetch("/api/upload", {

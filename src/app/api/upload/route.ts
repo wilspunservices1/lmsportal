@@ -13,9 +13,12 @@ export async function POST(req: NextRequest) {
 		const arrayBuffer = await file.arrayBuffer();
 		const buffer = Buffer.from(arrayBuffer);
 
-		// Extract filename and extension correctly
-		const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-		const fileExtension = file.name.split(".").pop();
+		// Clean the filename: remove all whitespace
+		const cleanFileName = file.name.replace(/\s+/g, "");
+
+		// Extract clean filename parts
+		const fileNameWithoutExt = cleanFileName.replace(/\.[^/.]+$/, "");
+		const fileExtension = cleanFileName.split(".").pop();
 
 		// Upload file to Cloudinary
 		const result = await new Promise((resolve, reject) => {
@@ -25,10 +28,10 @@ export async function POST(req: NextRequest) {
 					resource_type: "auto",
 					use_filename: true,
 					unique_filename: false,
-					filename_override: file.name, // Retain correct filename & extension
+					filename_override: cleanFileName, // Cleaned filename with extension
 					flags: "attachment",
-					public_id: `${fileNameWithoutExt}`, // Preserve filename without extension
-					format: fileExtension, // Ensure the correct extension is preserved
+					public_id: fileNameWithoutExt,     // Cleaned filename without extension
+					format: fileExtension,             // Preserve correct extension
 				},
 				(error, uploadResult) => {
 					if (error) {
@@ -46,7 +49,7 @@ export async function POST(req: NextRequest) {
 		// Return Cloudinary file URL with forced download
 		return NextResponse.json({
 			message: "success",
-			imgUrl: `${(result as any).secure_url}?fl_attachment=${encodeURIComponent(file.name)}`,
+			imgUrl: `${(result as any).secure_url}?fl_attachment=${encodeURIComponent(cleanFileName)}`,
 		});
 	} catch (error) {
 		console.error("Error during file upload:", error);
