@@ -163,7 +163,7 @@ const SignUpForm = ({ switchToLogin }) => {
         </div>
 
         {/* Logo Container - Enhanced with subtle glow */}
-        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-20">
+        <div className="absolute left-0 top-1/3 transform -translate-y-1/2 z-20">
           <div className="bg-white/90 backdrop-blur-sm h-[120px] w-[500px] flex items-center justify-center rounded-r-[100px] shadow-xl border-l-4 border-yellow">
             <div className="relative group">
               <Image
@@ -180,7 +180,7 @@ const SignUpForm = ({ switchToLogin }) => {
         </div>
 
         {/* Content Overlay - Enhanced with animation */}
-        <div className="absolute left-0 top-[65%] z-10 w-full">
+        <div className="absolute left-0 top-[51%] z-10 w-full">
           <div className="max-w-md mx-auto text-center px-8 space-y-6">
             <h2 className="text-4xl font-bold text-white mb-4 animate-fade-in-up">
               Welcome to <span className="text-yellow">Meridian</span>
