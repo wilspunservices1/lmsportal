@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -385,7 +384,7 @@ const SignUpForm = ({ switchToLogin }) => {
                 <label htmlFor="terms" className="font-medium text-gray-700">
                   I agree to the{" "}
                   <Link
-                    href="/privacy-policy"
+                    href="/termsandconditions"
                     className="text-yellow hover:underline"
                   >
                     Terms and Conditions

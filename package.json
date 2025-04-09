@@ -57,6 +57,7 @@
     "react-image-crop": "^11.0.7",
     "react-konva": "^18.2.10",
     "react-quill": "^2.0.0",
+    "react-responsive": "^10.0.1",
     "react-router-dom": "^7.3.0",
     "react-select": "^5.9.0",
     "react-signature-canvas": "^1.0.6",
