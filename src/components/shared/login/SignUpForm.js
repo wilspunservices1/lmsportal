@@ -134,8 +134,9 @@ const SignUpForm = ({ switchToLogin }) => {
 
   return (
     <div className="flex min-h-screen">
-      {/* Left Section - Background Image with Overlay Content */}
-      <div className="hidden md:flex relative w-[750px] h-[700px] rounded-[20px] overflow-hidden">
+      {/* Left Section - Enhanced Background with Creative Elements */}
+      <div className="hidden md:flex relative w-[750px] h-[700px] rounded-[20px] overflow-hidden bg-gradient-to-br from-blue-900 to-indigo-800">
+        {/* <div className="hidden md:flex relative w-[750px] h-[700px] rounded-[20px] overflow-hidden"> */}
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
@@ -149,33 +150,57 @@ const SignUpForm = ({ switchToLogin }) => {
           />
           <div className="absolute inset-0 bg-black bg-opacity-30"></div>
         </div>
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Floating Circles */}
+          <div className="absolute top-1/4 left-1/4 w-40 h-40 rounded-full bg-blue-700 opacity-20 mix-blend-overlay animate-float1"></div>
+          <div className="absolute top-1/3 right-1/5 w-32 h-32 rounded-full bg-indigo-600 opacity-20 mix-blend-overlay animate-float2"></div>
+          <div className="absolute bottom-1/4 right-1/3 w-24 h-24 rounded-full bg-purple-500 opacity-20 mix-blend-overlay animate-float3"></div>
 
-        {/* Logo Container - Positioned in middle left with centered logo */}
-        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-20">
-        <div className="bg-white h-[160px] w-[600px] flex items-center justify-center rounded-r-[100px]">
-            <Image
-              src={meridianLogo}
-              alt="Meridian Logo"
-              width={300}
-              height={80}
-              className="object-contain"
-              priority
-            />
+          {/* Diagonal Lines Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 bg-[linear-gradient(45deg,_transparent_45%,_white_45%,_white_55%,_transparent_55%)] bg-[length:40px_40px]"></div>
           </div>
         </div>
 
-        {/* Content Overlay - Centered below logo */}
+        {/* Logo Container - Enhanced with subtle glow */}
+        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-20">
+          <div className="bg-white/90 backdrop-blur-sm h-[120px] w-[500px] flex items-center justify-center rounded-r-[100px] shadow-xl border-l-4 border-yellow">
+            <div className="relative group">
+              <Image
+                src={meridianLogo}
+                alt="Meridian Logo"
+                width={280}
+                height={80}
+                className="object-contain transition-transform duration-300 group-hover:scale-105"
+                priority
+              />
+              <div className="absolute inset-0 rounded-full bg-blue-500/10 blur-md group-hover:opacity-50 transition-opacity duration-300 -z-10"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Overlay - Enhanced with animation */}
         <div className="absolute left-0 top-[65%] z-10 w-full">
-          <div className="max-w-md mx-auto text-center px-8">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Welcome to Meridian
+          <div className="max-w-md mx-auto text-center px-8 space-y-6">
+            <h2 className="text-4xl font-bold text-white mb-4 animate-fade-in-up">
+              Welcome to <span className="text-yellow">Meridian</span>
             </h2>
-            <p className="text-lg text-white">
+            <p className="text-lg text-white/90 leading-relaxed animate-fade-in-up delay-100">
               Access your courses, collaborate with peers, and track your
               progress—all in one place.
             </p>
+
+            {/* Animated Dots */}
+            <div className="flex justify-center space-x-2 animate-bounce delay-300">
+              <div className="w-3 h-3 bg-yellow rounded-full"></div>
+              <div className="w-3 h-3 bg-white rounded-full"></div>
+              <div className="w-3 h-3 bg-yellow rounded-full"></div>
+            </div>
           </div>
         </div>
+
+        {/* Bottom Decorative Elements */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/30 to-transparent z-0"></div>
       </div>
 
       {/* Right Section - Sign Up Form */}
@@ -358,7 +383,10 @@ const SignUpForm = ({ switchToLogin }) => {
               <div className="ml-3 text-sm">
                 <label htmlFor="terms" className="font-medium text-gray-700">
                   I agree to the{" "}
-                  <Link href="/privacy-policy" className="text-yellow hover:underline">
+                  <Link
+                    href="/privacy-policy"
+                    className="text-yellow hover:underline"
+                  >
                     Terms and Conditions
                   </Link>{" "}
                 </label>
