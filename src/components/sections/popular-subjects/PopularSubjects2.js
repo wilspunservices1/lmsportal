@@ -4,7 +4,15 @@ import Subject from "@/components/shared/popular-subjects/Subject";
 import SectionName from "@/components/shared/section-names/SectionName";
 import Link from "next/link";
 import React from "react";
-import Image from "next/image";
+
+// Import the category images
+import Category1 from "@/assets/images/categories/category1.png";
+import Category2 from "@/assets/images/categories/category2.png";
+import Category3 from "@/assets/images/categories/category3.png";
+import Category4 from "@/assets/images/categories/category4.png";
+import Category5 from "@/assets/images/categories/category5.png";
+import Category6 from "@/assets/images/categories/category6.png";
+import Category7 from "@/assets/images/categories/category7.png";
 
 const PopularSubjects2 = () => {
   const subjects = [
@@ -16,15 +24,11 @@ const PopularSubjects2 = () => {
       category: "Food & Safety",
       svg: (
         <div className="relative w-20 h-[70px]">
-          <div className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px]">
-            <Image
-              src="/assets/images/categories/category1.png"
-              alt="Food Safety"
-              width={80}
-              height={60}
-              className="w-full h-full object-contain"
-            />
-          </div>
+          <img 
+            src={Category1.src} 
+            alt="Food Safety" 
+            className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px] object-contain"
+          />
           <div className="service__bg__img w-20 h-[60px]">
             <svg
               className="w-20 h-[60px]"
@@ -52,15 +56,11 @@ const PopularSubjects2 = () => {
       category: "Environmental System",
       svg: (
         <div className="relative w-20 h-[60px]">
-          <div className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px]">
-            <Image
-              src="/assets/images/categories/category2.png"
-              alt="Environmental Management"
-              width={80}
-              height={60}
-              className="w-full h-full object-contain"
-            />
-          </div>
+          <img 
+            src={Category2.src} 
+            alt="Environmental Management" 
+            className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px] object-contain"
+          />
           <div className="service__bg__img w-20 h-[60px]">
             <svg
               className="w-20 h-[60px]"
@@ -87,15 +87,11 @@ const PopularSubjects2 = () => {
       category: "Fitness & Health",
       svg: (
         <div className="relative w-20 h-[90px]">
-          <div className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px]">
-            <Image
-              src="/assets/images/categories/category3.png"
-              alt="Health & Safety"
-              width={80}
-              height={60}
-              className="w-full h-full object-contain"
-            />
-          </div>
+          <img 
+            src={Category3.src} 
+            alt="Health & Safety" 
+            className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px] object-contain"
+          />
           <div className="service__bg__img w-20 h-[60px]">
             <svg
               className="w-20 h-[60px]"
@@ -122,15 +118,11 @@ const PopularSubjects2 = () => {
       category: "Sigma Development",
       svg: (
         <div className="relative w-20 h-[90px]">
-          <div className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px]">
-            <Image
-              src="/assets/images/categories/category4.png"
-              alt="Six Sigma"
-              width={80}
-              height={60}
-              className="w-full h-full object-contain"
-            />
-          </div>
+          <img 
+            src={Category4.src} 
+            alt="Six Sigma" 
+            className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px] object-contain"
+          />
           <div className="service__bg__img w-20 h-[60px]">
             <svg
               className="w-20 h-[60px]"
@@ -157,15 +149,11 @@ const PopularSubjects2 = () => {
       category: "Business Quality",
       svg: (
         <div className="relative w-20 h-[90px]">
-          <div className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px]">
-            <Image
-              src="/assets/images/categories/category5.png"
-              alt="Quality Management"
-              width={80}
-              height={60}
-              className="w-full h-full object-contain"
-            />
-          </div>
+          <img 
+            src={Category5.src} 
+            alt="Quality Management" 
+            className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px] object-contain"
+          />
           <div className="service__bg__img w-20 h-[60px]">
             <svg
               className="w-20 h-[60px]"
@@ -193,15 +181,11 @@ const PopularSubjects2 = () => {
       category: "Management",
       svg: (
         <div className="relative w-20 h-[90px]">
-          <div className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px]">
-            <Image
-              src="/assets/images/categories/category6.png"
-              alt="Project Management"
-              width={80}
-              height={60}
-              className="w-full h-full object-contain"
-            />
-          </div>
+          <img 
+            src={Category6.src} 
+            alt="Project Management" 
+            className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px] object-contain"
+          />
           <div className="service__bg__img w-20 h-[60px]">
             <svg
               className="w-20 h-[60px]"
@@ -229,15 +213,11 @@ const PopularSubjects2 = () => {
       category: "Business",
       svg: (
         <div className="relative w-20 h-[90px]">
-          <div className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px]">
-            <Image
-              src="/assets/images/categories/category7.png"
-              alt="Business Continuity"
-              width={80}
-              height={60}
-              className="w-full h-full object-contain"
-            />
-          </div>
+          <img 
+            src={Category7.src} 
+            alt="Business Continuity" 
+            className="absolute inline-block translate-y-3 translate-x-2 w-20 h-[60px] object-contain"
+          />
           <div className="service__bg__img w-20 h-[60px]">
             <svg
               className="w-20 h-[60px]"
