@@ -22,11 +22,11 @@ type LanguageOption = {
 };
 
 const languageOptions: LanguageOption[] = [
-	{ value: "english", label: "English" },
-	{ value: "spanish", label: "Spanish" },
-	{ value: "french", label: "French" },
-	{ value: "german", label: "German" },
-	{ value: "chinese", label: "Chinese" },
+	{ value: "English", label: "English" },
+	{ value: "Spanish", label: "Spanish" },
+	{ value: "French", label: "French" },
+	{ value: "German", label: "German" },
+	{ value: "Chinese", label: "Chinese" },
 ];
 
 const CourseRight: React.FC<Props> = ({ courseId, extras }) => {
