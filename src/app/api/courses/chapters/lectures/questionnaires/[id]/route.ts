@@ -1,19 +1,36 @@
+//src\app\api\courses\chapters\lectures\questionnaires\[id]\route.ts
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { questionnaires } from "@/db/schemas/questionnaire";
 import { questions } from "@/db/schemas/questions";
 import { eq } from "drizzle-orm";
 
-export async function GET(
-	request: Request,
-	{ params }: { params?: { id?: string } }
-) {
+//course_questionnaires_questionnaire_id_questionnaires_id_fk
+
+export async function DELETE(request: Request, { params }: { params?: { id?: string } }) {
+	try {
+		if (!params?.id) {
+			return NextResponse.json({ error: "Missing questionnaire ID" }, { status: 400 });
+		}
+
+		// Delete all related questions first
+		await db.delete(questions).where(eq(questions.questionnaireId, params.id));
+
+		// Then delete the questionnaire
+		await db.delete(questionnaires).where(eq(questionnaires.id, params.id));
+
+		// ✅ Return JSON with success
+		return NextResponse.json({ success: true }, { status: 200 });
+	} catch (error) {
+		console.error("Error deleting questionnaire:", error);
+		return NextResponse.json({ error: "Failed to delete questionnaire" }, { status: 500 });
+	}
+}
+
+export async function GET(request: Request, { params }: { params?: { id?: string } }) {
 	try {
 		if (!params || !params.id) {
-			return NextResponse.json(
-				{ error: "Missing questionnaire ID" },
-				{ status: 400 }
-			);
+			return NextResponse.json({ error: "Missing questionnaire ID" }, { status: 400 });
 		}
 
 		console.log("Fetching questionnaire for id:", params.id);
@@ -56,9 +73,6 @@ export async function GET(
 		});
 	} catch (error) {
 		console.error("Error fetching questionnaire:", error);
-		return NextResponse.json(
-			{ error: "Failed to fetch questionnaire" },
-			{ status: 500 }
-		);
+		return NextResponse.json({ error: "Failed to fetch questionnaire" }, { status: 500 });
 	}
 }
