@@ -1,119 +1,152 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db"; // Adjust the path as per your structure
+import { db } from "@/db";
 import { courses } from "@/db/schemas/courses";
 import { user } from "@/db/schemas/user";
-import { sql, eq, gte } from "drizzle-orm";
+import { sql, eq, and } from "drizzle-orm";
 
-// Function to get the required statistics
-async function getCounts() {
-    try {
-      // Fetch all users and their enrolledCourses
-      const usersWithEnrolledCourses = await db
-        .select({
-          enrolledCourses: user.enrolledCourses,
-        })
-        .from(user)
-        .execute();
-  
-      // Count total enrolled courses
-      const totalEnrolledCourses = usersWithEnrolledCourses.reduce((total, currentUser) => {
-        const coursesCount = currentUser.enrolledCourses
-          ? currentUser.enrolledCourses.length
-          : 0;
-        return total + coursesCount;
-      }, 0);
-  
-      // Count completed courses based on progress (e.g., 100% completion)
-      const completedCourses = usersWithEnrolledCourses.reduce((total, currentUser) => {
-        const completedCount = currentUser.enrolledCourses
-          ? currentUser.enrolledCourses.filter((course) => course.progress === 100).length
-          : 0;
-        return total + completedCount;
-      }, 0);
-  
-      // Query for active courses
-      const activeCourses = await db
-        .select({
-          activeCourses: sql`COUNT(*)`.as('activeCourses'),
-        })
-        .from(courses)
-        .where(eq(courses.isPublished, true)) // Only include published courses
-        .execute();
-  
-      // Query for total courses
-      const totalCourses = await db
-        .select({
-          totalCourses: sql`COUNT(*)`.as('totalCourses'),
-        })
-        .from(courses)
-        .execute();
-  
-      // Query for total students (users)
-      const totalStudents = await db
-        .select({
-          totalStudents: sql`COUNT(*)`.as('totalStudents'),
-        })
-        .from(user)
-        .execute();
-  
-      // Construct the counts array
-      const counts = [
+// Function to get global statistics
+async function getGlobalCounts() {
+  try {
+    const [activeCourses] = await db
+      .select({ count: sql`COUNT(*)` })
+      .from(courses)
+      .where(eq(courses.isPublished, true))
+      .execute();
+
+    const [totalCourses] = await db
+      .select({ count: sql`COUNT(*)` })
+      .from(courses)
+      .execute();
+
+    const [totalStudents] = await db
+      .select({ count: sql`COUNT(*)` })
+      .from(user)
+      .execute();
+
+    return {
+      activeCourses: activeCourses.count || 0,
+      totalCourses: totalCourses.count || 0,
+      totalStudents: totalStudents.count || 0,
+    };
+  } catch (error) {
+    console.error('Error fetching global counts:', error);
+    throw error;
+  }
+}
+
+// Enhanced function to get user-specific statistics
+async function getUserCounts(userId) {
+  try {
+    const [currentUser] = await db
+      .select()
+      .from(user)
+      .where(eq(user.id, userId))
+      .execute();
+
+    if (!currentUser) {
+      throw new Error('User not found');
+    }
+
+    // Get detailed enrolled courses with progress
+    const enrolledCourses = currentUser.enrolledCourses || [];
+    const completedCourses = enrolledCourses.filter(course => course.progress === 100);
+    
+    // Get course details for enrolled courses
+    const courseIds = enrolledCourses.map(course => course.courseId);
+    const courseDetails = courseIds.length > 0 
+      ? await db
+          .select()
+          .from(courses)
+          .where(and(
+            eq(courses.isPublished, true),
+            sql`${courses.id} IN ${courseIds}`
+          ))
+          .execute()
+      : [];
+
+    return {
+      enrolledCourses: enrolledCourses.length,
+      completedCourses: completedCourses.length,
+      enrolledCoursesDetails: courseDetails,
+      completedCoursesDetails: courseDetails.filter(course => 
+        completedCourses.some(c => c.courseId === course.id))
+    };
+  } catch (error) {
+    console.error('Error fetching user counts:', error);
+    throw error;
+  }
+}
+
+// API handler function
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+    
+    const globalCounts = await getGlobalCounts();
+    let userCounts = {
+      enrolledCourses: 0,
+      completedCourses: 0,
+      enrolledCoursesDetails: [],
+      completedCoursesDetails: []
+    };
+
+    if (userId) {
+      userCounts = await getUserCounts(userId);
+    }
+
+    const responseData = {
+      counts: [
         {
           name: "Enrolled Courses",
-          image: "/images/counter1.png",
-          data: totalEnrolledCourses || 0,
+          data: userId ? userCounts.enrolledCourses : 0,
           symbol: "+",
+          isUserSpecific: !!userId,
         },
         {
           name: "Active Courses",
-          image: "/images/counter2.png",
-          data: activeCourses[0]?.activeCourses || 0,
+          data: globalCounts.activeCourses,
           symbol: "+",
+          isUserSpecific: false,
         },
         {
           name: "Completed Courses",
-          image: "/images/counter3.png",
-          data: completedCourses || 0,
+          data: userId ? userCounts.completedCourses : 0,
           symbol: "+",
+          isUserSpecific: !!userId,
         },
         {
           name: "Total Courses",
-          image: "/images/counter4.png",
-          data: totalCourses[0]?.totalCourses || 0,
+          data: globalCounts.totalCourses,
           symbol: "+",
+          isUserSpecific: false,
         },
         {
           name: "Total Students",
-          image: "/images/counter5.png",
-          data: totalStudents[0]?.totalStudents || 0,
+          data: globalCounts.totalStudents,
           symbol: "+",
-        },
-        {
-          name: "OVER THE WORLD",
-          image: "/images/counter6.png",
-          data: totalCourses[0]?.totalCourses || 0, // Static data, change as per your requirement
-          symbol: "+",
-        },
-      ];
-  
-      return counts;
-    } catch (error) {
-      console.error('Error fetching counts:', error);
-      throw new Error('Error fetching counts');
-    }
-  }
-  
+          isUserSpecific: false,
+        }
+      ],
+      courses: userId ? {
+        enrolled: userCounts.enrolledCoursesDetails,
+        completed: userCounts.completedCoursesDetails
+      } : null,
+      meta: {
+        isUserDashboard: !!userId,
+        timestamp: new Date().toISOString()
+      }
+    };
 
-// API handler function
-export async function GET() {
-  try {
-    const counts = await getCounts();
-    return NextResponse.json({ counts });
+    return NextResponse.json(responseData);
   } catch (error) {
-    console.error("Error fetching counts:", error);
+    console.error("Error in API handler:", error);
     return NextResponse.json(
-      { error: `Failed to fetch counts: ${error.message}` },
-      { status: 500 }
+      { 
+        error: error.message || "Failed to fetch dashboard statistics",
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
+      { status: error.message === 'User not found' ? 404 : 500 }
     );
   }
 }

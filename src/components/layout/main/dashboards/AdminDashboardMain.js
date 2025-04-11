@@ -1,4 +1,3 @@
-import AdminFeedbacks from "@/components/sections/sub-section/dashboards/AdminFeedbacks";
 import CounterAdmin from "@/components/sections/sub-section/dashboards/CounterAdmin";
 import NoticeBoard from "@/components/sections/sub-section/dashboards/NoticeBoard";
 import Notifications from "@/components/sections/sub-section/dashboards/Notifications";
@@ -24,7 +23,6 @@ const AdminDashboardMain = () => {
         {/* notifications */}
         <Notifications />
       </div>
-      <AdminFeedbacks />
     </>
   );
 };

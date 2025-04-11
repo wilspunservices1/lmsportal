@@ -139,7 +139,7 @@ const HeroDashboard = () => {
                     </svg>{" "}
                     {userDetails?.enrolledCourses?.length || 0} Courses Enrolled
                   </li>
-                  {/* <li className="text-sm font-normal flex items-center gap-0.5">
+                  <li className="text-sm font-normal flex items-center gap-0.5">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="18"
@@ -156,7 +156,7 @@ const HeroDashboard = () => {
                       <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
                     </svg>
                     {userDetails ? userDetails.certificates : 0} Certificates
-                  </li> */}
+                  </li>
                 </ul>
               </div>
             )}

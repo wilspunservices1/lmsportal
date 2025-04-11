@@ -674,7 +674,10 @@ const CourseDetailsPrimary = ({
                             <p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
                               <span className="w-1/2">Enrolled:</span>
                               <span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-                                0 students
+                                {courseDetails.enrolledCount ||
+                                  courseDetails.purchasedUsers?.length ||
+                                  0}{" "}
+                                students
                               </span>
                             </p>
                           </li>

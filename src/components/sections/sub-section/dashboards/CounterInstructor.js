@@ -47,6 +47,7 @@ const CounterInstructor = () => {
     },
   ]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCounterData = async () => {
@@ -55,23 +56,40 @@ const CounterInstructor = () => {
         if (!response.ok) {
           throw new Error("Failed to fetch dashboard statistics");
         }
-        const { counts: apiCounts } = await response.json();
+        const data = await response.json();
         
-        // Map the API response to your component's expected format
-        const mappedCounts = counts.map((counter, index) => {
-          const apiCounter = apiCounts[index];
-          if (!apiCounter) return counter;
+        if (!data || !data.counts) {
+          throw new Error("Invalid data format from API");
+        }
+
+        // Create a mapping between API names and our counter names
+        const nameMapping = {
+          "Enrolled Courses": "Enrolled Courses",
+          "Active Courses": "Active Courses",
+          "Completed Courses": "Complete Courses",
+          "Total Courses": "Total Courses",
+          "Total Students": "Total Students",
+          "Total Earning": "Total Earning"
+        };
+
+        // Safely update counts while preserving the original order and images
+        const updatedCounts = counts.map(counter => {
+          const apiCounter = data.counts.find(ac => 
+            nameMapping[ac.name] === counter.name
+          );
           
           return {
             ...counter,
-            data: apiCounter.data,
-            symbol: counter.symbol // Keep your frontend's symbol logic
+            data: apiCounter?.data || 0,
+            symbol: counter.symbol
           };
         });
 
-        setCounts(mappedCounts);
-      } catch (error) {
-        console.error("Error fetching counter data:", error);
+        setCounts(updatedCounts);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching counter data:", err);
+        setError(err.message || "An error occurred while loading statistics");
       } finally {
         setLoading(false);
       }
@@ -81,7 +99,11 @@ const CounterInstructor = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading dashboard statistics...</div>;
+    return <div className="text-center py-8">Loading dashboard statistics...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-8 text-red-500">{error}</div>;
   }
 
   return (
