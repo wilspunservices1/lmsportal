@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { courses } from "@/db/schemas/courses";
 import { user } from "@/db/schemas/user";
 import { sql, eq, and } from "drizzle-orm";
-
+export const dynamic = 'force-dynamic';
 // Function to get global statistics
 async function getGlobalCounts() {
   try {
