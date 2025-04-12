@@ -38,27 +38,80 @@ const CourseEnroll = ({ type, course }) => {
 	const userId = session?.user?.id;
 
 	// Check if the course is already in the cart
-	const isInCart = cartProducts.some(
-		(product) => product.courseId === courseId
-	);
+	const isInCart = cartProducts.some((product) => product.courseId === courseId);
 
 	// Fetch the user's enrolled courses and check if the current course is enrolled
+
+	useEffect(() => {
+		const fetchCourseDetails = async () => {
+			try {
+				const response = await fetch(`/api/courses/${courseId}`, {
+					method: "GET",
+					headers: { "Content-Type": "application/json" },
+				});
+
+				if (!response.ok) {
+					throw new Error("Failed to fetch course details");
+				}
+
+				const data = await response.json();
+				const courseDetails = data.data;
+
+				console.log("Course Details:", courseDetails); // Debugging the course data
+
+				const chapters = courseDetails.chapters || [];
+				let foundLectureId = null;
+
+				// Loop through chapters to find the first chapter with order == 1
+				for (const chapter of chapters) {
+					if (parseInt(chapter.order) === 1) {
+						// Check if chapter.order == 1
+						const sortedLectures = (chapter.lectures || []).sort(
+							(a, b) => parseInt(a.order) - parseInt(b.order) // Sort lectures by order
+						);
+
+						// Find the first lecture with order == 1 within this chapter
+						const firstLecture = sortedLectures.find(
+							(lecture) => parseInt(lecture.order) === 1
+						);
+
+						if (firstLecture) {
+							foundLectureId = firstLecture.id; // Set the first lecture ID
+							break; // Exit after finding the first lecture
+						}
+					}
+				}
+
+				if (foundLectureId) {
+					setFirstLectureId(foundLectureId); // Store the first lecture ID
+					console.log("First Lecture ID:", foundLectureId); // Log the first lecture ID
+				} else {
+					setError("No lectures found for this course.");
+				}
+			} catch (error) {
+				console.error("Error fetching course details:", error);
+				setError(error.message || "Failed to fetch course details.");
+			} finally {
+				setIsCheckingEnrollment(false);
+			}
+		};
+
+		fetchCourseDetails();
+	}, [courseId]);
+
 	useEffect(() => {
 		const checkEnrollment = async () => {
 			if (userId) {
 				try {
 					setIsCheckingEnrollment(true);
 
-					const response = await fetch(
-						`/api/user/${userId}/enrollCourses`,
-						{
-							method: "GET",
-							headers: {
-								"Content-Type": "application/json",
-							},
-							credentials: "include", // Include cookies for authentication
-						}
-					);
+					const response = await fetch(`/api/user/${userId}/enrollCourses`, {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						credentials: "include", // Include cookies for authentication
+					});
 
 					if (!response.ok) {
 						throw new Error("Failed to fetch enrolled courses.");
@@ -88,7 +141,7 @@ const CourseEnroll = ({ type, course }) => {
 						}
 
 						if (foundLectureId) {
-							setFirstLectureId(foundLectureId);
+							// setFirstLectureId(foundLectureId);
 						} else {
 							// Handle case where no lectures are found
 							setError("No lectures found for this course.");
@@ -113,10 +166,7 @@ const CourseEnroll = ({ type, course }) => {
 
 	const handleEnrollClick = async () => {
 		if (!session) {
-			creteAlert(
-				"error",
-				"You need to sign in to proceed with enrollment."
-			);
+			creteAlert("error", "You need to sign in to proceed with enrollment.");
 			router.push("/login");
 		} else {
 			// Start the loading process
@@ -163,9 +213,7 @@ const CourseEnroll = ({ type, course }) => {
 				}
 			} catch (error) {
 				console.error("Checkout error:", error);
-				setError(
-					error.message || "Something went wrong during checkout."
-				);
+				setError(error.message || "Something went wrong during checkout.");
 			} finally {
 				// End the loading process
 				setLoading(false);
@@ -195,11 +243,7 @@ const CourseEnroll = ({ type, course }) => {
 
 			<div
 				className={`flex justify-between ${
-					type === 2
-						? "mt-50px mb-5"
-						: type === 3
-						? "mb-50px"
-						: "mb-5"
+					type === 2 ? "mt-50px mb-5" : type === 3 ? "mb-50px" : "mb-5"
 				}`}
 			>
 				<div className="text-size-21 font-bold text-primaryColor font-inter leading-25px">
@@ -258,9 +302,7 @@ const CourseEnroll = ({ type, course }) => {
 						{/* Conditionally Render "Go to Course" or "Enroll Now" Button */}
 						{isEnrolled && firstLectureId ? (
 							<button
-								onClick={() =>
-									router.push(`/lessons/${firstLectureId}`)
-								} // Redirect to first lecture
+								onClick={() => router.push(`/lessons/${firstLectureId}`)} // Redirect to first lecture
 								className="w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px mb-10px leading-1.8 border border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark"
 							>
 								Go to Course
@@ -269,9 +311,7 @@ const CourseEnroll = ({ type, course }) => {
 							<button
 								onClick={handleEnrollClick}
 								className={`w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px mb-10px leading-1.8 border border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark ${
-									loading
-										? "cursor-not-allowed opacity-50"
-										: ""
+									loading ? "cursor-not-allowed opacity-50" : ""
 								}`}
 								disabled={loading}
 							>
