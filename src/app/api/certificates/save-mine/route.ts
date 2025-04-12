@@ -4,7 +4,6 @@ import { db } from "@/db";
 import { certification } from "@/db/schemas/certification";
 
 import { placeholders } from "@/db/schemas/placeholders";
-import { uploadToCloudinary } from "@/libs/uploadinary/upload";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { certificateIssuance } from "@/db/schemas/certificateIssuance";
@@ -16,12 +15,10 @@ function generateUniqueIdentifier() {
 }
 
 const saveCertificateSchema = z.object({
-	owner_id: z
-		.string()
-		.uuid({ message: "Invalid owner_id (must be UUID format)" }),
+	owner_id: z.string().uuid({ message: "Invalid owner_id (must be UUID format)" }),
 
-	certificate_data_url: z.string().startsWith("data:image/", {
-		message: "certificate_data_url must be a valid image in base64 format",
+	certificate_data_url: z.string().url({
+		message: "certificate_data_url must be a valid URL",
 	}),
 
 	title: z.string().min(1, { message: "Title is required" }),
@@ -35,9 +32,7 @@ const saveCertificateSchema = z.object({
 		.optional()
 		.default(() => {
 			const defaultExpirationDate = new Date();
-			defaultExpirationDate.setFullYear(
-				defaultExpirationDate.getFullYear() + 100
-			);
+			defaultExpirationDate.setFullYear(defaultExpirationDate.getFullYear() + 100);
 			return defaultExpirationDate.toISOString(); // ✅ Always sets current date + 100 years
 		}),
 
@@ -53,9 +48,7 @@ const saveCertificateSchema = z.object({
 
 	max_download: z.number().optional(),
 	is_deleted: z.boolean().optional(),
-	course_id: z
-		.string()
-		.uuid({ message: "Invalid owner_id (must be UUID format)" }),
+	course_id: z.string().uuid({ message: "Invalid owner_id (must be UUID format)" }),
 });
 
 function stripHtmlTags(html: string | undefined): string {
@@ -68,10 +61,7 @@ export async function POST(req: NextRequest) {
 		// Authenticate the user
 		let session = await getSession();
 		if (!session || !session.user) {
-			return NextResponse.json(
-				{ message: "Unauthorized" },
-				{ status: 401 }
-			);
+			return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 		}
 
 		// Check user roles
@@ -126,28 +116,7 @@ export async function POST(req: NextRequest) {
 			file_name,
 		} = payload;
 
-		// // ✅ Ensure metadata is a JSON object and append file_name
-		// const updatedMetadata = {
-		// 	...(metadata || {}), // Ensure metadata is always an object
-		// 	file_name: file_name, // Append file_name
-		// };
-
-		// Upload image to Cloudinary
-		const uploadResult = await uploadToCloudinary(
-			certificate_data_url,
-			title + ".png"
-		);
-		if (!uploadResult.success) {
-			return NextResponse.json(
-				{
-					message: "Failed to upload image to Cloudinary",
-					error: uploadResult.error,
-				},
-				{ status: 500 }
-			);
-		}
-
-		const { secure_url } = uploadResult.result;
+		const secure_url = certificate_data_url;
 
 		//! Creation of new certificate ID HERE and insertion into certification table
 
@@ -159,8 +128,7 @@ export async function POST(req: NextRequest) {
 				id: certificateId,
 				owner_id,
 				certificate_data_url: secure_url,
-				description:
-					stripHtmlTags(description) || "No description provided",
+				description: stripHtmlTags(description) || "No description provided",
 				is_published: false,
 				unique_identifier: generateUniqueIdentifier(),
 				title,
@@ -231,31 +199,22 @@ export async function POST(req: NextRequest) {
 			];
 
 			// Prepare and insert placeholders
-			const placeholdersToInsert = defaultPlaceholders.map(
-				(placeholder) => ({
-					id: uuidv4(),
-					certificate_id: certificateId,
-					key: placeholder.key,
-					discount: 0,
-					label: placeholder.label,
-					is_visible: true,
-					font_size: 14,
-					color: "#000000",
-					value: placeholder.value,
-					x: placeholder.x,
-					y: placeholder.y,
-				})
-			);
+			const placeholdersToInsert = defaultPlaceholders.map((placeholder) => ({
+				id: uuidv4(),
+				certificate_id: certificateId,
+				key: placeholder.key,
+				discount: 0,
+				label: placeholder.label,
+				is_visible: true,
+				font_size: 14,
+				color: "#000000",
+				value: placeholder.value,
+				x: placeholder.x,
+				y: placeholder.y,
+			}));
 
 			await trx.insert(placeholders).values(placeholdersToInsert);
 		});
-
-		// Issue the certificate
-		// await issueCertificate({
-		//   certificateId,
-		//   owner_id,
-		//   issuedBy: session.user.id,
-		// });
 
 		// ✅ Query all placeholders for the newly created certificate
 		const storedPlaceholders = await db
@@ -284,32 +243,3 @@ export async function POST(req: NextRequest) {
 		);
 	}
 }
-
-// async function issueCertificate({
-//   certificateId,
-//   owner_id,
-//   issuedBy,
-// }: {
-//   certificateId: string;
-//   owner_id: string;
-//   issuedBy: string;
-// }) {
-//   try {
-//     const issuanceUniqueIdentifier = `CERT-ISSUE-${uuidv4()}`;
-
-//     await db.insert(certificateIssuance).values({
-//       id: uuidv4(),
-//       certificateId,
-//       issuedBy,
-//       issuedTo: owner_id,
-//       issuanceUniqueIdentifier,
-//       description: "Certificate issued directly after saving.",
-//       isRevoked: false,
-//       isExpired: false,
-//       issuedAt: new Date(),
-//     });
-//   } catch (error) {
-//     console.error("Error issuing certificate:", error);
-//     throw new Error("Failed to issue certificate.");
-//   }
-// }
