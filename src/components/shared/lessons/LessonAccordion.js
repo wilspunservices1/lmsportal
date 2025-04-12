@@ -761,18 +761,40 @@ const LessonAccordion = ({
                           Final Exam
                         </h3>
                         {finalExamAttempted ? (
-                          <p
-                            style={{
-                              color: "red",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            You have already attempted the final exam.
-                          </p>
+                          <div className="text-center">
+                            <p
+                              style={{
+                                color: "red",
+                                fontWeight: "bold",
+                                marginBottom: "0.5rem",
+                              }}
+                            >
+                              You have already attempted the final exam.
+                            </p>
+                            <div className="mt-2 p-3 bg-gray-100 rounded-lg">
+                              <p className="text-lg font-semibold">
+                                Your Final Score:
+                              </p>
+                              <p className="text-3xl font-bold text-blue-600">
+                                {quizScores[finalExamId] || 0}%
+                              </p>
+                              <p className="text-sm text-gray-600 mt-1">
+                                {(quizScores[finalExamId] || 0) >= 70 ? (
+                                  <span className="text-green-600 font-semibold">
+                                    Passed ✓
+                                  </span>
+                                ) : (
+                                  <span className="text-red-600 font-semibold">
+                                    Not Passed ✗
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                          </div>
                         ) : (
                           <button
                             onClick={handleFinalExamStart}
-                            className="bg-blue-600 text-black font-bold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center space-x-2 hover:bg-blue-700"
+                            className="bg-red-400 text-black font-bold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center space-x-2 hover:bg-red-600"
                           >
                             <span>Start Final Exam</span>
                             <svg
