@@ -237,116 +237,10 @@ export async function PATCH(
   }
 }
 
-// export async function GET(
-//   req: Request,
-//   { params }: { params: { userId: string } }
-// ) {
-//   const { userId } = params;
-
-//   if (!userId) {
-//     return NextResponse.json(
-//       { error: "User ID is required." },
-//       { status: 400 }
-//     );
-//   }
-
-//   try {
-//     // Parse the query parameters from the URL
-//     const url = new URL(req.url);
-//     const includeEnrolledCourses = url.searchParams.get(
-//       "includeEnrolledCourses"
-//     );
-//     const includeWishlist = url.searchParams.get("includeWishlist");
-
-//     // Perform the base query to fetch user details along with userDetails and userSocials
-// const [userWithDetailsAndSocials] = await db
-//   .select({
-//     id: user.id,
-//     name: user.name,
-//     username: user.username,
-//     phone: user.phone,
-//     email: user.email,
-//     image: user.image,
-//     roles: user.roles,
-//     isVerified: user.isVerified,
-//     createdAt: user.createdAt,
-//     updatedAt: user.updatedAt,
-//     biography: userDetails.biography,
-//     expertise: userDetails.expertise,
-//     registrationDate: userDetails.registrationDate,
-//     enrolledCourses: user.enrolledCourses,
-//     wishlist: user.wishlist,
-//     // Socials fields
-//     facebook: userSocials.facebook,
-//     twitter: userSocials.twitter,
-//     linkedin: userSocials.linkedin,
-//     website: userSocials.website,
-//     github: userSocials.github,
-//   })
-//   .from(user)
-//   .leftJoin(userDetails, eq(user.id, userDetails.userId))
-//   .leftJoin(userSocials, eq(user.id, userSocials.userId))
-//   .where(eq(user.id, userId))
-//   .limit(1);
-
-//     if (!userWithDetailsAndSocials) {
-//       return NextResponse.json(
-//         { error: "User details not found." },
-//         { status: 404 }
-//       );
-//     }
-
-//     // Structure the socials data
-//     const socials = {
-//       facebook: userWithDetailsAndSocials.facebook || "",
-//       twitter: userWithDetailsAndSocials.twitter || "",
-//       linkedin: userWithDetailsAndSocials.linkedin || "",
-//       website: userWithDetailsAndSocials.website || "",
-//       github: userWithDetailsAndSocials.github || "",
-//     };
-
-//     // Prepare response with all details by default
-//     const response = {
-//       id: userWithDetailsAndSocials.id,
-//       name: userWithDetailsAndSocials.name,
-//       username: userWithDetailsAndSocials.username,
-//       phone: userWithDetailsAndSocials.phone,
-//       email: userWithDetailsAndSocials.email,
-//       image: userWithDetailsAndSocials.image,
-//       roles: userWithDetailsAndSocials.roles,
-//       isVerified: userWithDetailsAndSocials.isVerified,
-//       createdAt: userWithDetailsAndSocials.createdAt,
-//       updatedAt: userWithDetailsAndSocials.updatedAt,
-//       biography: userWithDetailsAndSocials.biography || "Biography not provided.",
-//       expertise: userWithDetailsAndSocials.expertise.length > 0 ? userWithDetailsAndSocials.expertise : ["No expertise provided."],
-//       registrationDate: userWithDetailsAndSocials.registrationDate || "Date not provided",
-//       socials, // Include socials
-//     };
-
-//     // Conditionally include enrolledCourses and wishlist
-//     if (includeEnrolledCourses !== "false") {
-//       response['enrolledCourses'] = userWithDetailsAndSocials.enrolledCourses;
-//     }
-
-//     if (includeWishlist !== "false") {
-//       response['wishlist'] = userWithDetailsAndSocials.wishlist;
-//     }
-
-//     // Return the response
-//     return NextResponse.json(response);
-//   } catch (error) {
-//     console.error("Error fetching user details:", error);
-//     return NextResponse.json(
-//       { error: "An error occurred while fetching user details." },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-// Define precise types based on your schema
 interface EnrolledCourse {
   courseId: string
   progress: number
+  finalExamStatus?: Boolean
   completedLectures: string[]
 }
 
@@ -379,7 +273,7 @@ interface UserResponse {
   expertise: string[]
   registrationDate: string
   socials: Socials
-  enrolledCourses: Course[]
+  enrolledCourses: EnrolledCourse[];
   wishlist: Course[]
 }
 export async function GET(
@@ -439,7 +333,7 @@ export async function GET(
         : ['No expertise provided.']
 
     // Process enrolledCourses: always process if the field exists
-    let enrolledCoursesProcessed: Course[] = []
+    let enrolledCoursesProcessed: EnrolledCourse[] = []
     if (mainUser.enrolledCourses) {
       try {
         const normalized = JSON.parse(JSON.stringify(mainUser.enrolledCourses))
