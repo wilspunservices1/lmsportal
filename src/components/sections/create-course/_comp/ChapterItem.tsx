@@ -45,10 +45,7 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 	>([]);
 	const [selectedQuestionnaire, setSelectedQuestionnaire] =
 		useState<string>("");
-	const [showAssignModal, setShowAssignModal] = useState(false);
-	const [selectedCourse, setSelectedCourse] = useState<string>("");
-	const [selectedChapterId, setSelectedChapterId] = useState<string>("");
-
+		
 	const fetchQuestionnaires = useCallback(async () => {
 		try {
 			const response = await fetch("/api/questionnaire/list");
@@ -105,6 +102,37 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 		} catch (error) {
 			console.error("Error assigning questionnaire:", error);
 			showAlert("error", "Failed to assign questionnaire");
+		}
+	};
+
+	const handleRemoveQuestionnaire = async () => {
+		try {
+			const response = await fetch("/api/questionnaire/remove", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					courseId: courseId,
+					chapterId: chapterId,
+				}),
+			});
+	
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.error || "Failed to remove questionnaire");
+			}
+	
+			const updatedChapter = {
+				...chapter,
+				questionnaireId: null,
+			};
+			updateChapter(index, updatedChapter);
+			setSelectedQuestionnaire(""); // Reset selection
+			showAlert("success", "Questionnaire removed successfully");
+		} catch (error) {
+			console.error("Error removing questionnaire:", error);
+			showAlert("error", error.message || "Failed to remove questionnaire");
 		}
 	};
 
@@ -448,6 +476,7 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 							setSelectedQuestionnaire(e.target.value)
 						}
 						className="flex-1 p-2 border rounded focus:ring-2 focus:ring-primaryColor"
+						disabled={!!chapter.questionnaireId}
 					>
 						<option value="">Select a Quiz</option>
 						{availableQuestionnaires.map((q) => (
@@ -456,22 +485,47 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 							</option>
 						))}
 					</select>
-					<button
-						onClick={handleAssignQuestionnaire}
-						className="px-4 py-2 bg-primaryColor text-white rounded hover:bg-opacity-90"
-					>
-						Assign Quiz
-					</button>
+					{!chapter.questionnaireId ? (
+						<button
+							onClick={handleAssignQuestionnaire}
+							className="px-4 py-2 bg-primaryColor text-white rounded hover:bg-opacity-90"
+						>
+							Assign Quiz
+						</button>
+					) : (
+						<button
+							onClick={handleRemoveQuestionnaire}
+							className="px-4 py-2 bg-red-500 text-white rounded hover:bg-opacity-90"
+						>
+							Remove Quiz
+						</button>
+					)}
 				</div>
 
 				{chapter.questionnaireId && (
-					<div className="mt-2 p-2 bg-gray-50 rounded">
+					<div className="mt-2 p-2 bg-gray-50 rounded flex justify-between items-center">
 						<p className="text-sm">
 							Assigned Quiz:{" "}
 							{availableQuestionnaires.find(
 								(q) => q.id === chapter.questionnaireId
 							)?.title || "Loading..."}
 						</p>
+						<Tooltip content="Remove assigned quiz" position="left">
+							<button
+								onClick={handleRemoveQuestionnaire}
+								className="text-red-500 hover:text-red-700"
+							>
+								<svg 
+									xmlns="http://www.w3.org/2000/svg" 
+									width="16" 
+									height="16" 
+									fill="currentColor" 
+									viewBox="0 0 16 16"
+								>
+									<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+								</svg>
+							</button>
+						</Tooltip>
 					</div>
 				)}
 			</div>

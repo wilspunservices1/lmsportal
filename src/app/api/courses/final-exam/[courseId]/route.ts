@@ -14,27 +14,48 @@ export async function PATCH(
 		const { courseId } = params; // Extract courseId from dynamic route params
 		const { finalExamId } = await req.json(); // Extract finalExamId from request body
 
-		// Validate input
-		if (!courseId || !finalExamId) {
+		// Validate courseId only - finalExamId can be null for removal
+		if (!courseId) {
 			return NextResponse.json(
-				{ error: "Missing courseId or finalExamId" },
+				{ error: "Missing courseId" },
 				{ status: 400 }
 			);
 		}
 
-		// Update the course with the new finalExamId
+		// Check if course exists
+		const existingCourse = await db
+			.select()
+			.from(courses)
+			.where(eq(courses.id, courseId))
+			.limit(1);
+
+		if (!existingCourse.length) {
+			return NextResponse.json(
+				{ error: "Course not found" },
+				{ status: 404 }
+			);
+		}
+
+		// Update the course - allowing null finalExamId for removal
 		await db
 			.update(courses)
-			.set({ finalExamId })
+			.set({ finalExamId: finalExamId || null })
 			.where(eq(courses.id, courseId));
 
 		return NextResponse.json({
-			message: "Final Exam assigned successfully!",
+			success: true,
+			message: finalExamId 
+				? "Final Exam assigned successfully!"
+				: "Final Exam removed successfully!",
 		});
 	} catch (error) {
 		console.error("Error updating Final Exam:", error);
 		return NextResponse.json(
-			{ error: "Internal Server Error" },
+			{ 
+				success: false,
+				error: "Internal Server Error",
+				details: error instanceof Error ? error.message : "Unknown error"
+			},
 			{ status: 500 }
 		);
 	}

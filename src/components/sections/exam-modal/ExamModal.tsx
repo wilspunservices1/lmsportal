@@ -59,6 +59,9 @@ const ExamModal: React.FC<ExamModalProps> = ({
 	// Timer logic: 60 minutes (3600 seconds) for the entire exam
 	const [timeLeft, setTimeLeft] = useState(3600);
 
+	// Add new state to track answered questions
+	const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
+
 	if (!examData) return null;
 
 	const totalQuestions = examData.questions.length;
@@ -98,6 +101,7 @@ const ExamModal: React.FC<ExamModalProps> = ({
 			...prev,
 			[questionIndex]: option,
 		}));
+		setAnsweredQuestions((prev) => new Set(Array.from(prev).concat(questionIndex)));
 	};
 
 	/** Move to next question or submit if it's the last */
@@ -107,6 +111,18 @@ const ExamModal: React.FC<ExamModalProps> = ({
 		} else {
 			handleSubmitExam();
 		}
+	};
+
+	/** Move to previous question */
+	const handlePrevQuestion = () => {
+		if (currentIndex > 0) {
+			setCurrentIndex(currentIndex - 1);
+		}
+	};
+
+	/** Select a specific question */
+	const handleQuestionSelect = (index: number) => {
+		setCurrentIndex(index);
 	};
 
 	/** Final submission logic */
@@ -226,93 +242,158 @@ const ExamModal: React.FC<ExamModalProps> = ({
 	}
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-			{/* Increased container size */}
-			<div className="bg-white w-full max-w-5xl min-h-[80vh] mx-4 rounded shadow-lg relative p-8">
-				{/* Top Bar: Question Navigation (disabled) + Timer */}
-				<div className="flex items-center justify-between border-b pb-2 mb-4">
-					<div className="space-x-2">
-						{examData.questions.map((_, idx) => (
-							<button
-								key={idx}
-								disabled
-								className={`px-2 py-1 border rounded cursor-not-allowed ${
-									currentIndex === idx
-										? "bg-green-600 text-white border-green-600"
-										: "bg-gray-100 text-gray-600"
-								}`}
-							>
-								{idx + 1}
-							</button>
-						))}
-					</div>
-					<div className="text-red-600 font-semibold">
-						Total Time Remaining: {formatTime(timeLeft)}
+		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+			{/* Increased container size and improved layout */}
+			<div className="bg-white w-full max-w-7xl min-h-[90vh] rounded-lg shadow-2xl relative flex flex-col">
+				{/* Header with Timer and Close Button */}
+				<div className="bg-gray-50 p-4 rounded-t-lg border-b flex items-center justify-between">
+					<h2 className="text-2xl font-bold text-gray-800">Final Examination</h2>
+					<div className="flex items-center gap-4">
+						<div className="bg-white px-4 py-2 rounded-md border">
+							<span className="text-red-600 font-semibold">
+								Time Remaining: {formatTime(timeLeft)}
+							</span>
+						</div>
+						<button
+							onClick={onClose}
+							className="text-gray-500 hover:text-gray-700"
+							aria-label="Close"
+						>
+							<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						</button>
 					</div>
 				</div>
 
-				{/* Question Title & Directions */}
-				<h3 className="text-lg font-bold mb-2">
-					Final Exam - Question {currentIndex + 1} of {totalQuestions}
-				</h3>
-				<p className="text-sm text-gray-600 mb-3">
-					Final Exam: Answer all questions within the allotted time.
-				</p>
-
-				{/* Question & Options Layout */}
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					{/* Left: Question Text */}
-					<div className="border p-4 rounded">
-						<p className="font-medium mb-2">
-							{currentQuestion.question}
-						</p>
+				{/* Main Content Area */}
+				<div className="flex flex-1 overflow-hidden">
+					{/* Left Sidebar: Question Navigation */}
+					<div className="w-64 bg-gray-50 p-4 border-r overflow-y-auto">
+						<h3 className="text-sm font-semibold text-gray-600 mb-3">Question Navigation</h3>
+						<div className="grid grid-cols-4 gap-2">
+							{examData.questions.map((_, idx) => (
+								<button
+									key={idx}
+									onClick={() => handleQuestionSelect(idx)}
+									className={`
+										p-2 rounded text-center text-sm font-medium
+										${currentIndex === idx ? 'ring-2 ring-blue-500' : ''}
+										${answeredQuestions.has(idx) 
+											? 'bg-green-100 text-green-800 border-green-200' 
+											: 'bg-gray-100 text-gray-600 border-gray-200'}
+										hover:bg-gray-200 transition-colors
+									`}
+								>
+									{idx + 1}
+								</button>
+							))}
+						</div>
+						
+						<div className="mt-4 p-3 bg-blue-50 rounded-md">
+							<h4 className="text-sm font-semibold text-blue-800 mb-2">Progress</h4>
+							<div className="space-y-2">
+								<div className="flex justify-between text-sm">
+									<span>Answered:</span>
+									<span className="font-medium">{answeredQuestions.size}/{totalQuestions}</span>
+								</div>
+								<div className="w-full bg-gray-200 rounded-full h-2">
+									<div 
+										className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+										style={{ width: `${(answeredQuestions.size/totalQuestions) * 100}%` }}
+									/>
+								</div>
+							</div>
+						</div>
 					</div>
 
-					{/* Right: Options */}
-					<div className="border p-4 rounded">
-						<p className="font-semibold mb-2">
-							Choose the correct option:
-						</p>
-						{options.map((option, idx) => (
-							<label
-								key={idx}
-								className="flex items-center mb-2 cursor-pointer"
-							>
-								<input
-									type="radio"
-									name={`question-${currentIndex}`}
-									value={option}
-									className="mr-2"
-									onChange={() =>
-										handleOptionChange(currentIndex, option)
-									}
-									checked={
-										selectedAnswers[currentIndex] === option
-									}
-								/>
-								<span>{option}</span>
-							</label>
-						))}
-					</div>
-				</div>
+					{/* Main Question Area */}
+					<div className="flex-1 p-6 overflow-y-auto">
+						<div className="max-w-3xl mx-auto">
+							{/* Question Header */}
+							<div className="mb-6">
+								<h3 className="text-xl font-bold text-gray-800 mb-2">
+									Question {currentIndex + 1} of {totalQuestions}
+								</h3>
+								<p className="text-gray-600">
+									Select the best answer for the question below
+								</p>
+							</div>
 
-				{/* Bottom Navigation */}
-				<div className="flex justify-end space-x-2 mt-6">
-					{currentIndex < totalQuestions - 1 ? (
-						<button
-							onClick={handleNextQuestion}
-							className="px-6 py-3 bg-blue text-white rounded hover:bg-blue-700 transition-colors"
-						>
-							Save & Next
-						</button>
-					) : (
-						<button
-							onClick={handleSubmitExam}
-							className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-						>
-							Submit Exam
-						</button>
-					)}
+							{/* Question Content */}
+							<div className="bg-white rounded-lg border p-6 mb-6">
+								<p className="text-lg font-medium text-gray-800 mb-6">
+									{currentQuestion.question}
+								</p>
+
+								{/* Options */}
+								<div className="space-y-3">
+									{options.map((option, idx) => (
+										<label
+											key={idx}
+											className={`
+												flex items-center p-4 rounded-lg border cursor-pointer
+												${selectedAnswers[currentIndex] === option 
+													? 'bg-blue-50 border-blue-200' 
+													: 'hover:bg-gray-50'}
+												transition-colors
+											`}
+										>
+											<input
+												type="radio"
+												name={`question-${currentIndex}`}
+												value={option}
+												className="w-4 h-4 text-blue-600"
+												onChange={() => handleOptionChange(currentIndex, option)}
+												checked={selectedAnswers[currentIndex] === option}
+											/>
+											<span className="ml-3">{option}</span>
+										</label>
+									))}
+								</div>
+							</div>
+
+							{/* Navigation Buttons */}
+							<div className="flex justify-between items-center mt-6">
+								<button
+									onClick={handlePrevQuestion}
+									disabled={currentIndex === 0}
+									className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 
+											 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed
+											 transition-colors flex items-center gap-2"
+								>
+									<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+									</svg>
+									Previous
+								</button>
+
+								{currentIndex < totalQuestions - 1 ? (
+									<button
+										onClick={handleNextQuestion}
+										className="px-6 py-2.5 bg-yellow text-white rounded-lg
+											 hover:bg-blue-700 transition-colors flex items-center gap-2"
+									>
+										Next
+										<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+										</svg>
+									</button>
+								) : (
+									<button
+										onClick={handleSubmitExam}
+										className="px-6 py-2.5 bg-green-600 text-white rounded-lg
+											 hover:bg-green-700 transition-colors flex items-center gap-2"
+									>
+										Submit Exam
+										<svg className="w-5 h-5" fill="none" viewBox="0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+										</svg>
+									</button>
+								)}
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

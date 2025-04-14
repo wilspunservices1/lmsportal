@@ -29,9 +29,11 @@ const PreExamPopup: React.FC<PreExamPopupProps> = ({
             <h3 className="text-lg font-semibold text-yellow-800 mb-2">
               Important Notice
             </h3>
-            <p className="text-yellow-700">
-              This is a one-time attempt exam. Once started, you cannot pause or restart the exam.
-            </p>
+            <ul className="text-yellow-700 list-disc pl-4 space-y-1">
+              <li>If you start without booking, you will lose your attempt.</li>
+              <li>Please ensure you are ready before starting the exam.</li>
+              <li>This is a one-time attempt exam. Once started, you cannot pause or restart the exam.</li>
+            </ul>
           </div>
 
           <div className="space-y-3">
