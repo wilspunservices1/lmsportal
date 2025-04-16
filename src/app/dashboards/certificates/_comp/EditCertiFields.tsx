@@ -525,12 +525,12 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
 							))}
 						</div>
 					)}
-					<button
+					{/* <button
 						onClick={() => setShowCropper(true)}
 						className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
 					>
 						Crop Certificate
-					</button>
+					</button> */}
 
 					{showCropper ? (
 						<div className="fixed inset-0 z-50 bg-white p-4">
@@ -641,15 +641,6 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
 							</div>
 						</div>
 					)}
-
-					<div className="flex justify-center mt-4">
-						<button
-							onClick={handleSaveChanges}
-							className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
-						>
-							Save Changes
-						</button>
-					</div>
 				</div>
 			)}
 

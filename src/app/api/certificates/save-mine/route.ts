@@ -2,13 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/libs/auth";
 import { db } from "@/db";
 import { certification } from "@/db/schemas/certification";
-
 import { placeholders } from "@/db/schemas/placeholders";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import { certificateIssuance } from "@/db/schemas/certificateIssuance";
 import { eq } from "drizzle-orm";
-import { request } from "http";
 
 function generateUniqueIdentifier() {
 	return "CERT-" + Math.random().toString(36).substring(2, 11).toUpperCase();
@@ -16,15 +13,11 @@ function generateUniqueIdentifier() {
 
 const saveCertificateSchema = z.object({
 	owner_id: z.string().uuid({ message: "Invalid owner_id (must be UUID format)" }),
-
 	certificate_data_url: z.string().url({
 		message: "certificate_data_url must be a valid URL",
 	}),
-
 	title: z.string().min(1, { message: "Title is required" }),
-
 	description: z.string().optional(),
-
 	file_name: z.string().min(1, { message: "File name is required" }),
 
 	expiration_date: z
@@ -35,17 +28,12 @@ const saveCertificateSchema = z.object({
 			defaultExpirationDate.setFullYear(defaultExpirationDate.getFullYear() + 100);
 			return defaultExpirationDate.toISOString(); // ✅ Always sets current date + 100 years
 		}),
-
 	is_revocable: z.boolean().optional().default(true),
-
 	metadata: z.record(z.any()).optional().default({}),
-
 	is_enabled: z.boolean().optional().default(true),
-
 	orientation: z.enum(["landscape", "portrait"], {
 		required_error: "Orientation is required",
 	}),
-
 	max_download: z.number().optional(),
 	is_deleted: z.boolean().optional(),
 	course_id: z.string().uuid({ message: "Invalid owner_id (must be UUID format)" }),
@@ -63,7 +51,6 @@ export async function POST(req: NextRequest) {
 		if (!session || !session.user) {
 			return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 		}
-
 		// Check user roles
 		const userRoles: string[] = session.user.roles || [];
 		const allowedRoles = ["superAdmin", "instructor", "admin"];
@@ -71,7 +58,6 @@ export async function POST(req: NextRequest) {
 		if (!hasAccess) {
 			return NextResponse.json({ message: "Forbidden" }, { status: 403 });
 		}
-
 		// Validate the request payload
 		let payload;
 		try {
@@ -94,7 +80,6 @@ export async function POST(req: NextRequest) {
 				{ status: 400 }
 			);
 		}
-
 		const {
 			//id
 			owner_id,
@@ -117,9 +102,7 @@ export async function POST(req: NextRequest) {
 		} = payload;
 
 		const secure_url = certificate_data_url;
-
 		//! Creation of new certificate ID HERE and insertion into certification table
-
 		const certificateId = uuidv4();
 
 		await db.transaction(async (trx) => {
