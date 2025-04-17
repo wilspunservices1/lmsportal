@@ -1,237 +1,109 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import { CldImage } from "next-cloudinary";
 
+// Define the type for a review
+type Review = {
+	id: string;
+	rating: number;
+	comment: string;
+	avatar_url?: string; // Optional field for user's avatar
+	user_id: string; // The user who submitted the review
+	created_at: string; // Timestamp of when the review was created
+	name: string; // User's name
+	username?: string; // Added username field
+};
+
 type Props = {
-  reviews: any;
+	reviews: Review[];
 };
 
 const ClientsReviews: React.FC<Props> = ({ reviews }) => {
-  return (
-    <div className="mt-60px mb-10">
-      <h4 className="text-lg text-blackColor dark:text-blackColor-dark font-bold pl-2 before:w-0.5 relative before:h-[21px] before:bg-secondaryColor before:absolute before:bottom-[5px] before:left-0 leading-1.2 mb-25px">
-        Customer Reviews
-      </h4>
-      <ul>
-        {reviews && reviews.length > 0 ? (
-          reviews.map((review: any, index: number) => (
-            <li
-              key={index}
-              className="flex gap-30px pt-35px border-t border-borderColor2 dark:border-borderColor2-dark"
-            >
-              <div className="flex-shrink-0">
-                <CldImage
-                  width="60"
-                  height="60"
-                  alt={review.name}
-                  src={review.avatar}
-                  sizes="60w"
-                  className="w-25 h-25 rounded-full"
-                />
-              </div>
-              <div className="flex-grow">
-                <div className="flex justify-between">
-                  <div>
-                    <h4>
-                      <a
-                        href="#"
-                        className="text-lg font-semibold text-blackColor hover:text-secondaryColor dark:text-blackColor-dark dark:hover:text-condaryColor leading-1.2"
-                      >
-                        {review.name}
-                      </a>
-                    </h4>
-                    <div className="text-secondaryColor leading-1.8">
-                      {/* Render stars based on rating */}
-                      {Array(review.rating)
-                        .fill(0)
-                        .map((_, i) => (
-                          <i
-                            key={i}
-                            className="icofont-star text-secondaryColor"
-                          ></i>
-                        ))}
-                      {/* Add empty stars if needed */}
-                      {Array(5 - review.rating)
-                        .fill(0)
-                        .map((_, i) => (
-                          <i
-                            key={i}
-                            className="icofont-star text-gray-300"
-                          ></i>
-                        ))}
-                    </div>
-                  </div>
-                  <div className="author__icon">
-                    <p className="text-sm font-bold text-blackColor dark:text-blackColor-dark leading-9 px-25px mb-5px border-2 border-borderColor2 dark:border-borderColo2-dark hover:border-secondaryColor dark:hover:border-secondaryColor rounded-full transition-all duration-300">
-                      {review.date}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm text-contentColor dark:text-contentColor-dark leading-23px mb-15px">
-                  {review.comment}
-                </p>
-              </div>
-            </li>
-          ))
-        ) : (
-          <p>No reviews available.</p>
-        )}
-      </ul>
-    </div>
-  );
+	const [visibleReviews, setVisibleReviews] = useState(5);
+
+	// Helper function to format date to a more readable format
+	const formatDate = (dateString: string) => {
+		const date = new Date(dateString);
+		return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+	};
+
+	// Helper function to render stars based on rating
+	const renderStars = (rating: number) => {
+		const filledStars = Array(rating).fill(<i className="icofont-star text-yellow-500"></i>);
+		const emptyStars = Array(5 - rating).fill(<i className="icofont-star text-gray-300"></i>);
+		return [...filledStars, ...emptyStars];
+	};
+
+	const loadMoreReviews = () => {
+		setVisibleReviews((prev) => prev + 5);
+	};
+
+	return (
+		<div className="mt-10 mb-10 max-w-7xl mx-auto">
+			<h4 className="text-2xl text-blackColor dark:text-white font-semibold pl-2 mb-6">
+				Customer Reviews
+			</h4>
+			<div className="space-y-6">
+				{reviews && reviews.length > 0 ? (
+					<>
+						{reviews.slice(0, visibleReviews).map((review) => (
+							<div
+								key={review.id}
+								className="flex p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-300 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
+							>
+								<div className="flex-shrink-0 mr-6">
+									<CldImage
+										width="60"
+										height="60"
+										alt={review.name}
+										src={review.avatar_url || "/default-avatar.png"}
+										sizes="60w"
+										className="w-16 h-16 rounded-full object-cover"
+									/>
+								</div>
+								<div className="flex-grow">
+									<div className="flex justify-between items-start">
+										<div>
+											<h5 className="text-lg font-semibold text-blackColor dark:text-white">
+												{review.name}
+											</h5>
+											{review.username && (
+												<p className="text-sm text-gray-500 dark:text-gray-400">
+													@{review.username}
+												</p>
+											)}
+											<div className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+												{renderStars(review.rating)}
+											</div>
+										</div>
+										<div className="text-sm font-medium text-gray-500 dark:text-gray-400">
+											{formatDate(review.created_at)}
+										</div>
+									</div>
+									<p className="text-sm text-gray-700 dark:text-gray-300 mt-3">
+										{review.comment}
+									</p>
+								</div>
+							</div>
+						))}
+						{visibleReviews < reviews.length && (
+							<div className="text-center">
+								<button
+									onClick={loadMoreReviews}
+									className="px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
+									style={{ color: "#eb911e" }}
+								>
+									+ Show More Reviews
+								</button>
+							</div>
+						)}
+					</>
+				) : (
+					<p className="text-gray-500 dark:text-gray-400">No reviews available.</p>
+				)}
+			</div>
+		</div>
+	);
 };
 
 export default ClientsReviews;
-
-
-// import Image from "next/image";
-// import React from "react";
-// import teacherImage1 from "@/assets/images/teacher/teacher__1.png";
-// import teacherImage2 from "@/assets/images/teacher/teacher__2.png";
-// import teacherImage3 from "@/assets/images/teacher/teacher__3.png";
-// import { CldImage } from 'next-cloudinary';
-
-// type Props = {
-//     reviews: any
-// };
-
-// const ClientsReviews : React.FC<Props> = ({reviews}) => {
-//     console.log("reviews from client reviews",reviews)
-//   return (
-//     <div className="mt-60px mb-10">
-//       <h4 className="text-lg text-blackColor dark:text-blackColor-dark font-bold pl-2 before:w-0.5 relative before:h-[21px] before:bg-secondaryColor before:absolute before:bottom-[5px] before:left-0 leading-1.2 mb-25px">
-//         Customer Reviews
-//       </h4>
-//       <ul>
-//         <li className="flex gap-30px pt-35px border-t border-borderColor2 dark:border-borderColor2-dark">
-//           <div className="flex-shrink-0">
-//             <div>
-//               <Image
-//                 src={teacherImage2}
-//                 alt=""
-//                 className="w-25 h-25 rounded-full"
-//               />
-//             </div>
-//           </div>
-//           <div className="flex-grow">
-//             <div className="flex justify-between">
-//               <div>
-//                 <h4>
-//                   <a
-//                     href="#"
-//                     className="text-lg font-semibold text-blackColor hover:text-secondaryColor dark:text-blackColor-dark dark:hover:text-condaryColor leading-1.2"
-//                   >
-//                     Adam Smit
-//                   </a>
-//                 </h4>
-//                 <div className="text-secondaryColor leading-1.8">
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>
-//                 </div>
-//               </div>
-//               <div className="author__icon">
-//                 <p className="text-sm font-bold text-blackColor dark:text-blackColor-dark leading-9 px-25px mb-5px border-2 border-borderColor2 dark:border-borderColo2-dark hover:border-secondaryColor dark:hover:border-secondaryColor rounded-full transition-all duration-300">
-//                   September 2, 2024
-//                 </p>
-//               </div>
-//             </div>
-
-//             <p className="text-sm text-contentColor dark:text-contentColor-dark leading-23px mb-15px">
-//               Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-//               Doloribus, omnis fugit corporis iste magnam ratione.
-//             </p>
-//           </div>
-//         </li>
-//         <li className="flex gap-30px pt-35px border-t border-borderColor2 dark:border-borderColor2-dark">
-//           <div className="flex-shrink-0">
-//             <div>
-//               <Image
-//                 src={teacherImage1}
-//                 alt=""
-//                 className="w-25 h-25 rounded-full"
-//               />
-//             </div>
-//           </div>
-//           <div className="flex-grow">
-//             <div className="flex justify-between">
-//               <div>
-//                 <h4>
-//                   <a
-//                     href="#"
-//                     className="text-lg font-semibold text-blackColor hover:text-secondaryColor dark:text-blackColor-dark dark:hover:text-condaryColor leading-1.2"
-//                   >
-//                     Adam Smit
-//                   </a>
-//                 </h4>
-//                 <div className="text-secondaryColor leading-1.8">
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>
-//                 </div>
-//               </div>
-//               <div className="author__icon">
-//                 <p className="text-sm font-bold text-blackColor dark:text-blackColor-dark leading-9 px-25px mb-5px border-2 border-borderColor2 dark:border-borderColo2-dark hover:border-secondaryColor dark:hover:border-secondaryColor rounded-full transition-all duration-300">
-//                   September 2, 2024
-//                 </p>
-//               </div>
-//             </div>
-
-//             <p className="text-sm text-contentColor dark:text-contentColor-dark leading-23px mb-15px">
-//               Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-//               Doloribus, omnis fugit corporis iste magnam ratione.
-//             </p>
-//           </div>
-//         </li>
-//         <li className="flex gap-30px pt-35px border-t border-borderColor2 dark:border-borderColor2-dark">
-//           <div className="flex-shrink-0">
-//             <div>
-//               <Image
-//                 src={teacherImage3}
-//                 alt=""
-//                 className="w-25 h-25 rounded-full"
-//               />
-//             </div>
-//           </div>
-//           <div className="flex-grow">
-//             <div className="flex justify-between">
-//               <div>
-//                 <h4>
-//                   <a
-//                     href="#"
-//                     className="text-lg font-semibold text-blackColor hover:text-secondaryColor dark:text-blackColor-dark dark:hover:text-condaryColor leading-1.2"
-//                   >
-//                     Adam Smit
-//                   </a>
-//                 </h4>
-//                 <div className="text-secondaryColor leading-1.8">
-//                   {" "}
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>{" "}
-//                   <i className="icofont-star"></i>
-//                 </div>
-//               </div>
-//               <div className="author__icon">
-//                 <p className="text-sm font-bold text-blackColor dark:text-blackColor-dark leading-9 px-25px mb-5px border-2 border-borderColor2 dark:border-borderColo2-dark hover:border-secondaryColor dark:hover:border-secondaryColor rounded-full transition-all duration-300">
-//                   September 2, 2024
-//                 </p>
-//               </div>
-//             </div>
-
-//             <p className="text-sm text-contentColor dark:text-contentColor-dark leading-23px mb-15px">
-//               Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-//               Doloribus, omnis fugit corporis iste magnam ratione.
-//             </p>
-//           </div>
-//         </li>
-//       </ul>
-//     </div>
-//   );
-// };
-
-// export default ClientsReviews;
