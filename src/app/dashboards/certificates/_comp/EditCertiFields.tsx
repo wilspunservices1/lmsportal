@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import Select, { SingleValue } from "react-select";
 import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -8,7 +9,7 @@ import html2canvas from "html2canvas";
 import { debounce } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import Image from "next/image";
-
+import "@/styles/fonts.css";
 import { useCallback, useMemo } from "react";
 
 // Icons, Hooks, and Components
@@ -20,6 +21,14 @@ import DesignTab from "./DesignTab"; // Your additional design functionality
 // Local mock or shared placeholders
 import { initialPlaceholders } from "@/assets/mock";
 import DownloadIcon from "@/components/sections/create-course/_comp/Certificate/Icon/DownloadIcon";
+import Head from "next/head";
+
+<Head>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pacifico&family=Dancing+Script&family=Playfair+Display&family=Montserrat&display=swap"
+    rel="stylesheet"
+  />
+</Head>;
 
 interface APICertificate {
 	id: string;
@@ -450,199 +459,189 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
 								Show Hidden Placeholders
 							</button>
 
-							{selectedPlaceholders.map((ph) => (
-								<div key={ph.id} className="mb-2 flex items-center justify-between">
-									<span>{ph.label}</span>
-									<div className="flex items-center space-x-2">
-										<label className="text-sm">Font Size:</label>
-										<input
-											type="number"
-											value={ph.font_size}
-											onChange={(e) => {
-												const size = Math.max(
-													8,
-													Math.min(72, parseInt(e.target.value) || 16)
-												);
-												setSelectedPlaceholders((prev) =>
-													prev.map((item) =>
-														item.id === ph.id
-															? {
-																	...item,
-																	font_size: size,
-															  }
-															: item
-													)
-												);
-											}}
-											className="w-16 px-2 py-1 border rounded"
-											min={8}
-											max={72}
-										/>
-										<label className="text-sm">Color:</label>
-										<input
-											type="color"
-											value={ph.color}
-											onChange={(e) => {
-												setSelectedPlaceholders((prev) =>
-													prev.map((item) =>
-														item.id === ph.id
-															? {
-																	...item,
-																	color: e.target.value,
-															  }
-															: item
-													)
-												);
-											}}
-											className="w-16 px-2 py-1 border rounded"
-										/>
-										<label className="text-sm">Font Family:</label>
-										<select
-											value={ph.font_family}
-											onChange={(e) => {
-												setSelectedPlaceholders((prev) =>
-													prev.map((item) =>
-														item.id === ph.id
-															? {
-																	...item,
-																	font_family: e.target.value,
-															  }
-															: item
-													)
-												);
-											}}
-											className="w-24 px-2 py-1 border rounded"
-										>
-											<option value="Arial">Arial</option>
-											<option value="Anastasia Script">
-												Anastasia Script
-											</option>
-											<option value="Times New Roman">Times New Roman</option>
-											<option value="Courier New">Courier New</option>
-										</select>
-									</div>
-								</div>
-							))}
-						</div>
-					)}
-					{/* <button
-						onClick={() => setShowCropper(true)}
-						className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-					>
-						Crop Certificate
-					</button> */}
+              {selectedPlaceholders.map((ph) => (
+                <div
+                  key={ph.id}
+                  className="mb-2 flex items-center justify-between"
+                >
+                  <span>{ph.label}</span>
+                  <div className="flex items-center space-x-2">
+                    <label className="text-sm">Font Size:</label>
+                    <input
+                      type="number"
+                      value={ph.font_size}
+                      onChange={(e) => {
+                        const size = Math.max(
+                          8,
+                          Math.min(72, parseInt(e.target.value) || 16)
+                        );
+                        setSelectedPlaceholders((prev) =>
+                          prev.map((item) =>
+                            item.id === ph.id
+                              ? {
+                                  ...item,
+                                  font_size: size,
+                                }
+                              : item
+                          )
+                        );
+                      }}
+                      className="w-16 px-2 py-1 border rounded"
+                      min={8}
+                      max={72}
+                    />
+                    <label className="text-sm">Color:</label>
+                    <input
+                      type="color"
+                      value={ph.color}
+                      onChange={(e) => {
+                        setSelectedPlaceholders((prev) =>
+                          prev.map((item) =>
+                            item.id === ph.id
+                              ? {
+                                  ...item,
+                                  color: e.target.value,
+                                }
+                              : item
+                          )
+                        );
+                      }}
+                      className="w-16 px-2 py-1 border rounded"
+                    />
+                    <label className="text-sm">Font Family:</label>
+                    <select
+                      value={ph.font_family} // Change from selectedFont to ph.font_family
+                      onChange={(e) => {
+                        setSelectedPlaceholders((prev) =>
+                          prev.map((item) =>
+                            item.id === ph.id
+                              ? {
+                                  ...item,
+                                  font_family: e.target.value,
+                                }
+                              : item
+                          )
+                        );
+                      }}
+                      className="w-36 px-2 py-1 border rounded"
+                      style={{ fontFamily: ph.font_family }}
+                    >
+                      <option value="Great Vibes" className="font-great-vibes">
+                        Great Vibes
+                      </option>
+                      <option
+                        value="Pinyon Script"
+                        className="font-pinyon-script"
+                      >
+                        Pinyon Script
+                      </option>
+                      <option value="Tangerine" className="font-tangerine">
+                        Tangerine
+                      </option>
+                      <option value="Arial">Arial</option>
+                      <option value="Times New Roman">Times New Roman</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <div
+            className="certificate-container relative w-[842px] h-[595px] mx-auto bg-white border border-gray-200"
+            style={{
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <Image
+              src={selectedCertificate.certificate_data_url}
+              alt={`${selectedCertificate.title} - ${selectedCertificate.unique_identifier}`}
+              className="w-full h-full object-contain"
+              crossOrigin="anonymous"
+              width={842}
+              height={595}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+              }}
+            />
 
-					{showCropper ? (
-						<div className="fixed inset-0 z-50 bg-white p-4">
-							<div className="max-w-4xl mx-auto">
-								<ReactCrop
-									crop={crop}
-									onChange={(c) => setCrop(c)}
-									aspect={842 / 595}
-								>
-									<Image
-										data-crop-source
-										src={selectedCertificate.certificate_data_url}
-										alt="Certificate to crop"
-										className="max-w-full"
-										crossOrigin="anonymous"
-										width={1280}
-										height={904}
-										style={{
-											width: "100%",
-											height: "auto",
-										}}
-									/>
-								</ReactCrop>
-
-								<div className="mt-4 flex justify-end gap-2">
-									<button
-										onClick={() => setShowCropper(false)}
-										className="px-4 py-2 bg-gray-500 text-white rounded"
-									>
-										Cancel
-									</button>
-									<button
-										onClick={handleCrop}
-										className="px-4 py-2 bg-blue text-white rounded"
-									>
-										Apply Crop
-									</button>
-								</div>
-							</div>
-						</div>
-					) : (
-						<div className="certificate-container relative w-[842px] h-[595px] mx-auto bg-white">
-							<Image
-								src={selectedCertificate.certificate_data_url}
-								alt={`${selectedCertificate.title} - ${selectedCertificate.unique_identifier}`}
-								className="w-full h-full object-contain"
-								crossOrigin="anonymous"
-								width={1280}
-								height={904}
-								style={{ width: "100%", height: "auto" }}
-							/>
-							<div className="absolute inset-0 p-8">
-								{selectedPlaceholders
-									.filter((ph) => ph.is_visible)
-									.map((placeholder, index) => (
-										<Draggable
-											key={placeholder.id}
-											position={{
-												x: placeholder.x || 0,
-												y: placeholder.y || 0,
-											}} // Use `position` instead of `defaultPosition`
-											bounds="parent"
-											onStop={(e, data) => {
-												// Update the state with the new position
-												setSelectedPlaceholders((prev) =>
-													prev.map((item) =>
-														item.id === placeholder.id
-															? { ...item, x: data.x, y: data.y }
-															: item
-													)
-												);
-												// Save the new position to the database
-												savePlaceholderPosition(
-													placeholder.id,
-													data.x,
-													data.y
-												);
-											}}
-										>
-											<div className="absolute cursor-move group">
-												<input
-													type="text"
-													value={placeholder.value}
-													onChange={(e) => {
-														const updatedVal = e.target.value;
-														setSelectedPlaceholders((prev) =>
-															prev.map((item) =>
-																item.id === placeholder.id
-																	? { ...item, value: updatedVal }
-																	: item
-															)
-														);
-													}}
-													className="bg-transparent hover:bg-white/50 focus:bg-white/50 
-                            border border-transparent hover:border-gray-300 
-                            focus:border-blue-500 rounded px-2 py-1 outline-none transition-all"
-													style={{
-														fontSize: `${placeholder.font_size}px`,
-														color: placeholder.color,
-														fontFamily: placeholder.font_family,
-														minWidth: "100px",
-													}}
-													placeholder={placeholder.label || ""}
-												/>
-											</div>
-										</Draggable>
-									))}
-							</div>
-						</div>
-					)}
-				</div>
-			)}
+            {/* Placeholders container */}
+            <div className="absolute inset-0">
+              {selectedPlaceholders
+                .filter((ph) => ph.is_visible)
+                .map((placeholder) => (
+                  <Draggable
+                    key={placeholder.id}
+                    position={{ x: placeholder.x, y: placeholder.y }}
+                    bounds="parent"
+                    onStop={(e, data) => {
+                      setSelectedPlaceholders((prev) =>
+                        prev.map((item) =>
+                          item.id === placeholder.id
+                            ? { ...item, x: data.x, y: data.y }
+                            : item
+                        )
+                      );
+                      savePlaceholderPosition(placeholder.id, data.x, data.y);
+                    }}
+                  >
+                    <div
+                      className="absolute cursor-move bg-white bg-opacity-70 hover:bg-opacity-100 transition-all p-1 rounded"
+                      style={{
+                        left: `${placeholder.x}px`,
+                        top: `${placeholder.y}px`,
+                        zIndex: 10,
+                        minWidth: "150px",
+                        userSelect: "none",
+                        touchAction: "none",
+                        transform: `translate(${placeholder.x}px, ${placeholder.y}px)`
+                      }}
+                    >
+                      <input
+                        type="text"
+                        value={placeholder.value}
+                        onChange={(e) => {
+                          const updatedVal = e.target.value;
+                          setSelectedPlaceholders((prev) =>
+                            prev.map((item) =>
+                              item.id === placeholder.id
+                                ? { ...item, value: updatedVal }
+                                : item
+                            )
+                          );
+                        }}
+                        className={`w-full bg-transparent border border-dashed border-gray-300 hover:border-blue-500 focus:border-blue-500 rounded px-2 py-1 outline-none transition-all
+                          ${
+                            placeholder.font_family === "Great Vibes"
+                              ? "font-great-vibes"
+                              : ""
+                          }
+                          ${
+                            placeholder.font_family === "Pinyon Script"
+                              ? "font-pinyon-script"
+                              : ""
+                          }
+                          ${
+                            placeholder.font_family === "Tangerine"
+                              ? "font-tangerine"
+                              : ""
+                          }`}
+                        style={{
+                          fontSize: `${placeholder.font_size}px`,
+                          color: placeholder.color,
+                          fontFamily: placeholder.font_family,
+                        }}
+                        placeholder={placeholder.label || ""}
+                      />
+                    </div>
+                  </Draggable>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
 
 			<div className="mt-4">
 				{currentIdx === 0 && (
