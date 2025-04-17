@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Select, { SingleValue } from "react-select";
 import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -21,443 +20,433 @@ import DesignTab from "./DesignTab"; // Your additional design functionality
 // Local mock or shared placeholders
 import { initialPlaceholders } from "@/assets/mock";
 import DownloadIcon from "@/components/sections/create-course/_comp/Certificate/Icon/DownloadIcon";
-import Head from "next/head";
-
-<Head>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pacifico&family=Dancing+Script&family=Playfair+Display&family=Montserrat&display=swap"
-    rel="stylesheet"
-  />
-</Head>;
 
 interface APICertificate {
-	id: string;
-	owner_id: string;
-	certificate_data_url: string;
-	description: string;
-	is_published: boolean;
-	unique_identifier: string;
-	title: string;
-	expiration_date: string;
-	is_revocable: boolean;
-	created_at: string;
-	updated_at: string;
-	deleted_at: string | null;
-	is_enabled: boolean;
-	orientation: string;
-	max_download: number;
-	is_deleted: boolean;
-	course_id: string;
-	file_name: string;
-	metadata: {
-		courseName?: string;
-		instructor?: string;
-		courseDuration?: string;
-		file_name: string;
-	};
-	placeholders: APIPlaceholder[];
+  id: string;
+  owner_id: string;
+  certificate_data_url: string;
+  description: string;
+  is_published: boolean;
+  unique_identifier: string;
+  title: string;
+  expiration_date: string;
+  is_revocable: boolean;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  is_enabled: boolean;
+  orientation: string;
+  max_download: number;
+  is_deleted: boolean;
+  course_id: string;
+  file_name: string;
+  metadata: {
+    courseName?: string;
+    instructor?: string;
+    courseDuration?: string;
+    file_name: string;
+  };
+  placeholders: APIPlaceholder[];
 }
 
 interface APIPlaceholder {
-	id: string;
-	certificate_id: string;
-	key: string;
-	discount: number;
-	label: string;
-	value: string;
-	x: number;
-	y: number;
-	font_size?: number;
-	is_visible?: boolean;
-	color?: string;
-	font_family?: string;
+  id: string;
+  certificate_id: string;
+  key: string;
+  discount: number;
+  label: string;
+  value: string;
+  x: number;
+  y: number;
+  font_size?: number;
+  is_visible?: boolean;
+  color?: string;
+  font_family?: string;
 }
 
 interface UIPlaceholder extends APIPlaceholder {
-	font_size: number; // from font_size
-	is_visible: boolean; // from is_visible
-	color: string; // from color
-	font_family: string; // from font_family
+  font_size: number; // from font_size
+  is_visible: boolean; // from is_visible
+  color: string; // from color
+  font_family: string; // from font_family
 }
 
 interface CertificateOption {
-	value: string; // The certificate's id
-	label: string; // title + unique_identifier
+  value: string; // The certificate's id
+  label: string; // title + unique_identifier
 }
 
 interface EditCertiFieldsProps {
-	setDesignData: (data: any) => void;
+  setDesignData: (data: any) => void;
 }
 
 const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
-	const { currentIdx } = useTab();
-	const showAlert = useSweetAlert();
+  const { currentIdx } = useTab();
+  const showAlert = useSweetAlert();
 
-	const [allCertificates, setAllCertificates] = useState<APICertificate[]>([]);
-	const [selectedCertificate, setSelectedCertificate] = useState<APICertificate | null>(null);
-	const [selectedPlaceholders, setSelectedPlaceholders] = useState<UIPlaceholder[]>([]);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [showOptions, setShowOptions] = useState(false);
-	const [crop, setCrop] = useState<Crop>({ unit: "%", x: 25, y: 25, width: 50, height: 50 });
-	const [showCropper, setShowCropper] = useState(false);
-	const [isEditing, setIsEditing] = useState(false);
-	const [instructorName, setInstructorName] = useState("");
-	const [selectedFont, setSelectedFont] = useState<string>("Arial"); // Default font
+  const [allCertificates, setAllCertificates] = useState<APICertificate[]>([]);
+  const [selectedCertificate, setSelectedCertificate] =
+    useState<APICertificate | null>(null);
+  const [selectedPlaceholders, setSelectedPlaceholders] = useState<
+    UIPlaceholder[]
+  >([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showOptions, setShowOptions] = useState(false);
+  const [crop, setCrop] = useState<Crop>({
+    unit: "%",
+    x: 25,
+    y: 25,
+    width: 50,
+    height: 50,
+  });
+  const [showCropper, setShowCropper] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [instructorName, setInstructorName] = useState("");
+  const [selectedFont, setSelectedFont] = useState<string>("Arial"); // Default font
+  const [isSaving, setIsSaving] = useState(false);
 
-	const fetchUserCertificates = useCallback(async () => {
-		try {
-			setLoading(true);
-			const response = await fetch("/api/certificates/get-saved");
-			if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-			const data = await response.json();
+  const fetchUserCertificates = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/certificates/get-saved");
+      if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+      const data = await response.json();
 
-			if (!data || !Array.isArray(data.certificates)) {
-				throw new Error("Invalid data format from API.");
-			}
+      if (!data || !Array.isArray(data.certificates)) {
+        throw new Error("Invalid data format from API.");
+      }
 
-			setAllCertificates(data.certificates);
-		} catch (err: any) {
-			setError(err.message || "Failed to fetch certificates");
-			console.error("Error fetching certificates:", err);
-		} finally {
-			setLoading(false);
-		}
-	}, []);
+      setAllCertificates(data.certificates);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch certificates");
+      console.error("Error fetching certificates:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-	useEffect(() => {
-		fetchUserCertificates();
-	}, [fetchUserCertificates]);
+  useEffect(() => {
+    fetchUserCertificates();
+  }, [fetchUserCertificates]);
 
-	const handleSelectCertificate = (newValue: SingleValue<CertificateOption>) => {
-		if (!newValue) {
-			setSelectedCertificate(null);
-			setSelectedPlaceholders([]);
-			return;
-		}
+  const handleSelectCertificate = (
+    newValue: SingleValue<CertificateOption>
+  ) => {
+    if (!newValue) {
+      setSelectedCertificate(null);
+      setSelectedPlaceholders([]);
+      return;
+    }
 
-		const found = allCertificates.find((cert) => cert.id === newValue.value);
-		if (!found) {
-			console.warn("Selected certificate not found in state:", newValue.value);
-			return;
-		}
+    const found = allCertificates.find((cert) => cert.id === newValue.value);
+    if (!found) {
+      console.warn("Selected certificate not found in state:", newValue.value);
+      return;
+    }
 
-		setSelectedCertificate(found);
+    setSelectedCertificate(found);
 
-		const placeholdersForCert: UIPlaceholder[] = found.placeholders.map((ph) => ({
-			...ph,
-			font_size: ph.font_size ?? 16,
-			font_family: ph.font_family || selectedFont, // Use dropdown-selected font if missing
-			is_visible: ph.is_visible !== false,
-			color: ph.color ?? "#000000",
-		}));
-		setSelectedPlaceholders(placeholdersForCert);
-	};
+    const placeholdersForCert: UIPlaceholder[] = found.placeholders.map(
+      (ph, index) => {
+        // Check if position is valid (not null/undefined and within bounds)
+        const hasValidPosition =
+          ph.x !== undefined &&
+          ph.x !== null &&
+          ph.y !== undefined &&
+          ph.y !== null &&
+          ph.x >= 0 &&
+          ph.y >= 0 &&
+          ph.x <= 842 - 100 && // Account for placeholder width
+          ph.y <= 595 - 30; // Account for placeholder height
 
-	const handleCrop = useCallback(() => {
-		if (!selectedCertificate) {
-			showAlert("error", "No certificate to crop");
-			return;
-		}
+        return {
+          ...ph,
+          font_size: ph.font_size ?? 16,
+          font_family: ph.font_family || selectedFont,
+          is_visible: ph.is_visible !== false,
+          color: ph.color ?? "#000000",
+          x: hasValidPosition ? ph.x : 30, // Use saved x or default
+          y: hasValidPosition ? ph.y : index * 60 + 30, // Use saved y or default
+        };
+      }
+    );
+    setSelectedPlaceholders(placeholdersForCert);
+  };
 
-		const imageEl = document.querySelector("img[data-crop-source]") as HTMLImageElement;
-		if (!imageEl || !crop.width || !crop.height) {
-			showAlert("error", "Please select an area to crop");
-			return;
-		}
+  const handleDownload = useCallback(async () => {
+    const container = document.querySelector(".certificate-container");
+    if (!container) return;
 
-		try {
-			const canvas = document.createElement("canvas");
-			const scaleX = imageEl.naturalWidth / imageEl.width;
-			const scaleY = imageEl.naturalHeight / imageEl.height;
+    try {
+      const canvas = await html2canvas(container as HTMLElement, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#fff",
+        scale: 2,
+      });
 
-			canvas.width = crop.width;
-			canvas.height = crop.height;
-			const ctx = canvas.getContext("2d");
-			if (!ctx) throw new Error("Failed to get 2D context");
+      const dataUrl = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `certificate-${Date.now()}.png`;
+      link.click();
 
-			ctx.drawImage(
-				imageEl,
-				crop.x * scaleX,
-				crop.y * scaleY,
-				crop.width * scaleX,
-				crop.height * scaleY,
-				0,
-				0,
-				crop.width,
-				crop.height
-			);
+      showAlert("success", "Certificate downloaded successfully");
+    } catch (error) {
+      console.error("Download error:", error);
+      showAlert("error", "Failed to download certificate");
+    }
+  }, [showAlert]);
 
-			const croppedDataUrl = canvas.toDataURL("image/png");
+  const certificateIdx = selectedCertificate?.id;
 
-			setSelectedCertificate((prev) => {
-				if (!prev) return null;
-				return {
-					...prev,
-					certificate_data_url: croppedDataUrl,
-				};
-			});
+  const updatePlaceholderCoordinates = useCallback(
+    async (placeholderId: string, x: number, y: number) => {
+      try {
+        if (!certificateIdx) return;
+        const response = await fetch(
+          `/api/manageCertificates/${certificateIdx}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ placeholderId, x, y }),
+          }
+        );
+        if (!response.ok) {
+          console.error(
+            "Failed to update placeholder in DB, status:",
+            response.status
+          );
+        }
+      } catch (err) {
+        console.error("Error updating placeholder in DB:", err);
+      }
+    },
+    [certificateIdx]
+  );
 
-			setShowCropper(false);
-			showAlert("success", "Image cropped successfully");
-		} catch (error) {
-			console.error("Error cropping image:", error);
-			showAlert("error", "Failed to crop image");
-		}
-	}, [selectedCertificate, crop, showAlert]);
+  const debouncedUpdatePlaceholderCoordinates = useMemo(
+    () => debounce(updatePlaceholderCoordinates, 500),
+    [updatePlaceholderCoordinates]
+  );
 
-	const handleDownload = useCallback(async () => {
-		const container = document.querySelector(".certificate-container");
-		if (!container) return;
+  const savePlaceholderPosition = async (
+    placeholderId: string,
+    x: number,
+    y: number
+  ) => {
+    try {
+      // First update local state for immediate UI response
+      setSelectedPlaceholders((prev) =>
+        prev.map((item) =>
+          item.id === placeholderId ? { ...item, x, y } : item
+        )
+      );
 
-		try {
-			const canvas = await html2canvas(container as HTMLElement, {
-				useCORS: true,
-				allowTaint: true,
-				backgroundColor: "#fff",
-				scale: 2,
-			});
+      // Then update the backend
+      await debouncedUpdatePlaceholderCoordinates(placeholderId, x, y);
+    } catch (error) {
+      console.error("Error updating placeholder position:", error);
+      // Optionally revert local state if save fails
+      setSelectedPlaceholders((prev) =>
+        prev.map((item) =>
+          item.id === placeholderId
+            ? { ...item, x: item.x, y: item.y } // Revert to previous position
+            : item
+        )
+      );
+    }
+  };
 
-			const dataUrl = canvas.toDataURL("image/png");
-			const link = document.createElement("a");
-			link.href = dataUrl;
-			link.download = `certificate-${Date.now()}.png`;
-			link.click();
+  const handleSaveChanges = async () => {
+    setIsSaving(true);
+    try {
+      if (!selectedCertificate) {
+        showAlert("error", "No certificate selected");
+        return;
+      }
 
-			showAlert("success", "Certificate downloaded successfully");
-		} catch (error) {
-			console.error("Download error:", error);
-			showAlert("error", "Failed to download certificate");
-		}
-	}, [showAlert]);
+      // Prepare the data to be sent to the backend
+      const dataToSave = {
+        placeholders: selectedPlaceholders.map((ph) => ({
+          id: ph.id,
+          x: ph.x,
+          y: ph.y,
+          value: ph.value,
+          font_size: ph.font_size,
+          color: ph.color,
+          font_family: ph.font_family,
+          is_visible: ph.is_visible,
+        })),
+      };
 
-	const certificateIdx = selectedCertificate?.id;
+      // Send the request to the backend
+      const response = await fetch("/api/placeholders/bulk-update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSave),
+      });
 
-	const updatePlaceholderCoordinates = useCallback(
-		async (placeholderId: string, x: number, y: number) => {
-			try {
-				if (!certificateIdx) return;
-				const response = await fetch(`/api/manageCertificates/${certificateIdx}`, {
-					method: "PATCH",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ placeholderId, x, y }),
-				});
-				if (!response.ok) {
-					console.error("Failed to update placeholder in DB, status:", response.status);
-				}
-			} catch (err) {
-				console.error("Error updating placeholder in DB:", err);
-			}
-		},
-		[certificateIdx]
-	);
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
 
-	const debouncedUpdatePlaceholderCoordinates = useMemo(
-		() => debounce(updatePlaceholderCoordinates, 500),
-		[updatePlaceholderCoordinates]
-	);
+      // Refresh the certificate data to ensure we have the latest from the backend
+      await fetchUserCertificates();
 
-	const savePlaceholderPosition = async (placeholderId: string, x: number, y: number) => {
-		try {
-			// Update the backend
-			await debouncedUpdatePlaceholderCoordinates(placeholderId, x, y);
+      showAlert("success", "Certificate changes saved successfully");
+    } catch (err) {
+      console.error("Error saving changes:", err);
+      showAlert("error", "Failed to save changes");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-			// Update the local state
-			setSelectedPlaceholders((prev) =>
-				prev.map((item) =>
-					item.id === placeholderId
-						? { ...item, x, y } // Update x and y
-						: item
-				)
-			);
-		} catch (error) {
-			console.error("Error updating placeholder position:", error);
-		}
-	};
+  const togglePlaceholderVisibility = async (
+    placeholderId: string,
+    isVisible: boolean
+  ) => {
+    try {
+      const response = await fetch(`/api/placeholders/${placeholderId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ is_visible: isVisible }),
+      });
 
-	useEffect(() => {
-		return () => {
-			debouncedUpdatePlaceholderCoordinates.cancel();
-		};
-	}, [debouncedUpdatePlaceholderCoordinates]);
+      if (!response.ok) {
+        throw new Error("Failed to update visibility");
+      }
 
-	const handleSaveChanges = async () => {
-		try {
-			if (!selectedCertificate) {
-				showAlert("error", "No certificate selected");
-				return;
-			}
+      console.log(
+        `Placeholder ${placeholderId} visibility updated to ${isVisible}`
+      );
+    } catch (error) {
+      console.error("Error updating placeholder visibility:", error);
+    }
+  };
 
-			// Prepare the data to be sent to the backend
-			const dataToSave = {
-				placeholders: selectedPlaceholders.map((ph) => ({
-					id: ph.id,
-					x: ph.x,
-					y: ph.y,
-					value: ph.value,
-					font_size: ph.font_size,
-					color: ph.color,
-					font_family: ph.font_family,
-					is_visible: ph.is_visible,
-				})),
-			};
+  return (
+    <div className="p-4">
+      <div className="mb-4">
+        <Select
+          options={allCertificates.map((cert) => ({
+            value: cert.id,
+            label: `${cert.title} - ${cert.unique_identifier}`,
+          }))}
+          onChange={handleSelectCertificate}
+          isLoading={loading}
+          placeholder="Select a certificate..."
+          className="react-select-container"
+          classNamePrefix="react-select"
+          isSearchable
+        />
+      </div>
 
-			// Send the request to the backend
-			const response = await fetch("/api/placeholders/bulk-update", {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(dataToSave),
-			});
+      {selectedCertificate && (
+        <div className="mb-6">
+          <div className="flex space-x-4 mb-4">
+            <button
+              onClick={() => setShowOptions(!showOptions)}
+              className="flex items-center space-x-2 bg-blue text-white px-4 py-2 rounded-lg"
+            >
+              <SettingsIcon size={24} color="white" />
+              <span>Options</span>
+            </button>
 
-			if (!response.ok) {
-				throw new Error(`HTTP Error: ${response.status}`);
-			}
+            <button
+              onClick={() =>
+                setSelectedPlaceholders(
+                  initialPlaceholders.map((ph: any) => ({
+                    ...ph,
+                    font_size: ph.font_size || 16,
+                    is_visible: true,
+                    id: ph.id || uuidv4(),
+                  }))
+                )
+              }
+              className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg"
+            >
+              <RefreshIcon size={24} color="white" />
+              <span>Reset</span>
+            </button>
 
-			const result = await response.json();
-			console.log("Save changes response:", result);
+            <button
+              onClick={handleDownload}
+              className="flex items-center space-x-2 bg-yellow text-white px-4 py-2 rounded-lg"
+            >
+              <DownloadIcon width={24} color="white" />
+              <span>Download</span>
+            </button>
 
-			showAlert("success", "Certificate changes saved successfully");
-		} catch (err) {
-			console.error("Error saving changes:", err);
-			showAlert("error", "Failed to save changes");
-		}
-	};
+            {/* Add the Save Changes button here */}
+            <button
+              onClick={handleSaveChanges}
+              disabled={isSaving}
+              className={`flex items-center space-x-2 ${
+                isSaving ? "bg-gray-500" : "bg-green-500"
+              } text-white px-4 py-2 rounded-lg`}
+            >
+              {isSaving ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
 
-	const togglePlaceholderVisibility = async (placeholderId: string, isVisible: boolean) => {
-		try {
-			const response = await fetch(`/api/placeholders/${placeholderId}`, {
-				method: "PATCH",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ is_visible: isVisible }),
-			});
-
-			if (!response.ok) {
-				throw new Error("Failed to update visibility");
-			}
-
-			console.log(`Placeholder ${placeholderId} visibility updated to ${isVisible}`);
-		} catch (error) {
-			console.error("Error updating placeholder visibility:", error);
-		}
-	};
-
-	return (
-		<div className="p-4">
-			<div className="mb-4">
-				<Select
-					options={allCertificates.map((cert) => ({
-						value: cert.id,
-						label: `${cert.title} - ${cert.unique_identifier}`,
-					}))}
-					onChange={handleSelectCertificate}
-					isLoading={loading}
-					placeholder="Select a certificate..."
-					className="react-select-container"
-					classNamePrefix="react-select"
-					isSearchable
-				/>
-			</div>
-
-			{selectedCertificate && (
-				<div className="mb-6">
-					<div className="flex space-x-4 mb-4">
-						<button
-							onClick={() => setShowOptions(!showOptions)}
-							className="flex items-center space-x-2 bg-blue text-white px-4 py-2 rounded-lg"
-						>
-							<SettingsIcon size={24} color="white" />
-							<span>Options</span>
-						</button>
-
-						<button
-							onClick={() =>
-								setSelectedPlaceholders(
-									initialPlaceholders.map((ph: any) => ({
-										...ph,
-										font_size: ph.font_size || 16,
-										is_visible: true,
-										id: ph.id || uuidv4(),
-									}))
-								)
-							}
-							className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg"
-						>
-							<RefreshIcon size={24} color="white" />
-							<span>Reset</span>
-						</button>
-
-						<button
-							onClick={handleDownload}
-							className="flex items-center space-x-2 bg-yellow text-white px-4 py-2 rounded-lg"
-						>
-							<DownloadIcon width={24} color="white" />
-							<span>Download</span>
-						</button>
-
-						{/* Add the Save Changes button here */}
-						<button
-							onClick={handleSaveChanges}
-							className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg"
-						>
-							<span>Save Changes</span>
-						</button>
-					</div>
-
-					{showOptions && (
-						<div className="mb-4 p-4 border rounded bg-gray-100">
-							<h3 className="text-lg font-bold mb-4">Placeholder Settings</h3>
-							<Select
-								isMulti
-								options={selectedPlaceholders.map((p) => ({
-									value: p.id,
-									label: p.label,
-								}))}
-								value={selectedPlaceholders
-									.filter((p) => p.is_visible)
-									.map((p) => ({
-										value: p.id,
-										label: p.label,
-									}))}
-								onChange={(selected) => {
-									const selectedIds = selected?.map((opt) => opt.value) || [];
-									setSelectedPlaceholders((prev) =>
-										prev.map((ph) => {
-											const newVisibility = selectedIds.includes(ph.id);
-											if (ph.is_visible !== newVisibility) {
-												togglePlaceholderVisibility(ph.id, newVisibility);
-											}
-											return {
-												...ph,
-												is_visible: newVisibility,
-											};
-										})
-									);
-								}}
-								className="mb-4"
-							/>
-							<button
-								onClick={() => {
-									setSelectedPlaceholders((prev) =>
-										prev.map((ph) => {
-											if (!ph.is_visible) {
-												togglePlaceholderVisibility(ph.id, true);
-												return {
-													...ph,
-													is_visible: true,
-												};
-											}
-											return ph;
-										})
-									);
-								}}
-								className="mt-4 px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300"
-							>
-								Show Hidden Placeholders
-							</button>
+          {showOptions && (
+            <div className="mb-4 p-4 border rounded bg-gray-100">
+              <h3 className="text-lg font-bold mb-4">Placeholder Settings</h3>
+              <Select
+                isMulti
+                options={selectedPlaceholders.map((p) => ({
+                  value: p.id,
+                  label: p.label,
+                }))}
+                value={selectedPlaceholders
+                  .filter((p) => p.is_visible)
+                  .map((p) => ({
+                    value: p.id,
+                    label: p.label,
+                  }))}
+                onChange={(selected) => {
+                  const selectedIds = selected?.map((opt) => opt.value) || [];
+                  setSelectedPlaceholders((prev) =>
+                    prev.map((ph) => {
+                      const newVisibility = selectedIds.includes(ph.id);
+                      if (ph.is_visible !== newVisibility) {
+                        togglePlaceholderVisibility(ph.id, newVisibility);
+                      }
+                      return {
+                        ...ph,
+                        is_visible: newVisibility,
+                      };
+                    })
+                  );
+                }}
+                className="mb-4"
+              />
+              <button
+                onClick={() => {
+                  setSelectedPlaceholders((prev) =>
+                    prev.map((ph) => {
+                      if (!ph.is_visible) {
+                        togglePlaceholderVisibility(ph.id, true);
+                        return {
+                          ...ph,
+                          is_visible: true,
+                        };
+                      }
+                      return ph;
+                    })
+                  );
+                }}
+                className="mt-4 px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+              >
+                Show Hidden Placeholders
+              </button>
 
               {selectedPlaceholders.map((ph) => (
                 <div
@@ -510,7 +499,7 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
                     />
                     <label className="text-sm">Font Family:</label>
                     <select
-                      value={ph.font_family} // Change from selectedFont to ph.font_family
+                      value={ph.font_family}
                       onChange={(e) => {
                         setSelectedPlaceholders((prev) =>
                           prev.map((item) =>
@@ -523,80 +512,77 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
                           )
                         );
                       }}
-                      className="w-36 px-2 py-1 border rounded"
-                      style={{ fontFamily: ph.font_family }}
+                      className="w-32 px-2 py-1 border rounded"
                     >
-                      <option value="Great Vibes" className="font-great-vibes">
-                        Great Vibes
-                      </option>
-                      <option
-                        value="Pinyon Script"
-                        className="font-pinyon-script"
-                      >
-                        Pinyon Script
-                      </option>
-                      <option value="Tangerine" className="font-tangerine">
-                        Tangerine
-                      </option>
                       <option value="Arial">Arial</option>
                       <option value="Times New Roman">Times New Roman</option>
+                      <option value="Great Vibes">Great Vibes</option>
+                      <option value="Pinyon Script">Pinyon Script</option>
+                      <option value="Tangerine">Tangerine</option>
                     </select>
                   </div>
                 </div>
               ))}
             </div>
           )}
-          <div
-            className="certificate-container relative w-[842px] h-[595px] mx-auto bg-white border border-gray-200"
-            style={{
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            <Image
-              src={selectedCertificate.certificate_data_url}
-              alt={`${selectedCertificate.title} - ${selectedCertificate.unique_identifier}`}
-              className="w-full h-full object-contain"
-              crossOrigin="anonymous"
-              width={842}
-              height={595}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-              }}
-            />
 
-            {/* Placeholders container */}
+          <div className="certificate-container relative w-[842px] h-[595px] mx-auto bg-white">
+            {/* Certificate background image */}
             <div className="absolute inset-0">
+              <Image
+                src={selectedCertificate.certificate_data_url}
+                alt={`${selectedCertificate.title} - ${selectedCertificate.unique_identifier}`}
+                className="w-full h-full object-contain"
+                crossOrigin="anonymous"
+                width={842} // Match container width
+                height={595} // Match container height
+                style={{
+                  width: "842px",
+                  height: "595px",
+                  objectFit: "contain",
+                }}
+              />
+            </div>
+
+            {/* Placeholders container with matching dimensions */}
+            <div
+              className="absolute inset-0"
+              style={{ width: "842px", height: "595px" }}
+            >
               {selectedPlaceholders
                 .filter((ph) => ph.is_visible)
                 .map((placeholder) => (
                   <Draggable
                     key={placeholder.id}
-                    position={{ x: placeholder.x, y: placeholder.y }}
-                    bounds="parent"
+                    position={{
+                      x: placeholder.x,
+                      y: placeholder.y,
+                    }}
+                    bounds={{
+                      left: 0,
+                      top: 0,
+                      right: 842 - 100, // Subtract placeholder min-width
+                      bottom: 595 - 30, // Subtract approximate placeholder height
+                    }}
                     onStop={(e, data) => {
+                      // Ensure coordinates stay within bounds
+                      const x = Math.max(0, Math.min(data.x, 842 - 100));
+                      const y = Math.max(0, Math.min(data.y, 595 - 30));
+
                       setSelectedPlaceholders((prev) =>
                         prev.map((item) =>
-                          item.id === placeholder.id
-                            ? { ...item, x: data.x, y: data.y }
-                            : item
+                          item.id === placeholder.id ? { ...item, x, y } : item
                         )
                       );
-                      savePlaceholderPosition(placeholder.id, data.x, data.y);
+                      savePlaceholderPosition(placeholder.id, x, y);
                     }}
                   >
                     <div
-                      className="absolute cursor-move bg-white bg-opacity-70 hover:bg-opacity-100 transition-all p-1 rounded"
+                      className="absolute cursor-move group"
                       style={{
                         left: `${placeholder.x}px`,
                         top: `${placeholder.y}px`,
                         zIndex: 10,
-                        minWidth: "150px",
-                        userSelect: "none",
-                        touchAction: "none",
-                        transform: `translate(${placeholder.x}px, ${placeholder.y}px)`
                       }}
                     >
                       <input
@@ -612,26 +598,27 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
                             )
                           );
                         }}
-                        className={`w-full bg-transparent border border-dashed border-gray-300 hover:border-blue-500 focus:border-blue-500 rounded px-2 py-1 outline-none transition-all
-                          ${
-                            placeholder.font_family === "Great Vibes"
-                              ? "font-great-vibes"
-                              : ""
-                          }
-                          ${
-                            placeholder.font_family === "Pinyon Script"
-                              ? "font-pinyon-script"
-                              : ""
-                          }
-                          ${
-                            placeholder.font_family === "Tangerine"
-                              ? "font-tangerine"
-                              : ""
-                          }`}
+                        className={`bg-transparent hover:bg-white/50 focus:bg-white/50 
+        border border-transparent hover:border-gray-300 
+        focus:border-blue-500 rounded px-2 py-1 outline-none transition-all
+        ${placeholder.font_family === "Great Vibes" ? "font-great-vibes" : ""}
+        ${
+          placeholder.font_family === "Pinyon Script"
+            ? "font-pinyon-script"
+            : ""
+        }
+        ${placeholder.font_family === "Tangerine" ? "font-tangerine" : ""}`}
                         style={{
                           fontSize: `${placeholder.font_size}px`,
                           color: placeholder.color,
-                          fontFamily: placeholder.font_family,
+                          fontFamily: [
+                            "Great Vibes",
+                            "Pinyon Script",
+                            "Tangerine",
+                          ].includes(placeholder.font_family)
+                            ? undefined
+                            : placeholder.font_family,
+                          minWidth: "100px",
                         }}
                         placeholder={placeholder.label || ""}
                       />
@@ -643,54 +630,54 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
         </div>
       )}
 
-			<div className="mt-4">
-				{currentIdx === 0 && (
-					<DesignTab
-						certificateData={
-							selectedCertificate
-								? {
-										id: selectedCertificate.id,
-										owner_id: selectedCertificate.owner_id,
-										certificate_data_url:
-											selectedCertificate.certificate_data_url,
-										description: selectedCertificate.description,
-										is_published: selectedCertificate.is_published,
-										unique_identifier: selectedCertificate.unique_identifier,
-										title: selectedCertificate.title,
-										is_revocable: selectedCertificate.is_revocable,
-										metadata: selectedCertificate.metadata,
-										created_at: selectedCertificate.created_at,
-										updated_at: selectedCertificate.updated_at,
-								  }
-								: {
-										id: "",
-										owner_id: "",
-										certificate_data_url: "",
-										description: "",
-										is_published: false,
-										unique_identifier: "",
-										title: "",
-										is_revocable: false,
-										metadata: {
-											courseName: "",
-											instructor: "",
-											courseDuration: "",
-											file_name: "",
-										},
-										created_at: "",
-										updated_at: "",
-								  }
-						}
-						isEditing={isEditing}
-						instructorName={instructorName}
-						setDesignData={setDesignData}
-						placeholders={selectedPlaceholders}
-						setPlaceholders={setSelectedPlaceholders}
-					/>
-				)}
-			</div>
-		</div>
-	);
+      <div className="mt-4">
+        {currentIdx === 0 && (
+          <DesignTab
+            certificateData={
+              selectedCertificate
+                ? {
+                    id: selectedCertificate.id,
+                    owner_id: selectedCertificate.owner_id,
+                    certificate_data_url:
+                      selectedCertificate.certificate_data_url,
+                    description: selectedCertificate.description,
+                    is_published: selectedCertificate.is_published,
+                    unique_identifier: selectedCertificate.unique_identifier,
+                    title: selectedCertificate.title,
+                    is_revocable: selectedCertificate.is_revocable,
+                    metadata: selectedCertificate.metadata,
+                    created_at: selectedCertificate.created_at,
+                    updated_at: selectedCertificate.updated_at,
+                  }
+                : {
+                    id: "",
+                    owner_id: "",
+                    certificate_data_url: "",
+                    description: "",
+                    is_published: false,
+                    unique_identifier: "",
+                    title: "",
+                    is_revocable: false,
+                    metadata: {
+                      courseName: "",
+                      instructor: "",
+                      courseDuration: "",
+                      file_name: "",
+                    },
+                    created_at: "",
+                    updated_at: "",
+                  }
+            }
+            isEditing={isEditing}
+            instructorName={instructorName}
+            setDesignData={setDesignData}
+            placeholders={selectedPlaceholders}
+            setPlaceholders={setSelectedPlaceholders}
+          />
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default EditCertiFields;
