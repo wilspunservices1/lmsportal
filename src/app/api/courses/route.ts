@@ -165,8 +165,19 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "12", 10);
     const offset = (page - 1) * limit;
 
-    // Always filter by published status unless explicitly requested otherwise
-    const whereConditions: any[] = [eq(courses.isPublished, true)];
+    const userId = searchParams.get("userId");
+    const includeAllStatuses = searchParams.get("includeAllStatuses") === "true";
+    
+    const whereConditions: any[] = [];
+    
+    if (!includeAllStatuses) {
+      // Default to only published courses if not explicitly overridden
+      whereConditions.push(eq(courses.isPublished, true));
+    }
+    
+    if (userId) {
+      whereConditions.push(eq(courses.userId, userId));
+    }   
 
     // Handle search
     if (search) {
@@ -224,7 +235,7 @@ export async function GET(req: NextRequest) {
     // If no courses found, return empty array
     if (allCourses.length === 0) {
       return NextResponse.json({
-        message: "No published courses found",
+        message: "No courses found",
         length: 0,
         total: 0,
         page,
@@ -301,7 +312,7 @@ export async function GET(req: NextRequest) {
     const hasPrevious = offset > 0;
 
     return NextResponse.json({
-      message: "Published courses fetched successfully",
+      message: "Courses fetched successfully",
       length: allCourses.length,
       total: totalCourses,
       page,
