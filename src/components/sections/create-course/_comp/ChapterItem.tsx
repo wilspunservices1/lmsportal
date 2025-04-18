@@ -35,20 +35,16 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 	const [lectures, setLectures] = useState<Lecture[]>(chapter.lectures || []);
 	const [currentLecture, setCurrentLecture] = useState<Lecture | null>(null);
 	const [isSaved, setIsSaved] = useState(!!chapter.title);
-	const [chapterId, setChapterId] = useState<string>(
-		chapter.id?.toString() || ""
-	);
+	const [chapterId, setChapterId] = useState<string>(chapter.id?.toString() || "");
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const showAlert = useSweetAlert();
-	const [availableQuestionnaires, setAvailableQuestionnaires] = useState<
-		Questionnaire[]
-	>([]);
-	const [selectedQuestionnaire, setSelectedQuestionnaire] =
-		useState<string>("");
-		
+	const [availableQuestionnaires, setAvailableQuestionnaires] = useState<Questionnaire[]>([]);
+	const [selectedQuestionnaire, setSelectedQuestionnaire] = useState<string>("");
+
 	const fetchQuestionnaires = useCallback(async () => {
+		if (!courseId) return; // Avoid fetching if courseId is not yet available
 		try {
-			const response = await fetch("/api/questionnaire/list");
+			const response = await fetch(`/api/questionnaire/list?courseId=${courseId}`);
 			if (!response.ok)
 				throw new Error(
 					`Failed to fetch questionnaires: ${response.status} - ${response.statusText}`
@@ -60,13 +56,10 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 			console.error("Error fetching questionnaires:", error);
 			showAlert(
 				"error",
-				error instanceof Error
-					? error.message
-					: "Failed to load questionnaires"
+				error instanceof Error ? error.message : "Failed to load questionnaires"
 			);
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [courseId, showAlert]);
 
 	useEffect(() => {
 		fetchQuestionnaires();
@@ -117,12 +110,12 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 					chapterId: chapterId,
 				}),
 			});
-	
+
 			if (!response.ok) {
 				const errorData = await response.json();
 				throw new Error(errorData.error || "Failed to remove questionnaire");
 			}
-	
+
 			const updatedChapter = {
 				...chapter,
 				questionnaireId: null,
@@ -163,15 +156,10 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 
 	const handleSaveLecture = async (newLecture: Lecture) => {
 		try {
-			const response = await fetch(
-				`/api/courses/chapters/lectures?chapterId=${chapterId}`
-			);
+			const response = await fetch(`/api/courses/chapters/lectures?chapterId=${chapterId}`);
 			if (!response.ok) {
 				const errorData = await response.json();
-				console.error(
-					"Error fetching updated lectures:",
-					errorData.message
-				);
+				console.error("Error fetching updated lectures:", errorData.message);
 				showAlert("error", "Failed to fetch updated lectures.");
 				return;
 			}
@@ -204,20 +192,15 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 		setIsLoading(true);
 
 		try {
-			const response = await fetch(
-				`/api/courses/chapters/lectures/${lectureToRemove.id}`,
-				{
-					method: "DELETE",
-					headers: {
-						"Content-Type": "application/json",
-					},
-				}
-			);
+			const response = await fetch(`/api/courses/chapters/lectures/${lectureToRemove.id}`, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
 
 			if (response.ok) {
-				const updatedLectures = lectures.filter(
-					(_, idx) => idx !== lectureIndex
-				);
+				const updatedLectures = lectures.filter((_, idx) => idx !== lectureIndex);
 				const result = await response.json();
 				setLectures(updatedLectures);
 				setIsLoading(false);
@@ -237,37 +220,25 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 				const errorData = await response.json();
 				setIsLoading(false);
 				console.error(`Failed to remove lecture: ${errorData.message}`);
-				showAlert(
-					"error",
-					`Failed to remove lecture: ${errorData.message}`
-				);
+				showAlert("error", `Failed to remove lecture: ${errorData.message}`);
 			}
 		} catch (error) {
 			setIsLoading(false);
-			console.error(
-				"An error occurred while removing the lecture:",
-				error
-			);
+			console.error("An error occurred while removing the lecture:", error);
 			showAlert("error", "An error occurred while removing the lecture.");
 		}
 	};
 
-	const handleEditLecture = async (
-		lecture: Lecture,
-		lectureIndex: number
-	) => {
+	const handleEditLecture = async (lecture: Lecture, lectureIndex: number) => {
 		setIsLoading(true);
 		try {
-			const response = await fetch(
-				`/api/courses/chapters/lectures?id=${lecture.id}`,
-				{
-					method: "PUT",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(lecture),
-				}
-			);
+			const response = await fetch(`/api/courses/chapters/lectures?id=${lecture.id}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(lecture),
+			});
 
 			if (response.ok) {
 				const result = await response.json();
@@ -290,10 +261,7 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 				console.error("Failed to update lecture");
 			}
 		} catch (error) {
-			console.error(
-				"An error occurred while updating the lecture:",
-				error
-			);
+			console.error("An error occurred while updating the lecture:", error);
 		} finally {
 			setIsLoading(false);
 		}
@@ -324,15 +292,12 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 		setIsLoading(true);
 
 		try {
-			const response = await fetch(
-				`/api/courses/chapters?id=${chapterId}`,
-				{
-					method: "DELETE",
-					headers: {
-						"Content-Type": "application/json",
-					},
-				}
-			);
+			const response = await fetch(`/api/courses/chapters?id=${chapterId}`, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
 
 			if (response.ok) {
 				removeChapter(index);
@@ -344,10 +309,7 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 			}
 		} catch (error) {
 			setIsLoading(false);
-			console.error(
-				"An error occurred while removing the chapter:",
-				error
-			);
+			console.error("An error occurred while removing the chapter:", error);
 		}
 	};
 
@@ -367,18 +329,13 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 				/>
 				{isSaved && (
 					<div className="absolute top-8 right-6 pr-4 flex items-center">
-						<Tooltip
-							content="Click to expand Lessens"
-							position="left"
-						>
+						<Tooltip content="Click to expand Lessens" position="left">
 							<button
 								type="button"
 								onClick={toggleAccordion}
 								className="text-gray-500 flex items-center justify-center ml-2 transform transition-transform"
 								style={{
-									transform: isAccordionOpen
-										? "rotate(90deg)"
-										: "rotate(0)",
+									transform: isAccordionOpen ? "rotate(90deg)" : "rotate(0)",
 								}}
 								title="Toggle Details"
 							>
@@ -401,10 +358,7 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 							className="text-green-500 ml-2"
 							title="Add Lecture"
 						>
-							<Tooltip
-								content="Click to add lesson"
-								position="top"
-							>
+							<Tooltip content="Click to add lesson" position="top">
 								+
 							</Tooltip>
 						</button>
@@ -414,10 +368,7 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 							className="text-red-500 ml-2"
 							title="Remove Chapter"
 						>
-							<Tooltip
-								content="Click to del chapter"
-								position="right"
-							>
+							<Tooltip content="Click to del chapter" position="right">
 								{isLoading ? <DotLoader /> : "X"}
 							</Tooltip>
 						</button>
@@ -430,17 +381,13 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 					<CurriculumContent
 						chapters={[
 							{
-								id: parseInt(
-									chapterId || chapter.id.toString(),
-									10
-								),
+								id: parseInt(chapterId || chapter.id.toString(), 10),
 								title: chapter.title,
 								duration: `${lectures
 									.filter((lecture) => lecture !== undefined)
 									.reduce(
 										(total, lecture) =>
-											total +
-											(Number(lecture?.duration) || 0),
+											total + (Number(lecture?.duration) || 0),
 										0
 									)} minutes`,
 								lectures,
@@ -460,11 +407,9 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 						courseId={courseId || ""}
 						onSave={handleSaveLecture}
 						onCancel={handleCancelLecture}
-						initialData={
-							currentLecture ? currentLecture : undefined
-						}
+						initialData={currentLecture ? currentLecture : undefined}
 					/>
-				</div> 
+				</div>
 			)}
 
 			<div className="mt-4 border-t pt-4">
@@ -472,9 +417,7 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 				<div className="flex gap-4">
 					<select
 						value={selectedQuestionnaire}
-						onChange={(e) =>
-							setSelectedQuestionnaire(e.target.value)
-						}
+						onChange={(e) => setSelectedQuestionnaire(e.target.value)}
 						className="flex-1 p-2 border rounded focus:ring-2 focus:ring-primaryColor"
 						disabled={!!chapter.questionnaireId}
 					>
@@ -506,23 +449,22 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 					<div className="mt-2 p-2 bg-gray-50 rounded flex justify-between items-center">
 						<p className="text-sm">
 							Assigned Quiz:{" "}
-							{availableQuestionnaires.find(
-								(q) => q.id === chapter.questionnaireId
-							)?.title || "Loading..."}
+							{availableQuestionnaires.find((q) => q.id === chapter.questionnaireId)
+								?.title || "Loading..."}
 						</p>
 						<Tooltip content="Remove assigned quiz" position="left">
 							<button
 								onClick={handleRemoveQuestionnaire}
 								className="text-red-500 hover:text-red-700"
 							>
-								<svg 
-									xmlns="http://www.w3.org/2000/svg" 
-									width="16" 
-									height="16" 
-									fill="currentColor" 
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									fill="currentColor"
 									viewBox="0 0 16 16"
 								>
-									<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+									<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
 								</svg>
 							</button>
 						</Tooltip>

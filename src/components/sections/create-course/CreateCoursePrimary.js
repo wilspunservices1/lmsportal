@@ -66,7 +66,7 @@ const CreateCoursePrimary = () => {
 		const fetchData = async () => {
 			setIsLoadingFinalExams(true);
 			try {
-				const response = await fetch("/api/questionnaire/list");
+				const response = await fetch(`/api/questionnaire/list?courseId=${id || courseId}`);
 				if (!response.ok) throw new Error("Failed to fetch final exams");
 
 				const data = await response.json();
@@ -95,6 +95,7 @@ const CreateCoursePrimary = () => {
 		};
 
 		fetchData();
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [courseId]);
 
 	const handleAssignFinalExam = async () => {
