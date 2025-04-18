@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useSweetAlert from "@/hooks/useSweetAlert";
 import EditQuiz from "./EditQuiz";
+import { useSession } from "next-auth/react";
 
 interface Question {
 	id: string;
@@ -60,17 +61,41 @@ const ManageQuestionnaire: FC<ManageQuestionnaireProps> = ({
 	const [userAnswers, setUserAnswers] = useState<{ [key: string]: string }>({});
 	const router = useRouter();
 
+	const { data: session } = useSession();
+
 	const fetchQuestionnaires = useCallback(async () => {
 		setLoading(true);
 		try {
-			const response = await fetch("/api/questionnaire/list");
-			if (!response.ok)
-				throw new Error(
-					`Failed to fetch questionnaires: ${response.status} - ${response.statusText}`
-				);
+			const userEmail = session?.user?.email;
+			if (!userEmail) throw new Error("User email not found in session");
 
-			const data = await response.json();
-			setQuestionnaires(data.questionnaires);
+			const userRes = await fetch(`/api/user/email?email=${userEmail}`);
+			const userData = await userRes.json();
+			const userId = userData.userId;
+
+			if (!userId) throw new Error("User ID not found");
+
+			const courseRes = await fetch(`/api/courses?userId=${userId}&includeAllStatuses=true`);
+			const courseData = await courseRes.json();
+			const courseIds = courseData?.data?.map((course: any) => course.id);
+
+			if (!Array.isArray(courseIds) || courseIds.length === 0) {
+				setQuestionnaires([]);
+				setLoading(false);
+				return;
+			}
+
+			// ✅ Loop and fetch quizzes per course
+			const allQuizzes: Questionnaire[] = [];
+			for (const id of courseIds) {
+				const res = await fetch(`/api/questionnaire/list?courseId=${id}`);
+				const data = await res.json();
+				if (data.questionnaires) {
+					allQuizzes.push(...data.questionnaires);
+				}
+			}
+
+			setQuestionnaires(allQuizzes);
 		} catch (error) {
 			console.error("Error fetching questionnaires:", error);
 			showAlert(
@@ -80,7 +105,7 @@ const ManageQuestionnaire: FC<ManageQuestionnaireProps> = ({
 		} finally {
 			setLoading(false);
 		}
-	}, [showAlert]);
+	}, [session?.user?.email, showAlert]);
 
 	const fetchSingleQuestionnaire = useCallback(async () => {
 		if (!questionnaireId) return;
@@ -109,10 +134,12 @@ const ManageQuestionnaire: FC<ManageQuestionnaireProps> = ({
 		if (mode === "take") {
 			fetchSingleQuestionnaire();
 		} else {
-			fetchQuestionnaires();
+			if (session?.user?.email) {
+				fetchQuestionnaires();
+			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [mode, questionnaireId]);
+	}, [mode, questionnaireId, session?.user?.email]);
 
 	const toggleQuestionnaireExpansion = (id: string) => {
 		setExpandedQuestionnaire(expandedQuestionnaire === id ? null : id);
