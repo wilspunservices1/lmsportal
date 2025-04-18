@@ -60,7 +60,6 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 					duration: totalDuration,
 				}));
 			} catch (error) {
-				console.error("Error fetching course details:", error);
 				setError(error.message);
 			}
 		};
@@ -230,7 +229,6 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 					setHasPassedFinalExam(matchedCourse?.finalExamStatus === true);
 				}
 			} catch (error) {
-				console.error("Error checking purchase/final exam status:", error);
 				setError(error.message);
 			}
 		};
@@ -263,38 +261,40 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 				<img 
 					src="${certificate_data_url}" 
 					alt="Certificate" 
-					style="display: block; width: 100%; height: auto;"
+					style="display: block; width: 100%; height: 100%; object-fit: contain;"
 				/>
 		`;
 	
 		const visiblePlaceholders = placeholders.filter((ph) => ph.is_visible);
-		visiblePlaceholders.forEach((ph) => {
-			const percentX = ((ph.x + 50) / originalWidth) * 100 + 18;
-			const percentY = ((ph.y + 50) / originalHeight) * 100 + 18;
-			const scaledFontSize = Math.max((ph.font_size ?? 16) * scaleFactor, 12);
-	
-			const fontClass = ph.font_family ? `font-${ph.font_family.toLowerCase().replace(/\s+/g, '-')}` : '';
-			const fontFamily = ['Great Vibes', 'Pinyon Script', 'Tangerine'].includes(ph.font_family)
-				? `'${ph.font_family}', cursive`
-				: ph.font_family || 'Arial';
+  visiblePlaceholders.forEach((ph) => {
+    // Calculate scaled positions
+	const posX = (ph.x / originalWidth) * 1100;
+	const posY = (ph.y / originalHeight) * 830;
+    const scaledFontSize = Math.max((ph.font_size ?? 16) * scaleFactor, 12);
+
+    const fontClass = ph.font_family ? `font-${ph.font_family.toLowerCase().replace(/\s+/g, '-')}` : '';
+    const fontFamily = ['Great Vibes', 'Pinyon Script', 'Tangerine'].includes(ph.font_family)
+      ? `'${ph.font_family}', cursive`
+      : ph.font_family || 'Arial';
 	
 			html += `
 				<div 
 					class="${fontClass}"
 					style="
 						position: absolute;
-						top: ${percentY}%;
-						left: ${percentX}%;
-						font-size: ${scaledFontSize}px;
-						color: ${ph.color || "#000"};
-						font-family: ${fontFamily};
-						transform: translate(-50%, -50%);
-						text-align: center;
-						white-space: nowrap;
-						background: rgba(255, 255, 255, 0.7);
-						padding: 2px 5px;
-						border-radius: 3px;
-						max-width: 90%;
+                    top: ${posY}px;
+                    left: ${posX}px;
+                    font-size: ${scaledFontSize}px;
+                    color: ${ph.color || "#000"};
+                    font-family: ${fontFamily};
+                    transform: translate(30%, -55%);
+                    text-align: center;
+                    white-space: nowrap;
+                    background: rgba(255, 255, 255, 0.7);
+                    padding: 2px 5px;
+                    max-width: 90%;
+                    z-index: 10;
+                    border-radius: 3px;
 					"
 				>
 					${ph.value ?? ph.label ?? ""}
@@ -350,28 +350,36 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 			  .placeholder { 
 				position: absolute; 
 				white-space: nowrap; 
+				z-index: 10;
 			  }
 			  .font-great-vibes { font-family: 'Great Vibes', cursive !important; }
 			  .font-pinyon-script { font-family: 'Pinyon Script', cursive !important; }
 			  .font-tangerine { font-family: 'Tangerine', cursive !important; }
 			  button { 
-				margin-top: 20px; 
-				padding: 10px 20px; 
-				font-size: 16px; 
-				cursor: pointer; 
-			  }
-			</style>
+          margin-top: 20px; 
+          padding: 10px 20px; 
+          font-size: 16px; 
+          cursor: pointer;
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          border-radius: 4px;
+        }
+        button:hover {
+          background-color: #45a049;
+        }
+      </style>
 		  </head>
 		  <body>
 			<div class="certificate-container">
-			  <img src="${certificateUrl}" alt="Certificate" style="width: 100%; height: auto;" id="certificate-image" />
+			  <img src="${certificateUrl}" alt="Certificate" style="width: 100%; height: 100%;" object-fit: contain; position: absolute; top: 0; left: 0; id="certificate-image" />
 			  ${placeholders
 				.filter(ph => ph.is_visible)
 				.map((ph) => `
 				  <div class="placeholder ${ph.font_family ? `font-${ph.font_family.toLowerCase().replace(/\s+/g, '-')}` : ''}" 
 					style="
-					  top: ${(ph.y / originalHeight) * 100 + 16}%;
-					  left: ${(ph.x / originalWidth) * 100 + 14}%;
+					  top: ${(ph.y / originalHeight) * 251}%;
+					  left: ${(ph.x / originalWidth) * 260}%;
 					  font-size: ${ph.font_size}px;
 					  color: ${ph.color || "#000000"};
 					  font-family: ${['Great Vibes', 'Pinyon Script', 'Tangerine'].includes(ph.font_family) 
@@ -538,28 +546,11 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 				});
 			}
 		} catch (error) {
-			console.error("Detailed error:", error);
 			showAlert("error", `Error: ${error.message}. Please try again or contact support.`);
 		}
 	};
 
-	const {
-		thumbnail,
-		categories,
-		duration,
-		updatedAt,
-		insName,
-		title,
-		price,
-		estimatedPrice,
-		lesson,
-		description,
-		discount,
-		skillLevel,
-		extras,
-	} = courseDetails;
 
-	// console.log("thumbnail course courseDetails", extras?.languages)
 	const allCourses = getAllCourses();
 	const course = allCourses?.find(({ id }) => parseInt(currentId) === id);
 	const { id } = course || {};

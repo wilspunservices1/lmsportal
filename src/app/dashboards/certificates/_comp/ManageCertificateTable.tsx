@@ -46,12 +46,18 @@ interface Certificate {
   }>;
 }
 
+const CERTIFICATE_WIDTH = 842;
+const CERTIFICATE_HEIGHT = 595;
+
 const ManageCertificateTable = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [previewCertificate, setPreviewCertificate] = useState<Certificate | null>(null);
-  const [imageLoading, setImageLoading] = useState<{[key: string]: boolean}>({});
+  const [previewCertificate, setPreviewCertificate] =
+    useState<Certificate | null>(null);
+  const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   const { data: session } = useSession();
   const showAlert = useSweetAlert();
@@ -89,13 +95,15 @@ const ManageCertificateTable = () => {
           return;
         }
 
-        // Fetch certificate images and placeholders for each certificate
         const certificatesWithData = await Promise.all(
-          data.filter((cert: Certificate) => cert.owner_id === userId)
+          data
+            .filter((cert: Certificate) => cert.owner_id === userId)
             .map(async (cert: Certificate) => {
               try {
                 if (cert.id) {
-                  const certResponse = await fetch(`/api/manageCertificates/${cert.id}`);
+                  const certResponse = await fetch(
+                    `/api/manageCertificates/${cert.id}`
+                  );
                   if (certResponse.ok) {
                     const certData = await certResponse.json();
                     return {
@@ -103,19 +111,22 @@ const ManageCertificateTable = () => {
                       certificate_data_url: certData.certificate_data_url,
                       placeholders: certData.placeholders?.map((ph: any) => ({
                         ...ph,
-                        is_visible: ph.is_visible !== false, // Ensure boolean
+                        is_visible: ph.is_visible !== false,
                         font_size: ph.font_size || 16,
                         x: ph.x || 0,
                         y: ph.y || 0,
-                        color: ph.color || '#000000',
-                        font_family: ph.font_family || 'Arial'
-                      }))
+                        color: ph.color || "#000000",
+                        font_family: ph.font_family || "Arial",
+                      })),
                     };
                   }
                 }
                 return cert;
               } catch (error) {
-                console.error(`Error fetching certificate ${cert.id} details:`, error);
+                console.error(
+                  `Error fetching certificate ${cert.id} details:`,
+                  error
+                );
                 return cert;
               }
             })
@@ -125,9 +136,7 @@ const ManageCertificateTable = () => {
       } catch (error) {
         console.error("Error fetching certificates:", error);
         setError(
-          error instanceof Error
-            ? error.message
-            : "Failed to load certificates"
+          error instanceof Error ? error.message : "Failed to load certificates"
         );
       } finally {
         setIsLoading(false);
@@ -176,7 +185,10 @@ const ManageCertificateTable = () => {
       showAlert("success", "Certificate deleted successfully!");
     } catch (error) {
       console.error("Error deleting certificate:", error);
-      showAlert("error", error instanceof Error ? error.message : "Failed to delete certificate");
+      showAlert(
+        "error",
+        error instanceof Error ? error.message : "Failed to delete certificate"
+      );
     }
   };
 
@@ -185,50 +197,39 @@ const ManageCertificateTable = () => {
       showAlert("error", "No certificate image available");
       return;
     }
-  
-    setImageLoading(prev => ({ ...prev, [certificate.id]: true }));
-  
+
+    setImageLoading((prev) => ({ ...prev, [certificate.id]: true }));
+
     try {
       const response = await fetch(`/api/manageCertificates/${certificate.id}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch certificate data');
+        throw new Error("Failed to fetch certificate data");
       }
-      
+
       const certData = await response.json();
-      
-      // Create image to get dimensions
-      const img = new window.Image();
-      img.src = certificate.certificate_data_url;
-      
-      img.onload = () => {
-        setPreviewCertificate({
-          ...certificate,
-          placeholders: certData.placeholders?.map((ph: any) => ({
-            id: ph.id,
-            label: ph.label || '',
-            value: ph.value || '',
-            is_visible: ph.is_visible !== false,
-            font_size: ph.font_size || 16,
-            x: ph.x || 0,
-            y: ph.y || 0,
-            font_family: ph.font_family || 'Arial',
-            color: ph.color || '#000000',
-            font_weight: ph.font_weight || 'normal',
-            font_style: ph.font_style || 'normal',
-            key: ph.key || ''
-          }))
-        });
-        setImageLoading(prev => ({ ...prev, [certificate.id]: false }));
-      };
-      
-      img.onerror = () => {
-        showAlert("error", "Failed to load certificate image");
-        setImageLoading(prev => ({ ...prev, [certificate.id]: false }));
-      };
+
+      setPreviewCertificate({
+        ...certificate,
+        placeholders: certData.placeholders?.map((ph: any) => ({
+          id: ph.id,
+          label: ph.label || "",
+          value: ph.value || "",
+          is_visible: ph.is_visible !== false,
+          font_size: ph.font_size || 16,
+          x: ph.x || 0,
+          y: ph.y || 0,
+          font_family: ph.font_family || "Arial",
+          color: ph.color || "#000000",
+          font_weight: ph.font_weight || "normal",
+          font_style: ph.font_style || "normal",
+          key: ph.key || "",
+        })),
+      });
     } catch (error) {
       console.error("Error fetching certificate data:", error);
       showAlert("error", "Failed to load certificate data");
-      setImageLoading(prev => ({ ...prev, [certificate.id]: false }));
+    } finally {
+      setImageLoading((prev) => ({ ...prev, [certificate.id]: false }));
     }
   };
 
@@ -239,13 +240,13 @@ const ManageCertificateTable = () => {
     }
 
     try {
-      setImageLoading(prev => ({ ...prev, [certificate.id]: true }));
+      setImageLoading((prev) => ({ ...prev, [certificate.id]: true }));
 
       const response = await fetch(certificate.certificate_data_url);
       const blob = await response.blob();
-      
+
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = `${certificate.title}_${certificate.unique_identifier}.png`;
       document.body.appendChild(a);
@@ -256,7 +257,7 @@ const ManageCertificateTable = () => {
       console.error("Error downloading certificate:", error);
       showAlert("error", "Failed to download certificate");
     } finally {
-      setImageLoading(prev => ({ ...prev, [certificate.id]: false }));
+      setImageLoading((prev) => ({ ...prev, [certificate.id]: false }));
     }
   };
 
@@ -266,12 +267,28 @@ const ManageCertificateTable = () => {
 
   const indexOfLastCertificate = currentPage * certificatesPerPage;
   const indexOfFirstCertificate = indexOfLastCertificate - certificatesPerPage;
-  const currentCertificates = certificates.slice(indexOfFirstCertificate, indexOfLastCertificate);
+  const currentCertificates = certificates.slice(
+    indexOfFirstCertificate,
+    indexOfLastCertificate
+  );
   const totalPages = Math.ceil(certificates.length / certificatesPerPage);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const getFontClassName = (fontFamily?: string) => {
+    switch (fontFamily) {
+      case "Great Vibes":
+        return "font-great-vibes";
+      case "Pinyon Script":
+        return "font-pinyon-script";
+      case "Tangerine":
+        return "font-tangerine";
+      default:
+        return "";
+    }
   };
 
   if (isLoading) {
@@ -293,8 +310,12 @@ const ManageCertificateTable = () => {
   if (certificates.length === 0) {
     return (
       <div className="text-center py-10">
-        <h3 className="text-lg font-medium text-gray-700">No certificates found</h3>
-        <p className="text-gray-500 mt-2">Create your first certificate to get started</p>
+        <h3 className="text-lg font-medium text-gray-700">
+          No certificates found
+        </h3>
+        <p className="text-gray-500 mt-2">
+          Create your first certificate to get started
+        </p>
       </div>
     );
   }
@@ -311,8 +332,8 @@ const ManageCertificateTable = () => {
             key={cert.id}
             className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300"
           >
-            <div 
-              className="relative h-64 cursor-pointer" 
+            <div
+              className="relative h-64 cursor-pointer"
               onClick={() => handlePreview(cert)}
             >
               {cert.certificate_data_url ? (
@@ -330,24 +351,6 @@ const ManageCertificateTable = () => {
                         className="object-contain"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
-                      {/* Show first 2 placeholders on the thumbnail */}
-                      {cert.placeholders?.slice(0, 2).map((placeholder) => (
-                        placeholder.is_visible && (
-                          <div
-                            key={placeholder.id}
-                            className="absolute px-2 py-1 bg-blue-100 border border-blue-300 rounded text-xs"
-                            style={{
-                              left: `${placeholder.x}px`,
-                              top: `${placeholder.y}px`,
-                              fontSize: `${Math.max(placeholder.font_size * 0.5, 8)}px`,
-                              color: placeholder.color,
-                              fontFamily: placeholder.font_family
-                            }}
-                          >
-                            {placeholder.value || placeholder.label}
-                          </div>
-                        )
-                      ))}
                     </>
                   )}
                 </div>
@@ -365,15 +368,15 @@ const ManageCertificateTable = () => {
               <p className="text-gray-600 text-sm mb-2">
                 ID: {cert.unique_identifier}
               </p>
-              
+
               <div className="grid grid-cols-2 gap-2 mt-4">
                 <button
                   onClick={() => handlePreview(cert)}
                   disabled={imageLoading[cert.id]}
                   className={`flex items-center justify-center px-3 py-2 rounded-md ${
-                    imageLoading[cert.id] 
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-blue-50 hover:bg-blue-100 text-blue-600'
+                    imageLoading[cert.id]
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-blue-50 hover:bg-blue-100 text-blue-600"
                   }`}
                 >
                   <FaEye className="mr-1" />
@@ -384,9 +387,9 @@ const ManageCertificateTable = () => {
                   onClick={() => handleDownload(cert)}
                   disabled={imageLoading[cert.id]}
                   className={`flex items-center justify-center px-3 py-2 rounded-md ${
-                    imageLoading[cert.id] 
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-green-50 hover:bg-green-100 text-green-600'
+                    imageLoading[cert.id]
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-green-50 hover:bg-green-100 text-green-600"
                   }`}
                 >
                   <FaFileDownload className="mr-1" />
@@ -414,12 +417,12 @@ const ManageCertificateTable = () => {
         ))}
       </div>
 
-      {/* Add this before the pagination buttons */}
       <div className="mt-4 text-center text-gray-600">
-        Showing {indexOfFirstCertificate + 1} to {Math.min(indexOfLastCertificate, certificates.length)} of {certificates.length} certificates
+        Showing {indexOfFirstCertificate + 1} to{" "}
+        {Math.min(indexOfLastCertificate, certificates.length)} of{" "}
+        {certificates.length} certificates
       </div>
 
-      {/* Add this pagination component after the grid */}
       {totalPages > 1 && (
         <div className="mt-8 flex justify-center items-center gap-2">
           <button
@@ -427,34 +430,34 @@ const ManageCertificateTable = () => {
             disabled={currentPage === 1}
             className={`px-4 py-2 rounded-md ${
               currentPage === 1
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-50 hover:bg-blue-100 text-blue-600'
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-blue-50 hover:bg-blue-100 text-blue-600"
             }`}
           >
             Previous
           </button>
-          
+
           {[...Array(totalPages)].map((_, index) => (
             <button
               key={index + 1}
               onClick={() => handlePageChange(index + 1)}
               className={`px-4 py-2 rounded-md ${
                 currentPage === index + 1
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-blue-50 hover:bg-blue-100 text-blue-600'
+                  ? "bg-blue-600 text-white"
+                  : "bg-blue-50 hover:bg-blue-100 text-blue-600"
               }`}
             >
               {index + 1}
             </button>
           ))}
-          
+
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
             className={`px-4 py-2 rounded-md ${
               currentPage === totalPages
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-50 hover:bg-blue-100 text-blue-600'
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-blue-50 hover:bg-blue-100 text-blue-600"
             }`}
           >
             Next
@@ -477,43 +480,56 @@ const ManageCertificateTable = () => {
                 ✕
               </button>
             </div>
-            
+
             <div className="p-6 flex justify-center">
-              <div className="certificate-container relative" style={{ width: '842px', height: '595px' }}>
-                <div className="relative w-full h-full">
-                  <Image
-                    src={previewCertificate.certificate_data_url || ''}
-                    alt={previewCertificate.title}
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 1200px) 100vw, 1200px"
-                    priority
-                  />
-                  {/* Render placeholders with exact positions */}
-                  <div className="absolute inset-0">
-                    {previewCertificate.placeholders?.map((placeholder) => (
-                      placeholder.is_visible && (
-                        <div
-                          key={placeholder.id}
-                          className="absolute"
-                          style={{
-                            left: `${placeholder.x}30px`,
-                            top: `${placeholder.y}15px`,
-                            fontFamily: placeholder.font_family || 'Arial',
-                            fontSize: `${placeholder.font_size}px`,
-                            color: placeholder.color || '#000000',
-                            fontWeight: placeholder.font_weight || 'normal',
-                            fontStyle: placeholder.font_style || 'normal',
-                            whiteSpace: 'nowrap',
-                            userSelect: 'none',
-                          }}
-                        >
-                          {placeholder.value || placeholder.label}
-                        </div>
-                      )
-                    ))}
-                  </div>
-                </div>
+              <div
+                className="relative"
+                style={{
+                  width: `${CERTIFICATE_WIDTH}px`,
+                  height: `${CERTIFICATE_HEIGHT}px`,
+                  maxWidth: "100%",
+                }}
+              >
+                <Image
+                  src={previewCertificate.certificate_data_url || ""}
+                  alt={previewCertificate.title}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1200px) 100vw, 1200px"
+                  priority
+                />
+
+                {/* Render placeholders with exact positions */}
+                {previewCertificate.placeholders
+                  ?.filter((ph) => ph.is_visible)
+                  .map((placeholder) => (
+                    <div
+                      key={placeholder.id}
+                      className={`absolute ${getFontClassName(
+                        placeholder.font_family
+                      )}`}
+                      style={{
+                        left: `${(placeholder.x / CERTIFICATE_WIDTH) * 215}%`,
+                        top: `${(placeholder.y / CERTIFICATE_HEIGHT) * 202}%`,
+                        fontSize: `${placeholder.font_size}px`,
+                        color: placeholder.color,
+                        fontFamily: [
+                          "Great Vibes",
+                          "Pinyon Script",
+                          "Tangerine",
+                        ].includes(placeholder.font_family || "")
+                          ? undefined
+                          : placeholder.font_family,
+                        fontWeight: placeholder.font_weight,
+                        fontStyle: placeholder.font_style,
+                        transform: "translate(0, 0)",
+                        whiteSpace: "nowrap",
+                        userSelect: "none",
+                      }}
+                    >
+                      {placeholder.value || placeholder.label}
+                    </div>
+                  ))}
               </div>
             </div>
           </div>

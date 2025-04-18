@@ -106,6 +106,11 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
   const [selectedFont, setSelectedFont] = useState<string>("Arial"); // Default font
   const [isSaving, setIsSaving] = useState(false);
 
+  const CERTIFICATE_WIDTH = 842;
+  const CERTIFICATE_HEIGHT = 595;
+  const PLACEHOLDER_MIN_WIDTH = 100;
+  const PLACEHOLDER_MIN_HEIGHT = 30;
+
   const fetchUserCertificates = useCallback(async () => {
     try {
       setLoading(true);
@@ -266,41 +271,59 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
         showAlert("error", "No certificate selected");
         return;
       }
-
-      // Prepare the data to be sent to the backend
-      const dataToSave = {
-        placeholders: selectedPlaceholders.map((ph) => ({
+  
+      // Validate placeholders before sending
+      const validPlaceholders = selectedPlaceholders.map(ph => {
+        // Ensure x and y are valid numbers
+        const x = Math.round(Number(ph.x));
+        const y = Math.round(Number(ph.y));
+  
+        // Validate position is within bounds
+        const validX = Math.max(0, Math.min(x, CERTIFICATE_WIDTH - PLACEHOLDER_MIN_WIDTH));
+        const validY = Math.max(0, Math.min(y, CERTIFICATE_HEIGHT - PLACEHOLDER_MIN_HEIGHT));
+  
+        return {
           id: ph.id,
-          x: ph.x,
-          y: ph.y,
-          value: ph.value,
-          font_size: ph.font_size,
-          color: ph.color,
-          font_family: ph.font_family,
-          is_visible: ph.is_visible,
-        })),
-      };
-
+          x: validX,
+          y: validY,
+          value: ph.value || "",
+          font_size: Math.round(Number(ph.font_size)) || 16,
+          color: ph.color || "#000000",
+          font_family: ph.font_family || "Arial",
+          is_visible: ph.is_visible ?? true
+        };
+      });
+  
+      // Check if any placeholder is missing required data
+      const invalidPlaceholders = validPlaceholders.filter(
+        ph => !ph.id || typeof ph.x !== 'number' || typeof ph.y !== 'number'
+      );
+  
+      if (invalidPlaceholders.length > 0) {
+        showAlert("error", "Some placeholders have invalid data");
+        return;
+      }
+  
       // Send the request to the backend
       const response = await fetch("/api/placeholders/bulk-update", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(dataToSave),
+        body: JSON.stringify({ placeholders: validPlaceholders }),
       });
-
+  
       if (!response.ok) {
-        throw new Error(`HTTP Error: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.details || `HTTP Error: ${response.status}`);
       }
-
+  
       // Refresh the certificate data to ensure we have the latest from the backend
       await fetchUserCertificates();
-
       showAlert("success", "Certificate changes saved successfully");
     } catch (err) {
       console.error("Error saving changes:", err);
-      showAlert("error", "Failed to save changes");
+      showAlert("error", err instanceof Error ? err.message : "Failed to save changes");
     } finally {
       setIsSaving(false);
     }
@@ -526,7 +549,14 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
             </div>
           )}
 
-          <div className="certificate-container relative w-[842px] h-[595px] mx-auto bg-white">
+          <div
+            className="certificate-container relative mx-auto bg-white"
+            style={{
+              width: `${CERTIFICATE_WIDTH}px`,
+              height: `${CERTIFICATE_HEIGHT}px`,
+              overflow: "hidden",
+            }}
+          >
             {/* Certificate background image */}
             <div className="absolute inset-0">
               <Image
@@ -534,21 +564,18 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
                 alt={`${selectedCertificate.title} - ${selectedCertificate.unique_identifier}`}
                 className="w-full h-full object-contain"
                 crossOrigin="anonymous"
-                width={842} // Match container width
-                height={595} // Match container height
+                width={CERTIFICATE_WIDTH} // Match container width
+                height={CERTIFICATE_HEIGHT} // Match container height
                 style={{
-                  width: "842px",
-                  height: "595px",
+                  width: `${CERTIFICATE_WIDTH}px`,
+                  height: `${CERTIFICATE_HEIGHT}px`,
                   objectFit: "contain",
                 }}
               />
             </div>
 
             {/* Placeholders container with matching dimensions */}
-            <div
-              className="absolute inset-0"
-              style={{ width: "842px", height: "595px" }}
-            >
+            <div className="absolute inset-0">
               {selectedPlaceholders
                 .filter((ph) => ph.is_visible)
                 .map((placeholder) => (
@@ -558,23 +585,63 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
                       x: placeholder.x,
                       y: placeholder.y,
                     }}
-                    bounds={{
-                      left: 0,
-                      top: 0,
-                      right: 842 - 100, // Subtract placeholder min-width
-                      bottom: 595 - 30, // Subtract approximate placeholder height
-                    }}
-                    onStop={(e, data) => {
-                      // Ensure coordinates stay within bounds
-                      const x = Math.max(0, Math.min(data.x, 842 - 100));
-                      const y = Math.max(0, Math.min(data.y, 595 - 30));
+                    bounds="parent" // This ensures the dragging is constrained to the parent container
+                    onDrag={(e, data) => {
 
-                      setSelectedPlaceholders((prev) =>
-                        prev.map((item) =>
-                          item.id === placeholder.id ? { ...item, x, y } : item
+                      if (typeof data.x !== 'number' || typeof data.y !== 'number') return;   
+                      // Validate position during drag
+                      const x = Math.max(
+                        0,
+                        Math.min(
+                          Math.round(data.x), // Round to prevent floating point issues
+                          CERTIFICATE_WIDTH - PLACEHOLDER_MIN_WIDTH
                         )
                       );
-                      savePlaceholderPosition(placeholder.id, x, y);
+                      const y = Math.max(
+                        0,
+                        Math.min(
+                          Math.round(data.y), // Round to prevent floating point issues
+                          CERTIFICATE_HEIGHT - PLACEHOLDER_MIN_HEIGHT
+                        )
+                      );
+
+                      // Update position only if within bounds
+                      if (Number.isFinite(x) && Number.isFinite(y)) {
+                        setSelectedPlaceholders((prev) =>
+                          prev.map((item) =>
+                            item.id === placeholder.id
+                              ? { ...item, x, y }
+                              : item
+                          )
+                        );
+                      }
+                    }}
+                    onStop={(e, data) => {
+                      if (typeof data.x !== 'number' || typeof data.y !== 'number') return;
+                      // Ensure final position is within bounds
+                      const x = Math.max(
+                        0,
+                        Math.min(
+                          Math.round(data.x),
+                          CERTIFICATE_WIDTH - PLACEHOLDER_MIN_WIDTH
+                        )
+                      );
+                      const y = Math.max(
+                        0,
+                        Math.min(
+                          Math.round(data.y),
+                          CERTIFICATE_HEIGHT - PLACEHOLDER_MIN_HEIGHT
+                        )
+                      );
+
+                      if (Number.isFinite(x) && Number.isFinite(y)) {
+                        setSelectedPlaceholders((prev) =>
+                          prev.map((item) =>
+                            item.id === placeholder.id ? { ...item, x, y } : item
+                          )
+                        );
+                        savePlaceholderPosition(placeholder.id, x, y);
+                      }
                     }}
                   >
                     <div
@@ -583,6 +650,8 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
                         left: `${placeholder.x}px`,
                         top: `${placeholder.y}px`,
                         zIndex: 10,
+                        width: `${PLACEHOLDER_MIN_WIDTH}px`,
+                        maxHeight: `${PLACEHOLDER_MIN_WIDTH}px`,
                       }}
                     >
                       <input
@@ -599,15 +668,11 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
                           );
                         }}
                         className={`bg-transparent hover:bg-white/50 focus:bg-white/50 
-        border border-transparent hover:border-gray-300 
-        focus:border-blue-500 rounded px-2 py-1 outline-none transition-all
-        ${placeholder.font_family === "Great Vibes" ? "font-great-vibes" : ""}
-        ${
-          placeholder.font_family === "Pinyon Script"
-            ? "font-pinyon-script"
-            : ""
-        }
-        ${placeholder.font_family === "Tangerine" ? "font-tangerine" : ""}`}
+                       dark:hover:bg-blackColor-dark/50 dark:focus:bg-blackColor-dark/50 border border-transparent hover:border-gray-300 
+                        focus:border-blue-500 rounded px-2 py-1 outline-none transition-all
+                        ${placeholder.font_family === "Great Vibes" ? "font-great-vibes" : ""}
+                        ${placeholder.font_family === "Pinyon Script"? "font-pinyon-script": ""}
+                        ${placeholder.font_family === "Tangerine" ? "font-tangerine" : ""}`}
                         style={{
                           fontSize: `${placeholder.font_size}px`,
                           color: placeholder.color,
@@ -618,7 +683,7 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
                           ].includes(placeholder.font_family)
                             ? undefined
                             : placeholder.font_family,
-                          minWidth: "100px",
+                          minWidth: `${PLACEHOLDER_MIN_WIDTH}px`,
                         }}
                         placeholder={placeholder.label || ""}
                       />
