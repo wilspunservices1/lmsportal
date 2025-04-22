@@ -7,92 +7,94 @@ import { eq } from "drizzle-orm";
 import { getToken } from "next-auth/jwt";
 
 export async function GET(
-	req: NextRequest,
-	{ params }: { params: { id: string } }
+    req: NextRequest,
+    { params }: { params: { id: string } }
 ) {
-	try {
-		const lessonId = await params.id;
+    try {
+        const lessonId = params.id; // Removed await since params.id is synchronous
 
-		// Get the user session
-		const token = await getToken({ req });
+        // Get the user session
+        const token = await getToken({ req });
 
-		// Fetch the lesson data with all necessary columns
-		const lessonData = await db
-			.select({
-				id: lectures.id,
-				title: lectures.title,
-				videoUrl: lectures.videoUrl, // No modification of videoUrl
-				isLocked: lectures.isLocked,
-				isPreview: lectures.isPreview,
-				chapterId: lectures.chapterId, // Ensure chapterId is included
-				duration: lectures.duration, // ✅ Added this
-			})
-			.from(lectures)
-			.where(eq(lectures.id, lessonId))
-			.limit(1);
+        // Fetch the lesson data with all necessary columns
+        const lessonData = await db
+            .select({
+                id: lectures.id,
+                title: lectures.title,
+                videoUrl: lectures.videoUrl,
+                isLocked: lectures.isLocked,
+                isPreview: lectures.isPreview,
+                chapterId: lectures.chapterId,
+                duration: lectures.duration,
+            })
+            .from(lectures)
+            .where(eq(lectures.id, lessonId))
+            .limit(1);
 
-		if (lessonData.length === 0) {
-			return NextResponse.json(
-				{ error: "Lesson not found" },
-				{ status: 404 }
-			);
-		}
+        if (lessonData.length === 0) {
+            return NextResponse.json(
+                { error: "Lesson not found" },
+                { status: 404 }
+            );
+        }
 
-		let lesson = lessonData[0];
-		// console.log('Fetched lesson:', lesson); // For debugging
+        let lesson = lessonData[0];
 
-		if (token && token.sub) {
-			const userId = token.sub as string;
+        if (token?.sub) {
+            const userId = token.sub;
 
-			// Fetch the user's enrolled courses
-			const userData = await db
-				.select({
-					enrolledCourses: user.enrolledCourses,
-				})
-				.from(user)
-				.where(eq(user.id, userId))
-				.limit(1);
+            // Fetch the user's enrolled courses
+            const userData = await db
+                .select({
+                    enrolledCourses: user.enrolledCourses,
+                })
+                .from(user)
+                .where(eq(user.id, userId))
+                .limit(1);
 
-			if (userData.length > 0) {
-				const enrolledCourses = userData[0].enrolledCourses || [];
+            // Ensure enrolledCourses is always treated as an array
+            const enrolledCourses = userData[0]?.enrolledCourses 
+                ? Array.isArray(userData[0].enrolledCourses) 
+                    ? userData[0].enrolledCourses 
+                    : [userData[0].enrolledCourses]
+                : [];
 
-				// Get the chapter data to retrieve the courseId
-				const chapterData = await db
-					.select({
-						courseId: chapters.courseId,
-					})
-					.from(chapters)
-					.where(eq(chapters.id, lesson.chapterId))
-					.limit(1);
+            // Get the chapter data to retrieve the courseId
+            const chapterData = await db
+                .select({
+                    courseId: chapters.courseId,
+                })
+                .from(chapters)
+                .where(eq(chapters.id, lesson.chapterId))
+                .limit(1);
 
-				if (chapterData.length > 0) {
-					const courseId = chapterData[0].courseId;
+            if (chapterData.length > 0) {
+                const courseId = chapterData[0].courseId;
 
-					// Check if the user is enrolled in this course
-					const isEnrolled = enrolledCourses.some(
-						(course: any) => course.courseId === courseId
-					);
+                // Check if the user is enrolled in this course
+                const isEnrolled = enrolledCourses.some(
+                    (course: any) => course?.courseId === courseId
+                );
 
-					if (isEnrolled) {
-						// Set isLocked to false
-						lesson = {
-							...lesson,
-							isLocked: false,
-						};
-					}
-				}
-			}
-		}
+                if (isEnrolled) {
+                    // Set isLocked to false
+                    lesson = {
+                        ...lesson,
+                        isLocked: false,
+                    };
+                }
+            }
+        }
 
-		// ✅ Returns lesson with **untouched videoUrl**
-		return NextResponse.json(lesson);
-	} catch (error) {
-		console.error("Error fetching lesson:", error);
-		return NextResponse.json(
-			{ error: "Failed to fetch lesson", details: error.message },
-			{ status: 500 }
-		);
-	}
+        return NextResponse.json(lesson);
+    } catch (error) {
+        console.error("Error fetching lesson:", error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        return NextResponse.json(
+            { error: "Failed to fetch lesson", details: errorMessage },
+            { status: 500 }
+        );
+    }
 }
 
 // // src/app/api/lessons/[id]/route.ts
