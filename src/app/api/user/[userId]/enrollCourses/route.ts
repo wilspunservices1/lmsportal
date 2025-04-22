@@ -48,24 +48,27 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-
-
-    // Extract enrolledCourses from user
-    const enrolledCourses = foundUsers[0].enrolledCourses || [];
+    // Extract enrolledCourses from user and ensure it's an array
+    const enrolledCourses = Array.isArray(foundUsers[0].enrolledCourses) 
+      ? foundUsers[0].enrolledCourses 
+      : [];
 
     // Step 2: Filter by progress if provided
     let filteredCourses = enrolledCourses;
-    if (progressQuery !== null) {
+    if (progressQuery !== null && Array.isArray(enrolledCourses)) {
       const progressValue = parseInt(progressQuery, 10);
       filteredCourses = enrolledCourses.filter(
-        (course: any) => course.progress === progressValue
+        (course: any) => course?.progress === progressValue
       );
     }
 
-    // Step 3: Get the list of courseIds from the filtered enrolled courses
-    const courseIds = filteredCourses.map((course: any) => course.courseId);
+    // Ensure filteredCourses is an array before mapping
+    if (!Array.isArray(filteredCourses)) {
+      filteredCourses = [];
+    }
 
-    // console.log("foundUsers ✔️✔️ courseIds",courseIds)
+    // Step 3: Get the list of courseIds from the filtered enrolled courses
+    const courseIds = filteredCourses.map((course: any) => course?.courseId).filter(Boolean);
 
     // Step 4: Fetch all orders for the user
     const userOrders = await db
@@ -75,16 +78,10 @@ export async function GET(
       .from(orders)
       .where(eq(orders.userId, userId));
 
-    // Debugging: Log the fetched orders
-    // console.log('Fetched User Orders:', JSON.stringify(userOrders, null, 2));
-
     // Step 5: Extract purchased courseIds from orders
     const purchasedCourseIds = new Set<string>();
     userOrders.forEach((order) => {
       const items = order.items;
-
-      // Debugging: Log the items
-      console.log(`Order ID: ${order.id}, Items: ${JSON.stringify(items)}`);
 
       if (Array.isArray(items)) {
         items.forEach((item: any) => {
@@ -93,9 +90,6 @@ export async function GET(
           }
         });
       } else {
-        console.warn(`Order ID: ${order.id} has malformed items:`, items);
-        // Optionally, handle single objects or skip
-        // If items is an object, you can convert it to an array
         if (typeof items === 'object' && items !== null) {
           if (items.courseId) {
             purchasedCourseIds.add(items.courseId);
@@ -173,7 +167,6 @@ export async function GET(
     // Return the valid enrolled courses with only IDs
     return NextResponse.json(coursesWithIds);
   } catch (error) {
-    console.error('Error fetching enrolled courses:', error);
     return NextResponse.json(
       { error: 'Failed to fetch enrolled courses' },
       { status: 500 }
