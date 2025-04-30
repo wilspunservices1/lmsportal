@@ -12,7 +12,7 @@ export const user = pgTable('User', {
   password: text('password').notNull(),
   emailVerified: timestamp('emailVerified'),
   image: text('image'),
-
+  coverImage: text('coverImage'),
   // role: text('role').default('user'),
   roles: json('roles').default(sql`'["user"]'::json`).notNull(), // JSON to store multiple roles
   enrolledCourses: json('enrolledCourses').default(sql`'[]'::json`).notNull(), // JSON to store enrolled courses as an array
@@ -28,20 +28,3 @@ export const user = pgTable('User', {
   instructorBio: text('instructorBio').default(''), // Text field for storing bio of the instructor
   qualifications: json('qualifications').default(sql`'[]'::json`).notNull(), // JSON array to store qualifications  
 });
-
-
-// import { pgTable, uuid, text, boolean as pgBoolean, timestamp } from 'drizzle-orm/pg-core';
-
-// export const user = pgTable('User', {
-//   id: uuid('id').defaultRandom().primaryKey(),
-//   name: text('name'),
-//   username: text('username').unique(),
-//   phone: text('phone').unique(),
-//   email: text('email').unique().notNull(),
-//   password: text('password'),
-//   emailVerified: timestamp('emailVerified'),
-//   image: text('image'),
-//   role: text('role'),
-//   isVerified: pgBoolean('isVerified').default(false).notNull(),
-//   activationToken: text('activationToken'), // New column for activation token
-// });

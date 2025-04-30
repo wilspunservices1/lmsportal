@@ -11,7 +11,6 @@ config({ path: '.env.local' });
 
 const dbUrl = process.env.POSTGRES_URL;
 if (!dbUrl) {
-  console.error('POSTGRES_URL is not defined in the environment variables');
   throw new Error('POSTGRES_URL is not defined in the environment variables');
 }
 
@@ -34,14 +33,11 @@ try {
   // Test the connection
   pool.query('SELECT 1', (err, res) => {
     if (err) {
-      console.error('Database connection test failed', err);
       throw err;
     } else {
-      console.log('Database connected successfully');
     }
   });
 } catch (error) {
-  console.error('Error initializing the database connection', error);
   throw new Error('Error initializing the database connection');
 }
 
