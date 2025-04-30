@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       filename_override: cleanFileName,
       public_id: fileNameWithoutExt,
       format: fileExtension,
-      upload_preset: "ml_default",
+      upload_preset: "lms_default_pro",
       ...(uploadType !== 'cover' && { flags: "attachment" }),
     };
 

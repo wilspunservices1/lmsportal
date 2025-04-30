@@ -9,7 +9,7 @@ const uploadToCloudinary = async (
 	const formData = new FormData();
 	formData.append("file", file);
 	formData.append("public_id", getSafeFileName(file.name)); // Use cleaned filename
-	formData.append("upload_preset", "ml_default");
+	formData.append("upload_preset", "lms_default_pro");
 
 	try {
 		const response = await fetch("/api/upload", {
