@@ -23,15 +23,28 @@ interface Extras {
 
 export async function GET(req: NextRequest) {
   try {
-    const filtersQuery = await db
+    // Get isPublished parameter from URL
+    const url = new URL(req.url);
+    const isPublished = url.searchParams.get("isPublished");
+    
+    // Build query with optional isPublished filter
+    let query = db
       .select({
         id: courses.id,
         categories: courses.categories,
         tags: sql`string_to_array(${courses.tag}, ',')`.as("tags"),
         skillLevel: courses.skillLevel,
         extras: courses.extras,
+        isPublished: courses.isPublished,
       })
       .from(courses);
+      
+    // Filter by isPublished if parameter is provided
+    if (isPublished === "true") {
+      query = query.where(sql`${courses.isPublished} = true`);
+    }
+    
+    const filtersQuery = await query;
 
     const categoriesMap: {
       [key: string]: { name: string; totalCount: number };
@@ -115,6 +128,10 @@ export async function GET(req: NextRequest) {
       });
     });
 
+    // Add "All" option with total count for categories
+    const totalCourseCount = filtersQuery.length;
+    categoriesMap["All"] = { name: "All", totalCount: totalCourseCount };
+
     // Convert Maps into arrays
     const categories = Object.values(categoriesMap);
     const tags = Object.values(tagsMap);
@@ -150,79 +167,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-
-// export async function GET(req: NextRequest) {
-//   try {
-//     // Fetch all distinct categories, tags, skill levels, and languages from the courses table
-//     const filtersQuery = await db
-//       .select({
-//         categories: courses.categories,
-//         // Assuming tags are stored as comma-separated strings, split them into an array
-//         tags: sql`ARRAY(SELECT unnest(string_to_array(${courses.tag}, ',')))`.as("tags"),
-//         skillLevel: courses.skillLevel,
-//         // Cast extras to jsonb and extract languages from the 'extras' JSONB field
-//         languages: sql`ARRAY(SELECT jsonb_array_elements_text(${courses.extras}::jsonb->'languages'))`.as(
-//           "languages"
-//         ),
-//       })
-//       .from(courses);
-
-//     const categoriesMap = {};
-//     const tagsSet = new Set();
-//     const skillLevelsSet = new Set();
-//     const languagesSet = new Set();
-
-//     filtersQuery.forEach((course) => {
-//       // Process categories
-//       course.categories.forEach((category) => {
-//         if (!categoriesMap[category]) {
-//           categoriesMap[category] = { name: category, totalCount: 0 };
-//         }
-//         categoriesMap[category].totalCount += 1;
-//       });
-
-//       // Process tags
-//       course.tags.forEach((tag) => tagsSet.add(tag));
-
-//       // Process skill levels
-//       skillLevelsSet.add(course.skillLevel);
-
-//       // Process languages
-//       course.languages.forEach((language) => languagesSet.add(language));
-//     });
-
-//     // Convert Sets and Map into arrays
-//     const categories = Object.values(categoriesMap);
-//     const tags = Array.from(tagsSet);
-//     const skillLevels = Array.from(skillLevelsSet);
-//     const languages = Array.from(languagesSet);
-
-//     // Format the filterInputs object
-//     const filterInputs = [
-//       {
-//         name: "Categories",
-//         inputs: categories,
-//       },
-//       {
-//         name: "Tag",
-//         inputs: tags,
-//       },
-//       {
-//         name: "Skill Level",
-//         inputs: skillLevels,
-//       },
-//       {
-//         name: "Languages",
-//         inputs: languages,
-//       },
-//     ];
-
-//     return NextResponse.json(filterInputs);
-//   } catch (error) {
-//     console.error("Error fetching filters:", error);
-//     return NextResponse.json(
-//       { error: "Failed to fetch filters" },
-//       { status: 500 }
-//     );
-//   }
-// }

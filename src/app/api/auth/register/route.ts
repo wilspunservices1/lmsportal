@@ -29,18 +29,21 @@ function generateUserName(fullName: string): string {
 export async function POST(req: Request) {
 	try {
 		const body = await req.json();
-		const { email, password, username } = body;
+		let { email, password, username } = body;
 
 		// Check for required fields
 		if (!email || !password || !username) {
 			return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
 		}
 
-		// Check for duplicate email
+		// Normalize email to lowercase
+		email = email.toLowerCase();
+
+		// Check for duplicate email (case-insensitive)
 		const existingUser = await db
 			.select()
 			.from(user)
-			.where(eq(user.email, email))
+			.where(sql`LOWER(${user.email}) = ${email}`)
 			.then((res) => res);
 		if (existingUser.length > 0) {
 			return NextResponse.json(
@@ -77,7 +80,7 @@ export async function POST(req: Request) {
 		// Insert user into the database only if email is successfully sent
 		await db.insert(user).values({
 			uniqueIdentifier,
-			email,
+			email, // Email is already normalized to lowercase
 			password: hashPassword,
 			username: generateUserName(username),
 			name: username.trim(),
