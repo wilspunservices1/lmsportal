@@ -37,9 +37,10 @@ const LoginForm = ({ csrfToken, switchToSignUp }) => {
     e.preventDefault();
     try {
       setLoading("...");
+      // Try with the email as-is (no case conversion)
       const res = await signIn("credentials", {
         redirect: false,
-        email,
+        email: email,
         password,
         callbackUrl: "/",
       });

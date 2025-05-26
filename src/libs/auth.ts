@@ -27,12 +27,19 @@ export const options = {
 				password: { label: "Password", type: "password" },
 			},
 			async authorize(credentials: any) {
-				const foundUser = await db
+				if (!credentials?.email) {
+					throw new Error("Email is required");
+				}
+				
+				// Get all users and find match manually (fallback approach)
+				const allUsers = await db
 					.select()
-					.from(user)
-					.where(eq(user.email, credentials.email))
-					.limit(1)
-					.then((res) => res[0]);
+					.from(user);
+				
+				// Find user with case-insensitive email match
+				const foundUser = allUsers.find(
+					u => u.email.toLowerCase() === credentials.email.toLowerCase()
+				);
 
 				if (!foundUser) {
 					throw new Error("No user found with this email.");
@@ -54,13 +61,14 @@ export const options = {
 	callbacks: {
 		async signIn({ user, account, profile }) {
 			if (account.provider === "google" || account.provider === "github") {
-				const email = user.email;
+				// Normalize email to lowercase
+				const email = user.email ? user.email.toLowerCase() : "";
 
-				// Check if the user already exists in the database
+				// Check if the user already exists in the database (case-insensitive)
 				let foundUser = await db
 					.select()
 					.from(user)
-					.where(eq(user.email, email))
+					.where(sql`LOWER(${user.email}) = ${email}`)
 					.limit(1)
 					.then((res) => res[0]);
 
@@ -69,7 +77,7 @@ export const options = {
 					foundUser = await db
 						.insert(user)
 						.values({
-							email: email,
+							email: email, // Store email in lowercase
 							username: profile.login || profile.name || email.split("@")[0], // Fallback to email prefix if no username
 							name: profile.name || email.split("@")[0],
 							image: profile.picture || user.image,
