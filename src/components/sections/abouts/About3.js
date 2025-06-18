@@ -37,7 +37,7 @@ const About3 = () => {
           <div data-aos="fade-up">
             <SectionNameSecondary>EDUCATION SOLUTION</SectionNameSecondary>
             <HeadingPrimaryXl>
-              Welcome to the Meridian LMS
+              Welcome to Meridian LMS
             </HeadingPrimaryXl>
             <p className="text-sm md:text-base leading-7 text-contentColor dark:text-contentColor-dark mb-6 pl-3 border-l-2 border-primaryColor">
             Unlock limitless learning opportunities with Meridian LMS, designed to empower educators and learners worldwide.

@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     // Get isPublished parameter from URL
     const url = new URL(req.url);
     const isPublished = url.searchParams.get("isPublished");
-    
+
     // Build query with optional isPublished filter
     let query = db
       .select({
@@ -38,12 +38,12 @@ export async function GET(req: NextRequest) {
         isPublished: courses.isPublished,
       })
       .from(courses);
-      
+
     // Filter by isPublished if parameter is provided
     if (isPublished === "true") {
       query = query.where(sql`${courses.isPublished} = true`);
     }
-    
+
     const filtersQuery = await query;
 
     const categoriesMap: {
@@ -117,7 +117,9 @@ export async function GET(req: NextRequest) {
           extras = course.extras as Extras;
         }
         if (extras.languages && Array.isArray(extras.languages)) {
-          languages = extras.languages;
+          languages = extras.languages.map(
+            (lang) => lang.charAt(0).toUpperCase() + lang.slice(1).toLowerCase()
+          );
         }
       }
       languages.forEach((language) => {
