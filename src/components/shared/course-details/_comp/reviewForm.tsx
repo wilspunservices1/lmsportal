@@ -9,6 +9,9 @@ const ReviewForm = ({ courseId, addReview }) => {
 	const showAlert = useSweetAlert();
 	const { data: session } = useSession() as { data: Session | null };
 	const [loading, setLoading] = useState(false);
+	const [canReview, setCanReview] = useState(true);
+	const [hasReviewed, setHasReviewed] = useState(false);
+	const [isPurchased, setIsPurchased] = useState(false);
 	const [formData, setFormData] = useState({
 		rating: 0, // Initial rating set to 0
 		comment: "",
@@ -24,9 +27,39 @@ const ReviewForm = ({ courseId, addReview }) => {
 		setFormData({ ...formData, [name]: value });
 	};
 
+	// Check if user can review (purchased and hasn't reviewed)
+	const checkReviewEligibility = async () => {
+		if (!session?.user?.id) return;
+		
+		try {
+			const response = await fetch(`/api/courses/${courseId}/reviews?checkEligibility=true&userId=${session.user.id}`);
+			const result = await response.json();
+			
+			setIsPurchased(result.isPurchased);
+			setHasReviewed(result.hasReviewed);
+			setCanReview(result.isPurchased && !result.hasReviewed);
+		} catch (error) {
+			console.error('Error checking review eligibility:', error);
+		}
+	};
+
+	React.useEffect(() => {
+		checkReviewEligibility();
+	}, [courseId, session?.user?.id]);
+
 	// Handle form submission
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		
+		if (!canReview) {
+			if (!isPurchased) {
+				showAlert("error", "You must purchase this course to leave a review.");
+			} else if (hasReviewed) {
+				showAlert("error", "You have already reviewed this course.");
+			}
+			return;
+		}
+		
 		setLoading(true);
 
 		// Validate the rating
@@ -104,6 +137,21 @@ const ReviewForm = ({ courseId, addReview }) => {
 	const handleStarClick = (rating: number) => {
 		setFormData({ ...formData, rating });
 	};
+
+	if (!canReview) {
+		return (
+			<div className="p-5 md:p-50px mb-50px bg-lightGrey12 dark:bg-transparent dark:shadow-brand-dark">
+				<h4 className="text-2xl font-bold text-blackColor dark:text-blackColor-dark mb-15px !leading-1.2">
+					{!isPurchased ? "Purchase Required" : "Already Reviewed"}
+				</h4>
+				<p className="text-contentColor dark:text-contentColor-dark">
+					{!isPurchased 
+						? "You must purchase this course to leave a review." 
+						: "You have already submitted a review for this course."}
+				</p>
+			</div>
+		);
+	}
 
 	return (
 		<div className="p-5 md:p-50px mb-50px bg-lightGrey12 dark:bg-transparent dark:shadow-brand-dark">

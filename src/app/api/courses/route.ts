@@ -83,10 +83,6 @@ export async function POST(req: NextRequest) {
     const parsedPrice = Number(parseFloat(price));
     const parsedEstimatedPrice = Number(parseFloat(estimatedPrice));
 
-    // console.log("type of parsedPrice", typeof parsedPrice);
-    // console.log("type of parsedEstimatedPrice", typeof parsedEstimatedPrice);
-    // console.log("parsedPrice + parsedEstimatedPrice", parsedPrice + parsedEstimatedPrice);
-
     // Validate that price does not exceed estimatedPrice
     if (parsedPrice > parsedEstimatedPrice) {
       return NextResponse.json(
@@ -170,10 +166,7 @@ export async function GET(req: NextRequest) {
     
     const whereConditions: any[] = [];
     
-    if (!includeAllStatuses) {
-      // Default to only published courses if not explicitly overridden
-      whereConditions.push(eq(courses.isPublished, true));
-    }
+    // Remove the published-only filter to show all courses including drafts
     
     if (userId) {
       whereConditions.push(eq(courses.userId, userId));
@@ -227,7 +220,7 @@ export async function GET(req: NextRequest) {
     const allCourses = await db
       .select()
       .from(courses)
-      .where(and(...whereConditions))
+      .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
       .limit(limit)
       .offset(offset)
       .orderBy(desc(courses.createdAt));
@@ -302,9 +295,13 @@ export async function GET(req: NextRequest) {
     });
 
     // Calculate total number of matching courses
-    const totalCoursesResult = await db.execute(
-      sql`SELECT COUNT(*)::int FROM ${courses} WHERE ${and(...whereConditions)}`
-    );
+    const totalCoursesResult = whereConditions.length > 0 
+      ? await db.execute(
+          sql`SELECT COUNT(*)::int FROM ${courses} WHERE ${and(...whereConditions)}`
+        )
+      : await db.execute(
+          sql`SELECT COUNT(*)::int FROM ${courses}`
+        );
 
     const totalCourses = totalCoursesResult.rows[0]?.count || 0;
 
