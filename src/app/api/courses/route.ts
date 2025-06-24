@@ -166,10 +166,20 @@ export async function GET(req: NextRequest) {
     
     const whereConditions: any[] = [];
     
-    // Remove the published-only filter to show all courses including drafts
-    
-    if (userId) {
-      whereConditions.push(eq(courses.userId, userId));
+    // Handle published/draft filtering
+    if (includeAllStatuses && userId) {
+      // For instructors/admins viewing their own courses - show published courses + their drafts
+      whereConditions.push(
+        sql`(${courses.isPublished} = true OR ${courses.userId} = ${userId})`
+      );
+    } else {
+      // For regular users - only show published courses
+      whereConditions.push(eq(courses.isPublished, true));
+      
+      // If userId is provided without includeAllStatuses, filter by that user
+      if (userId) {
+        whereConditions.push(eq(courses.userId, userId));
+      }
     }   
 
     // Handle search

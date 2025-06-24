@@ -59,7 +59,18 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
     try {
       // Construct query params for filters
       const params = new URLSearchParams();
-      params.set("isPublished", "true");
+      
+      // Check if user is instructor/admin to show their draft courses
+      const isInstructorOrAdmin = session?.user?.roles?.includes('instructor') || session?.user?.roles?.includes('admin');
+      
+      if (isInstructorOrAdmin && session?.user?.id) {
+        // For instructors/admins, include all their courses (published and draft)
+        params.set("userId", session.user.id);
+        params.set("includeAllStatuses", "true");
+      } else {
+        // For regular users, only show published courses
+        params.set("isPublished", "true");
+      }
 
       // Append multiple categories
       currentCategories.forEach((category) => {
@@ -129,6 +140,7 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
     currentSkillLevels,
     sortInput,
     currentPage,
+    session?.user?.id,
   ]);
 
   // Handle pagination
