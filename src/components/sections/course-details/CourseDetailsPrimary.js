@@ -796,7 +796,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 																Course Status:
 															</span>
 															<span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-																Under Approval
+																{courseDetails.id === 'd22308b2-9975-4b27-b3b5-1eb1641d9b8e' ? 'Under Approval' : 'Available'}
 															</span>
 														</p>
 													</li>
