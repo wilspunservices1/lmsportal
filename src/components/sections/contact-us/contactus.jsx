@@ -160,7 +160,7 @@ const ContactUs = () => {
               <div>
                 <h3 className="text-lg font-semibold text-gray-700">Canada</h3>
                 <p className="text-gray-600">
-                  Suite 306-3100 Kirwin Ave,
+                  306-3100 Kirwin Ave,
                   <br />
                   Mississauga, Ontario, L5A 3S6
                   <br />

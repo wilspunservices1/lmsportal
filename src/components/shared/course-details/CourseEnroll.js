@@ -27,6 +27,13 @@ const CourseEnroll = ({ type, course }) => {
 
 	const { addProductToCart, cartProducts } = useCartContext();
 	const { data: session } = useSession();
+
+	// Restricted course access
+	const RESTRICTED_COURSE_ID = 'd22308b2-9975-4b27-b3b5-1eb1641d9b8e';
+	const AUTHORIZED_USER_ID = '10d437d6-c35e-46f5-8d4f-f2de25434bf2';
+	const isRestrictedCourse = courseId === RESTRICTED_COURSE_ID;
+	const hasAccess = session?.user?.id === AUTHORIZED_USER_ID;
+	const isRestricted = isRestrictedCourse && !hasAccess;
 	const creteAlert = useSweetAlert();
 	const router = useRouter();
 	const [loading, setLoading] = useState(false); // Loading state for enrollment
@@ -90,7 +97,7 @@ const CourseEnroll = ({ type, course }) => {
 				}
 			} catch (error) {
 				console.error("Error fetching course details:", error);
-				setError(error.message || "Failed to fetch course details.");
+				setError(String(error?.message || "Failed to fetch course details."));
 			} finally {
 				setIsCheckingEnrollment(false);
 			}
@@ -151,7 +158,7 @@ const CourseEnroll = ({ type, course }) => {
 					}
 				} catch (error) {
 					console.error("Error checking enrollment:", error);
-					setError(error.message || "Failed to check enrollment.");
+					setError(typeof error === 'string' ? error : error?.message || "Failed to check enrollment.");
 				} finally {
 					setIsCheckingEnrollment(false);
 				}
@@ -213,7 +220,7 @@ const CourseEnroll = ({ type, course }) => {
 				}
 			} catch (error) {
 				console.error("Checkout error:", error);
-				setError(error.message || "Something went wrong during checkout.");
+				setError(typeof error === 'string' ? error : error?.message || "Something went wrong during checkout.");
 			} finally {
 				// End the loading process
 				setLoading(false);
@@ -263,12 +270,23 @@ const CourseEnroll = ({ type, course }) => {
 			</div>
 
 			<div className="mb-5" data-aos="fade-up">
-				{error && <p className="text-red-500 mb-3">{error}</p>}
+				{error && <p className="text-red-500 mb-3">{typeof error === 'string' ? error : 'An error occurred'}</p>}
 
 				{isCheckingEnrollment ? (
 					<div className="flex flex-col">
 						<SkeletonButton />
 						<SkeletonButton />
+					</div>
+				) : isRestricted ? (
+					<div className="text-center p-4">
+						<p className="text-red-500 font-semibold mb-2">Access Restricted</p>
+						<p className="text-sm text-gray-600">You don't have permission to enroll in this course.</p>
+						<button
+							className="w-full text-size-15 text-gray-400 bg-gray-200 px-25px py-10px border mb-10px leading-1.8 border-gray-200 cursor-not-allowed inline-block rounded"
+							disabled
+						>
+							Enrollment Disabled
+						</button>
 					</div>
 				) : (
 					<>

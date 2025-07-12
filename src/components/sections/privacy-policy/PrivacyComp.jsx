@@ -359,7 +359,7 @@ const PrivacyComp = () => {
                     Canada
                   </h3>
                   <p>
-                    Suite 306-3100 Kirwin Ave, Mississauga, Ontario, L5A 3S6
+                    306-3100 Kirwin Ave, Mississauga, Ontario, L5A 3S6
                   </p>
                   <p>Phone: +1 (647) 705 7675</p>
                 </motion.div>
