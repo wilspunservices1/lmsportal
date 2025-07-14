@@ -107,7 +107,7 @@ Record-Keeping
             <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
               <h3 className="font-semibold mb-4 text-xl">Canada Office</h3>
               <div className="space-y-2 text-gray-700 dark:text-gray-300">
-                <p>Unit 400, 111 2nd Avenue South</p>
+                <p>306-3100 Kirwin Ave,</p>
                 <p>Ontario , SK, S7K 1K6</p>
                 <p className="font-medium">Phone: +1 (647) 705 7675</p>
               </div>

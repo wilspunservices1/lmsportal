@@ -112,7 +112,7 @@ const SafetyCertification = () => {
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold text-gray-700 mb-4">Canada</h3>
               <p className="text-gray-600">
-                Unit 400, 111 2nd Avenue South
+                306-3100 Kirwin Ave,
                 <br />
                 Ontario, SK, S7K 1K6
                 <br />
