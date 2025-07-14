@@ -114,7 +114,7 @@ const SafetyCertification = () => {
               <p className="text-gray-600">
                 Unit 400, 111 2nd Avenue South
                 <br />
-                Saskatoon, SK, S7K 1K6
+                Ontario, SK, S7K 1K6
                 <br />
                 Phone: +1 (647) 705 7675
               </p>

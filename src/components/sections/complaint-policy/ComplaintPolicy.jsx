@@ -108,7 +108,7 @@ Record-Keeping
               <h3 className="font-semibold mb-4 text-xl">Canada Office</h3>
               <div className="space-y-2 text-gray-700 dark:text-gray-300">
                 <p>Unit 400, 111 2nd Avenue South</p>
-                <p>Saskatoon, SK, S7K 1K6</p>
+                <p>Ontario , SK, S7K 1K6</p>
                 <p className="font-medium">Phone: +1 (647) 705 7675</p>
               </div>
             </div>
