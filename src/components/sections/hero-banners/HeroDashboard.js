@@ -210,7 +210,7 @@ useEffect(() => {
             ) : (
               <div className="text-whiteColor font-bold text-center sm:text-start">
                 <h5 className="text-2xl leading-1.24 mb-5px">
-                  {userDetails ? userDetails.username : <SkeletonResultsText />}
+                  {userDetails ? userDetails.name : <SkeletonResultsText />}
                 </h5>
                 <ul className="flex items-center gap-15px">
                   <li className="text-sm font-normal flex items-center gap-0.5">

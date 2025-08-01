@@ -11,6 +11,7 @@ import useChapterEditing from "./hooks/useChapterEditing"; // Ensure correct imp
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import CertificatesTemp from "./_comp/Certificates";
+import CourseFAQManager from "./_comp/CourseFAQManager";
 
 const CreateCoursePrimary = () => {
 	const {
@@ -31,7 +32,7 @@ const CreateCoursePrimary = () => {
 	if (!session) {
 		router.push("/login");
 	}
-
+ 
 	// Fetch course data if `id` exists (editing mode)
 	useEffect(() => {
 		const fetchCourse = async () => {
@@ -364,6 +365,21 @@ const CreateCoursePrimary = () => {
 											</div>
 										</div>
 									)}
+								</div>
+							</li>
+
+							{/* Course FAQs Section */}
+							<li className="accordion mb-5">
+								<div className="bg-whiteColor dark:bg-whiteColor-dark shadow-accordion dark:shadow-accordion-dark rounded-md p-6">
+									<div className="border-b pb-4 mb-4">
+										<h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+											Course FAQs
+										</h3>
+										<p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+											Add frequently asked questions for this course
+										</p>
+									</div>
+									<CourseFAQManager courseId={id || courseId} />
 								</div>
 							</li>
 

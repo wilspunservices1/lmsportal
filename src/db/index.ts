@@ -5,6 +5,9 @@ import { config } from 'dotenv';
 import { certification } from './schemas/certification';
 import { courses } from './schemas/courses';
 import { certificateTracking } from './schemas/certificateTracking';
+import { examBookings } from './schemas/examBookings';
+import { user } from './schemas/user';
+import * as relations from './schemas/relations';
 
 // Load environment variables
 config({ path: '.env.local' });
@@ -26,7 +29,10 @@ try {
     schema: {
       certification,
       courses,
-      certificateTracking
+      certificateTracking,
+      examBookings,
+      user,
+      ...relations
     }
   });
 

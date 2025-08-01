@@ -36,7 +36,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 	const [error, setError] = useState(null); // Track errors
 	const [courseDetails, setCourseDetails] = useState(initialCourseDetails); // State to manage course details
 
-	const pdfUrl = "/uploads/files/trainingprograme.pdf";
+
 
 	useEffect(() => {
 		const fetchCourseDetails = async () => {
@@ -120,62 +120,23 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 		);
 	};
 
-	const faqs = [
-		{
-			question: "Who is this course intended for?",
-			answer: "This course is designed for anyone working in the food service industry, particularly those serving food to the public. It fulfills the legal food handler training requirements across Canada and is ideal for employees in restaurants, daycare centers, camps, long-term care facilities, and special events.",
-		},
-		{
-			question: "Why is the final exam monitored through video?",
-			answer: "The video proctoring of the final exam is a government requirement to:\n1) Verify the identity of the test-taker\n2) Ensure the security of the exam content\n3) Prevent any form of cheating.",
-		},
-		{
-			question: "Is photo ID required before taking the exam?",
-			answer: "Yes, online exam participants must present valid photo identification to confirm their identity, as required by provincial health authorities. However, the ID details are not stored or retained.",
-		},
-		{
-			question: "What does the course fee cover?",
-			answer: "The course fee includes both the training content and the final certification exam. You can take the exam at any time, 24/7, without the need for prior scheduling.",
-		},
-		{
-			question: "How secure is my payment information?",
-			answer: "Rest assured, your payment information is secure. The system does not store any credit card information, and all transactions are processed securely through the Stripe gateway.",
-		},
-		{
-			question: "What score do I need to pass the final exam?",
-			answer: "To pass the final exam and receive your certificate, you need to score at least 70%.",
-		},
-		{
-			question: "What happens if I fail the final exam?",
-			answer: "If you don't pass the exam on your first attempt, don't worry! The first-attempt pass rate is about 99%. If needed, you can take a free reattempt. (Valid only for one month after registration.)",
-		},
-		{
-			question: "How long is the certification valid?",
-			answer: "The certification is valid for five years, which aligns with industry standards.",
-		},
-		{
-			question: "When will I receive my certificate after passing?",
-			answer: "You will receive your digital, printable certificate and wallet card after completing the Food Handler Certification program. A copy of both will be sent to your registered email address within 6 hours of successfully completing the exam. Additionally, you can download them from the Meridian LMS after passing the exam.",
-		},
-		{
-			question: "Are course materials sent to students by mail?",
-			answer: "All course materials are provided digitally and can be accessed directly on the course page. No physical materials will be mailed.",
-		},
-		{
-			question:
-				"What are the minimum computer hardware/software requirements to access the course?",
-			answer: "The course content, including the final exam, can be accessed on any internet-enabled device with a web browser and camera. Devices such as smartphones, tablets, laptops, and desktops are all supported.",
-		},
-		{
-			question:
-				"What happens if a student is suspected of violating the online exam security?",
-			answer: "Our proctoring service monitors for any unusual behavior during the exam to ensure security and prevent cheating. If any violations are suspected, the student may be required to retake the exam at their own cost.",
-		},
-		{
-			question: "Will my final exam results be kept private?",
-			answer: "We prioritize your privacy. Your exam results will only be shared with you, any sponsoring organizations (if applicable), your local health department, and provincial health authorities, as required by law.",
-		},
-	];
+	const [faqs, setFaqs] = useState([]);
+
+	useEffect(() => {
+		const fetchFAQs = async () => {
+			try {
+				const response = await fetch(`/api/courses/${currentId}/faqs`);
+				if (response.ok) {
+					const data = await response.json();
+					setFaqs(data.faqs || []);
+				}
+			} catch (error) {
+				console.error("Error fetching FAQs:", error);
+			}
+		};
+
+		fetchFAQs();
+	}, [currentId]);
 
 	useEffect(() => {
 		const checkPurchaseStatus = async () => {
@@ -589,13 +550,15 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 											data-aos="fade-up"
 										>
 											<div className="flex items-center gap-6">
-												<a
-													href={pdfUrl}
-													download="Course_Description.pdf"
-													className="text-sm text-whiteColor bg-primaryColor border border-primaryColor px-26px py-0.5 leading-23px font-semibold hover:text-primaryColor hover:bg-whiteColor rounded inline-block dark:hover:bg-whiteColor-dark dark:hover:text-whiteColor"
-												>
-													Course Description
-												</a>
+												{courseDetails.descriptionPdfUrl && (
+													<a
+														href={courseDetails.descriptionPdfUrl}
+														download={`${courseDetails.title || 'Course'}_Description.pdf`}
+														className="text-sm text-whiteColor bg-primaryColor border border-primaryColor px-26px py-0.5 leading-23px font-semibold hover:text-primaryColor hover:bg-whiteColor rounded inline-block dark:hover:bg-whiteColor-dark dark:hover:text-whiteColor"
+													>
+														Course Description
+													</a>
+												)}
 												<button className="text-sm text-whiteColor bg-indigo border border-indigo px-22px py-0.5 leading-23px font-semibold hover:text-indigo hover:bg-whiteColor rounded inline-block dark:hover:bg-whiteColor-dark dark:hover:text-indigo">
 													{courseDetails.categories}
 												</button>
@@ -808,23 +771,25 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 								{/* course tab  */}
 								<CourseDetailsTab id={cid} type={type} course={courseDetails} />
 								{/* FAQs Section */}
-								<div className="md:col-start-5 md:col-span-8 mb-5">
-									<h4
-										className="text-2xl font-bold text-blackColor dark:text-blackColor-dark mb-15px !leading-38px"
-										data-aos="fade-up"
-									>
-										FAQs
-									</h4>
-									<div className="space-y-[15px] max-w-127">
-										{faqs.map((faq, index) => (
-											<FAQItem
-												key={index}
-												question={faq.question}
-												answer={faq.answer}
-											/>
-										))}
+								{faqs.length > 0 && (
+									<div className="md:col-start-5 md:col-span-8 mb-5">
+										<h4
+											className="text-2xl font-bold text-blackColor dark:text-blackColor-dark mb-15px !leading-38px"
+											data-aos="fade-up"
+										>
+											FAQs
+										</h4>
+										<div className="space-y-[15px] max-w-127">
+											{faqs.map((faq, index) => (
+												<FAQItem
+													key={faq.id || index}
+													question={faq.question}
+													answer={faq.answer}
+												/>
+											))}
+										</div>
 									</div>
-								</div>
+								)}
 								{/* tag and share   */}
 
 								<BlogTagsAndSocila />

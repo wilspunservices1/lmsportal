@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cloudinary } from "@/libs/uploadinary/cloudinary";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,6 +15,11 @@ export async function POST(req: NextRequest) {
 
     if (!file) {
       return NextResponse.json({ message: "No file provided" }, { status: 400 });
+    }
+
+    // Check if Cloudinary is configured
+    if (!process.env.CLOUDINARY_CLOUD_NAME) {
+      return NextResponse.json({ message: "Cloudinary not configured" }, { status: 500 });
     }
 
     const arrayBuffer = await file.arrayBuffer();

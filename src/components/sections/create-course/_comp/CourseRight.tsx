@@ -6,6 +6,7 @@ import { MultiValue } from "react-select";
 import useSweetAlert from "@/hooks/useSweetAlert";
 import FileModal from "./FileModal"; // Adjust the path as necessary
 import FileUploadField from "./FileUploadField";
+import CoursePDFUpload from "./CoursePDFUpload";
 
 type Props = {
 	courseId: string;
@@ -239,6 +240,15 @@ const CourseRight: React.FC<Props> = ({ courseId, extras }) => {
 					>
 						{isSaving ? "Saving..." : "Save Course Data"}
 					</button>
+				</div>
+
+				{/* Course Description PDF */}
+				<div className="mt-6">
+					<h4 className="text-lg font-semibold text-green-600 mb-3">Course Description PDF</h4>
+					<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+						Upload a PDF document for course description
+					</p>
+					<CoursePDFUpload courseId={courseId} />
 				</div>
 			</div>
 
