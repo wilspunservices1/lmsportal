@@ -9,9 +9,17 @@ cloudinary.config({
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('Upload API called');
     const formData = await req.formData();
     const file = formData.get("file") as File;
     const uploadType = formData.get("type") as string; // 'profile' or 'cover'
+
+    console.log('File details:', {
+      fileName: file?.name,
+      fileSize: file?.size,
+      fileType: file?.type,
+      uploadType: uploadType
+    });
 
     if (!file) {
       return NextResponse.json({ message: "No file provided" }, { status: 400 });
@@ -69,13 +77,14 @@ export async function POST(req: NextRequest) {
     // Default response for other uploads
     return NextResponse.json({
       message: "success",
-      imgUrl: `${(result as any).secure_url}?fl_attachment=${encodeURIComponent(cleanFileName)}`,
+      imgUrl: (result as any).secure_url,
     });
 
   } catch (error) {
     console.error("Error during file upload:", error);
+    console.error("Error stack:", error.stack);
     return NextResponse.json(
-      { message: "Upload failed", error: error.message },
+      { message: "Upload failed", error: error.message, stack: error.stack },
       { status: 500 }
     );
   }
