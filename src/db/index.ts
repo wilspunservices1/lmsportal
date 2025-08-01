@@ -5,7 +5,6 @@ import { config } from 'dotenv';
 import { certification } from './schemas/certification';
 import { courses } from './schemas/courses';
 import { certificateTracking } from './schemas/certificateTracking';
-import { examBookings } from './schemas/examBookings';
 import { user } from './schemas/user';
 import * as relations from './schemas/relations';
 
@@ -30,7 +29,6 @@ try {
       certification,
       courses,
       certificateTracking,
-      examBookings,
       user,
       ...relations
     }
