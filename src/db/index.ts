@@ -8,17 +8,25 @@ import { certificateTracking } from './schemas/certificateTracking';
 import { user } from './schemas/user';
 import * as relations from './schemas/relations';
 
-// Load environment variables
-config({ path: '.env.local' });
+// Load environment variables only in development
+if (process.env.NODE_ENV !== 'production') {
+  config({ path: '.env.local' });
+}
 
 const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
 if (!dbUrl) {
+  console.error('Environment variables:', {
+    POSTGRES_URL: process.env.POSTGRES_URL ? 'SET' : 'NOT SET',
+    DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT SET',
+    NODE_ENV: process.env.NODE_ENV
+  });
   throw new Error('POSTGRES_URL or DATABASE_URL is not defined in the environment variables');
 }
 
 // Validate the connection string format
 if (!dbUrl.startsWith('postgresql://') && !dbUrl.startsWith('postgres://')) {
-  throw new Error('Invalid database URL format. Must start with postgresql:// or postgres://');
+  console.error('Invalid database URL format. Received:', dbUrl.substring(0, 20) + '...');
+  throw new Error(`Invalid database URL format. Must start with postgresql:// or postgres://. Received: ${dbUrl.substring(0, 20)}...`);
 }
 
 let db;
