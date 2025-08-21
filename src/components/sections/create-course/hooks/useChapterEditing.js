@@ -23,10 +23,11 @@ const useChapterEditing = (initialChapters = []) => {
     setChapters((prevChapters) => [
       ...prevChapters,
       {
-        id: Date.now().toString(), // Use a unique string ID
+        id: `temp_${Date.now()}`, // Use a temporary ID for new chapters
         name: `Chapter ${prevChapters.length + 1}: New Chapter`,
         description: "",
         lectures: [],
+        order: (prevChapters.length + 1).toString(),
       },
     ]);
   }, []);

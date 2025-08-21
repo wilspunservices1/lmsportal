@@ -22,6 +22,56 @@ const CreateCoursePrimary = () => {
 		setInitialChapters,
 	} = useChapterEditing([]);
 
+	// Handle chapter reordering
+	const handleReorderChapters = async (draggedIndex, targetIndex) => {
+		if (draggedIndex === targetIndex) return;
+		
+		const newChapters = [...chapters];
+		const [draggedChapter] = newChapters.splice(draggedIndex, 1);
+		newChapters.splice(targetIndex, 0, draggedChapter);
+		
+		// Update order property for all chapters
+		const updatedChapters = newChapters.map((chapter, index) => ({
+			...chapter,
+			order: (index + 1).toString()
+		}));
+		
+		setInitialChapters(updatedChapters);
+		
+		// Save the updated order to database only for existing chapters
+		if ((courseId || id) && updatedChapters.length > 0) {
+			// Filter out chapters that don't have valid database IDs (new chapters)
+			const existingChapters = updatedChapters.filter(chapter => 
+				chapter.id && !chapter.id.toString().startsWith('temp_') && !isNaN(parseInt(chapter.id))
+			);
+			
+			if (existingChapters.length > 0) {
+				try {
+					const response = await fetch(`/api/courses/${courseId || id}/chapters/reorder`, {
+						method: 'PATCH',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							chapters: existingChapters.map(chapter => ({
+								id: chapter.id,
+								order: chapter.order
+							}))
+						})
+					});
+					
+					if (!response.ok) {
+						throw new Error('Failed to save chapter order');
+					}
+					console.log('Chapter order saved successfully');
+				} catch (error) {
+					console.error('Error saving chapter order:', error);
+					showAlert('error', 'Failed to save chapter order');
+				}
+			}
+		}
+	};
+
 	const [initialCourseData, setInitialCourseData] = useState(null);
 	const [courseId, setCourseId] = useState("");
 	const showAlert = useSweetAlert();
@@ -45,7 +95,11 @@ const CreateCoursePrimary = () => {
 					const data = await response.json();
 
 					setInitialCourseData(data.data);
-					setInitialChapters(data.data.chapters || []);
+					// Sort chapters by order when loading
+					const sortedChapters = (data.data.chapters || []).sort((a, b) => 
+						parseInt(a.order || 0) - parseInt(b.order || 0)
+					);
+					setInitialChapters(sortedChapters);
 					setCourseId(data.data.id);
 				} catch (error) {
 					console.error("Error fetching course data:", error);
@@ -392,6 +446,7 @@ const CreateCoursePrimary = () => {
 									index={index}
 									updateChapter={updateChapter}
 									removeChapter={removeChapter}
+									onReorderChapters={handleReorderChapters}
 								/>
 							))}
 						</ul>

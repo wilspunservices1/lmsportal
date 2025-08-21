@@ -14,6 +14,7 @@ interface ChapterItemProps {
 	updateChapter: (index: number, updatedChapter: any) => void;
 	removeChapter: (index: number) => void;
 	courseId: string;
+	onReorderChapters?: (draggedIndex: number, targetIndex: number) => void;
 }
 
 interface Questionnaire {
@@ -29,6 +30,7 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 	updateChapter,
 	removeChapter,
 	courseId,
+	onReorderChapters,
 }) => {
 	const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 	const [isAddingLecture, setIsAddingLecture] = useState(false);
@@ -314,8 +316,41 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 	};
 
 	return (
-		<li className="mb-5 relative">
-			<div className="bg-white dark:bg-gray-800 shadow-accordion dark:shadow-accordion-dark rounded-md p-4">
+		<li 
+			className="mb-5 relative cursor-move"
+			draggable={true}
+			onDragStart={(e) => {
+				e.dataTransfer.setData('text/plain', index.toString());
+				e.currentTarget.style.opacity = '0.5';
+			}}
+			onDragEnd={(e) => {
+				e.currentTarget.style.opacity = '1';
+			}}
+			onDragOver={(e) => {
+				e.preventDefault();
+				e.currentTarget.style.borderTop = '2px solid #3b82f6';
+			}}
+			onDragLeave={(e) => {
+				e.currentTarget.style.borderTop = 'none';
+			}}
+			onDrop={(e) => {
+				e.preventDefault();
+				e.currentTarget.style.borderTop = 'none';
+				const draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
+				const targetIndex = index;
+				
+				if (draggedIndex !== targetIndex && onReorderChapters) {
+					onReorderChapters(draggedIndex, targetIndex);
+				}
+			}}
+		>
+			<div className="bg-white dark:bg-gray-800 shadow-accordion dark:shadow-accordion-dark rounded-md p-4 relative">
+				{/* Drag Handle */}
+				<div className="absolute left-2 top-4 text-gray-400 hover:text-gray-600 cursor-move">
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+						<path d="M3 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM3 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm5-6a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM8 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm5-6a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+					</svg>
+				</div>
 				<ChapterAdd
 					title={chapter.title || ""}
 					description={chapter.description || ""}
