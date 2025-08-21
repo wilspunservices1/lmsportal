@@ -13,7 +13,7 @@ if (process.env.NODE_ENV !== 'production') {
   config({ path: '.env.local' });
 }
 
-const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+let dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
 if (!dbUrl) {
   console.error('Environment variables:', {
     POSTGRES_URL: process.env.POSTGRES_URL ? 'SET' : 'NOT SET',
@@ -23,10 +23,21 @@ if (!dbUrl) {
   throw new Error('POSTGRES_URL or DATABASE_URL is not defined in the environment variables');
 }
 
+// Clean the URL if it contains psql command prefix
+if (dbUrl.includes("psql '") && dbUrl.includes("'")) {
+  const match = dbUrl.match(/psql '([^']+)'/);
+  if (match) {
+    dbUrl = match[1];
+  }
+}
+
+// Remove any quotes or extra characters
+dbUrl = dbUrl.trim().replace(/^['"]|['"]$/g, '');
+
 // Validate the connection string format
 if (!dbUrl.startsWith('postgresql://') && !dbUrl.startsWith('postgres://')) {
-  console.error('Invalid database URL format. Received:', dbUrl.substring(0, 20) + '...');
-  throw new Error(`Invalid database URL format. Must start with postgresql:// or postgres://. Received: ${dbUrl.substring(0, 20)}...`);
+  console.error('Invalid database URL format. Received:', dbUrl.substring(0, 50) + '...');
+  throw new Error(`Invalid database URL format. Must start with postgresql:// or postgres://. Received: ${dbUrl.substring(0, 50)}...`);
 }
 
 let db;
