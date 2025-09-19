@@ -7,12 +7,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 export async function POST(req: Request) {
   try {
-    const { items, userId } = await req.json() // Assuming items and userId are passed in the body
+    const { items, userId, currency = 'usd' } = await req.json() // Assuming items, userId, and currency are passed in the body
+    
+    console.log('Stripe API received:', { currency, items: items.length })
 
     // Ensure price is passed as integer in cents and courseId is included
     const lineItems = items.map((item: any) => ({
       price_data: {
-        currency: 'usd', // Currency
+        currency: currency, // Use dynamic currency
         product_data: {
           name: item.name, // Name of the product
           images: [item.image], // Image URL
