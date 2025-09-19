@@ -10,6 +10,7 @@ import getStripe from "@/utils/loadStripe";
 import { useState, useEffect } from "react";
 import SkeletonButton from "@/components/Loaders/BtnSkeleton";
 import Link from "next/link";
+import PriceDisplay from "@/components/shared/PriceDisplay";
 
 const CourseEnroll = ({ type, course }) => {
 	const {
@@ -254,9 +255,9 @@ const CourseEnroll = ({ type, course }) => {
 				}`}
 			>
 				<div className="text-size-21 font-bold text-primaryColor font-inter leading-25px">
-					${parseFloat(price).toFixed(2)}{" "}
+					<PriceDisplay usdPrice={parseFloat(price)} />{" "}
 					<del className="text-sm text-lightGrey4 font-semibold">
-						/ ${parseFloat(estimatedPrice).toFixed(2)}
+						/ <PriceDisplay usdPrice={parseFloat(estimatedPrice)} />
 					</del>
 				</div>
 				<div>

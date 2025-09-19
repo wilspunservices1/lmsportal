@@ -7,6 +7,8 @@ import { useSession } from "next-auth/react";
 import VideoField from "./VideoField";
 import Loader from "./Icons/Loader";
 import dynamic from "next/dynamic";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { getCurrencySymbol, convertPrice, CURRENCIES } from "@/utils/currency";
 
 // Dynamically import ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import("react-quill"), {
@@ -27,6 +29,8 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 	const showAlert = useSweetAlert();
 	const { data: session } = useSession() as { data: Session | null };
 	const [isLoading, setIsLoading] = useState(false);
+	const { currency } = useCurrency();
+	const currencySymbol = getCurrencySymbol(currency);
 
 	// // Log initial data for debugging
 	// useEffect(() => {
@@ -102,15 +106,24 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 			return;
 		}
 
+		// Convert prices to USD for storage (prices are stored in USD)
+		const getCurrencyRate = (currencyCode: string): number => {
+			const currencyData = CURRENCIES.find(c => c.code === currencyCode);
+			return currencyData?.rate || 1;
+		};
+		
+		const usdRegularPrice = currency === 'USD' ? regularPriceValue : regularPriceValue / getCurrencyRate(currency);
+		const usdEstimatedPrice = estimatedPriceValue && currency !== 'USD' ? estimatedPriceValue / getCurrencyRate(currency) : estimatedPriceValue;
+
 		// Prepare course data for submission
 		const courseData = {
 			title,
 			slug,
 			lesson: title,
 			duration: "0 hours",
-			price: regularPriceValue.toFixed(2),
-			estimatedPrice: estimatedPriceValue
-				? estimatedPriceValue.toFixed(2)
+			price: usdRegularPrice.toFixed(2),
+			estimatedPrice: usdEstimatedPrice
+				? usdEstimatedPrice.toFixed(2)
 				: null,
 			isFree: offer === "Free",
 			tag: slug,
@@ -119,8 +132,9 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 			insName: session?.user?.name || "Unknown Instructor",
 			thumbnail: imagePath,
 			userId: session?.user?.id || "",
-			demoVideoUrl: videoPath, // Make sure videoPath is included
-			description: description || "", // Pass rich text content
+			demoVideoUrl: videoPath,
+			description: description || "",
+			currency: currency,
 		};
 
 		try {
@@ -199,7 +213,7 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 						</div>
 						<div>
 							<label className="mb-3 block font-semibold">
-								Regular Price ($)
+								Regular Price ({currencySymbol})
 							</label>
 							<input
 								type="number"
@@ -207,7 +221,7 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 								onChange={(e) =>
 									setRegularPrice(e.target.value)
 								}
-								placeholder="Regular Price ($)"
+								placeholder={`Regular Price (${currencySymbol})`}
 								className="w-full py-10px px-5 text-sm focus:outline-none text-contentColor dark:text-contentColor-dark bg-whiteColor dark:bg-whiteColor-dark border-2 border-borderColor dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 leading-23px rounded-md font-no"
 								min="0"
 								step="0.01"
@@ -215,7 +229,7 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 						</div>
 						<div>
 							<label className="mb-3 block font-semibold">
-								Estimated Price ($)
+								Estimated Price ({currencySymbol})
 							</label>
 							<input
 								type="number"
@@ -223,7 +237,7 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 								onChange={(e) =>
 									setEstimatedPrice(e.target.value)
 								}
-								placeholder="Estimated Price ($)"
+								placeholder={`Estimated Price (${currencySymbol})`}
 								className="w-full py-10px px-5 text-sm focus:outline-none text-contentColor dark:text-contentColor-dark bg-whiteColor dark:bg-whiteColor-dark border-2 border-borderColor dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 leading-23px rounded-md"
 								min="0"
 								step="0.01"

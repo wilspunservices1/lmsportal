@@ -10,6 +10,7 @@ import DropdownWrapperSecondary from "@/components/shared/wrappers/DropdownWrapp
 import DropdownContainerSecondary from "@/components/shared/containers/DropdownContainerSecondary"; // Ensure this import is correct
 import useSweetAlert from "@/hooks/useSweetAlert";
 import { useRouter } from "next/navigation";
+import PriceDisplay from "@/components/shared/PriceDisplay";
 
 // Function to calculate the total price of items in the cart
 const calculateTotalPrice = (cartProducts) => {
@@ -145,7 +146,9 @@ const DropdownCart = ({ isHeaderTop }) => {
                         </Link>
                         <p className="text-sm text-darkblack leading-5 block pb-5px dark:text-darkblack-dark">
                           {productQuantity} x{" "}
-                          <span className="text-secondaryColor">${formattedPrice}</span>
+                          <span className="text-secondaryColor">
+                            <PriceDisplay usdPrice={parseFloat(price)} />
+                          </span>
                         </p>
                       </div>
                       <button
@@ -164,7 +167,7 @@ const DropdownCart = ({ isHeaderTop }) => {
             <p className="text-size-17 text-contentColor dark:text-contentColor-dark pb-5 flex justify-between">
               Total Price:
               <span className="font-bold text-secondaryColor">
-                ${!isNaN(totalPrice) ? totalPrice.toFixed(2) : "0.00"}
+                <PriceDisplay usdPrice={!isNaN(totalPrice) ? totalPrice : 0} />
               </span>
             </p>
           </div>

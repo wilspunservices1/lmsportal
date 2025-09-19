@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import SearchField from "./_comp/SearchField"; // Updated SearchField component
 import { useSearch } from "@/contexts/SearchContext"; // Import Search context
 import SearchIcon from "./_comp/SearchIcon"; // Search Icon for the search button
+import CurrencySelector from "@/components/shared/CurrencySelector";
 
 const NavbarRight = () => {
   const isHome4 = useIsTrue("/home-4");
@@ -37,6 +38,11 @@ const NavbarRight = () => {
         {isDrawerOpen && (
           <SearchField />
         )}
+
+        {/* Currency Selector */}
+        <li className="px-5 lg:px-10px 2xl:px-5 lg:py-4 2xl:py-26px 3xl:py-9">
+          <CurrencySelector />
+        </li>
 
         {/* Dropdown for cart */}
         {!isHome2Dark && (

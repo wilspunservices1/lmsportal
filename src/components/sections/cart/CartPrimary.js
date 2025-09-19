@@ -9,6 +9,9 @@ import getStripe from "@/utils/loadStripe";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import PriceDisplay from "@/components/shared/PriceDisplay";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { convertPrice } from "@/utils/currency";
 
 const CartPrimary = () => {
   const { cartProducts: currentProducts, clearCart } = useCartContext();
@@ -16,6 +19,7 @@ const CartPrimary = () => {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { currency } = useCurrency();
 
   // Ensure cartProducts is assigned properly
   const cartProducts = currentProducts || [];
@@ -64,15 +68,21 @@ const CartPrimary = () => {
     try {
       const stripe = await getStripe();
 
-      const items = cartProducts.map((product) => ({
-        name: product.title,
-        price: parseFloat(product.price).toFixed(2),
-        image: product.thumbnail,
-        quantity: 1,
-        courseId: product.courseId,
-      }));
+      const items = cartProducts.map((product) => {
+        const usdPrice = parseFloat(product.price);
+        const convertedPrice = convertPrice(usdPrice, currency);
+        return {
+          name: product.title,
+          price: convertedPrice.toFixed(2),
+          image: product.thumbnail,
+          quantity: 1,
+          courseId: product.courseId,
+        };
+      });
 
       const userEmail = session.user.email;
+      
+      console.log('Sending to Stripe:', { currency: currency.toLowerCase(), items });
 
       const response = await fetch(`/api/stripe/checkout`, {
         method: "POST",
@@ -83,6 +93,7 @@ const CartPrimary = () => {
           items,
           email: userEmail,
           userId,
+          currency: currency.toLowerCase(),
         }),
       });
 
@@ -241,7 +252,7 @@ const CartPrimary = () => {
               <h4 className="text-sm font-bold text-blackColor dark:text-blackColor-dark mb-5 flex justify-between items-center">
                 <span className="leading-1.2">Cart Totals</span>
                 <span className="leading-1.2 text-lg font-medium">
-                  ${totalPrice ? totalPrice.toFixed(2) : "0.00"}
+                  <PriceDisplay usdPrice={totalPrice || 0} />
                 </span>
               </h4>
               <div>

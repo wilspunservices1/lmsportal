@@ -4,6 +4,7 @@ import QuantityInput from "../inputs/QuantityInput";
 import { useEffect, useState } from "react";
 import { useCartContext } from "@/contexts/CartContext";
 import { CldImage } from "next-cloudinary";
+import PriceDisplay from "@/components/shared/PriceDisplay";
 
 const CartProduct = ({ product }) => {
   const {
@@ -48,7 +49,7 @@ const CartProduct = ({ product }) => {
         </Link>
       </td>
       <td className="py-15px md:py-5 border-r border-borderColor dark:border-borderColor-dark">
-        <span className="amount">${(Number(price) || 0).toFixed(2)}</span>
+        <span className="amount"><PriceDisplay usdPrice={Number(price) || 0} /></span>
       </td>
       <td className="py-15px md:py-5 border-r border-borderColor dark:border-borderColor-dark w-300px">
         <QuantityInput
@@ -59,7 +60,7 @@ const CartProduct = ({ product }) => {
         />
       </td>
       <td className="py-15px md:py-5 border-r border-borderColor dark:border-borderColor-dark">
-        ${totalPrice <= 0 ? "0.00" : totalPrice.toFixed(2)}
+        <PriceDisplay usdPrice={totalPrice <= 0 ? 0 : totalPrice} />
       </td>
       <td className="py-15px md:py-5">
         <button className="hover:text-primaryColor mr-0.5 md:mr-1">

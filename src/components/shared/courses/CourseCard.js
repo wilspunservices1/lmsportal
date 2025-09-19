@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { CldImage } from "next-cloudinary";
 import { useSession } from "next-auth/react";
 import getItemsFromLocalstorage from "@/libs/getItemsFromLocalstorage";
+import PriceDisplay from "@/components/shared/PriceDisplay";
 
 const assignColorsToCategories = (categories, depBgs) => {
   return categories?.map((category, index) => {
@@ -211,9 +212,9 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
             {/* Show price or "Go to Course" button based on enrollment status */}
             {!isEnrolled ? (
               <div className="text-lg font-semibold text-primaryColor mb-4">
-                ${parseFloat(price).toFixed(2)}
+                <PriceDisplay usdPrice={parseFloat(price)} />
                 <del className="text-sm text-lightGrey4 font-semibold ml-1">
-                  / ${parseFloat(estimatedPrice).toFixed(2)}
+                  / <PriceDisplay usdPrice={parseFloat(estimatedPrice)} />
                 </del>
                 <span
                   className={`ml-6 text-base font-semibold ${

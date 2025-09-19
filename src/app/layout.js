@@ -10,11 +10,11 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-cards";
 import "./globals.css";
-import { getServerSession } from "next-auth/next";
-import { options } from "@/libs/auth";
 import SessionProvider from "@/components/provider/provider"
 import { getSession } from "@/libs/auth";
 import { Providers } from './providers';
+import { CurrencyProvider } from '@/contexts/CurrencyContext';
+import CurrencyNotification from '@/components/shared/CurrencyNotification';
 
 export const inter = Inter({
   subsets: ["latin"],
@@ -46,7 +46,10 @@ export default async function RootLayout({ children }) {
         <PreloaderPrimary />
         <Providers>
           <SessionProvider session={session}>
-            {children}
+            <CurrencyProvider>
+              {children}
+              <CurrencyNotification />
+            </CurrencyProvider>
           </SessionProvider>
         </Providers>
 

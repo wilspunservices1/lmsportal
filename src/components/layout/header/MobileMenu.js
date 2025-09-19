@@ -6,6 +6,7 @@ import MobileMyAccount from "./MobileMyAccount";
 import MobileSocial from "./MobileSocial";
 import MobileMenuClose from "@/components/shared/buttons/MobileMenuClose";
 import useIsTrue from "@/hooks/useIsTrue";
+import CurrencySelector from "@/components/shared/CurrencySelector";
 
 const MobileMenu = () => {
   const isHome2Dart = useIsTrue("/home-2-dark");
@@ -16,6 +17,13 @@ const MobileMenu = () => {
       {/*  mobile menu wrapper */}
       <div className="px-5 md:px-30px pt-5 md:pt-10 pb-50px h-full overflow-y-auto">
         <MobileMenuSearch />
+        
+        {/* Currency Selector */}
+        <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-600">
+          <p className="text-sm font-semibold mb-2 text-blackColor dark:text-blackColor-dark">Currency</p>
+          <CurrencySelector />
+        </div>
+        
         {/*  mobile menu accordions */}
         {isHome2Dart ? <MobileItems2 /> : <MobileMenuItems />}
         {/*  my account accordion */}
