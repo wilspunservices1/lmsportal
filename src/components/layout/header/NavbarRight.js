@@ -27,8 +27,8 @@ const NavbarRight = () => {
         {/* Search Icon to toggle search field */}
         {!isDrawerOpen && (
           <li
-            className="px-5 text-gray-500 flex items-center hover:text-gray-600 hover:cursor-pointer lg:px-10px 2xl:px-5 lg:py-4 2xl:py-26px 3xl:py-9 group"
-            onClick={toggleDrawer} // Trigger the search field on click
+            className="px-2 text-gray-500 flex items-center hover:text-gray-600 hover:cursor-pointer lg:px-2 lg:py-4 group"
+            onClick={toggleDrawer}
           >
             <SearchIcon />
           </li>
@@ -40,30 +40,30 @@ const NavbarRight = () => {
         )}
 
         {/* Currency Selector */}
-        <li className="px-5 lg:px-10px 2xl:px-5 lg:py-4 2xl:py-26px 3xl:py-9">
+        <li className="px-2 lg:px-2 lg:py-4">
           <CurrencySelector />
         </li>
 
         {/* Dropdown for cart */}
         {!isHome2Dark && (
-          <li className="px-5 lg:px-10px 2xl:px-5 lg:py-4 2xl:py-26px 3xl:py-9 group">
+          <li className="px-2 lg:px-2 lg:py-4 group">
             <DropdownCart />
           </li>
         )}
 
         {/* Dropdown for user */}
         {!isHome2Dark && session ? (
-          <li className="px-5 lg:px-10px 2xl:px-5 lg:py-4 2xl:py-26px 3xl:py-9 group">
+          <li className="px-2 lg:px-2 lg:py-4 group">
             <DropdownUser />
           </li>
         ) : null}
 
         {/* Login button if no session */}
         {!session && (
-          <li className="hidden lg:block">
+          <li className="hidden lg:block ml-2">
             <Link
               href="/login"
-              className="text-size-12 2xl:text-size-15 text-whiteColor bg-primaryColor block border-primaryColor border hover:text-primaryColor hover:bg-white px-15px py-2 rounded-standard dark:hover:bg-whiteColor-dark dark:hover:text-whiteColor"
+              className="text-xs text-whiteColor bg-primaryColor block border-primaryColor border hover:text-primaryColor hover:bg-white px-3 py-2 rounded-standard dark:hover:bg-whiteColor-dark dark:hover:text-whiteColor whitespace-nowrap"
             >
               {isHome2Dark
                 ? "Get Started Free"
