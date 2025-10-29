@@ -497,7 +497,14 @@ const LessonAccordion = ({
   return (
     <div>
       <ul className="accordion-container curriculum">
-        {chapters.map((chapter, index) => (
+        {chapters.map((chapter, index) => {
+          // Check if previous chapter quiz has 100% score
+          const prevChapter = index > 0 ? chapters[index - 1] : null;
+          const prevQuizId = prevChapter ? questionnaires[prevChapter.id]?.id : null;
+          const prevQuizScore = prevQuizId ? (quizScores[prevQuizId] || 0) : 100;
+          const isChapterLocked = index > 0 && prevQuizScore < 100;
+
+          return (
           <li
             key={chapter.id}
             className={`accordion mb-25px overflow-hidden ${
@@ -562,9 +569,18 @@ const LessonAccordion = ({
                 style={{ overflow: "hidden" }}
               >
                 <div className="content-wrapper p-10px md:px-30px">
-                  <LessonList lessons={chapter.lessons} />
+                  {isChapterLocked ? (
+                    <div className="p-4 bg-gray-100 rounded text-center">
+                      <p className="text-red-600 font-semibold">🔒 Chapter Locked</p>
+                      <p className="text-sm text-gray-600 mt-2">
+                        Complete the previous chapter quiz with 100% score to unlock this chapter.
+                      </p>
+                    </div>
+                  ) : (
+                    <LessonList lessons={chapter.lessons} />
+                  )}
 
-                  {questionnaires[chapter.id] && (
+                  {!isChapterLocked && questionnaires[chapter.id] && (
                     <div
                       className="mt-4 border-t pt-4"
                       data-questionnaire-id={questionnaires[chapter.id].id}
@@ -653,7 +669,8 @@ const LessonAccordion = ({
               </div>
             </div>
           </li>
-        ))}
+        );
+        })}
 
         {isEnrolled && (
           <>
