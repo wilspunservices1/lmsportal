@@ -6,7 +6,6 @@ import {
 	varchar,
 	boolean,
 	integer,
-	uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { courses } from "./courses";
 import { questionnaires } from "./questionnaire";
@@ -33,8 +32,5 @@ export const courseQuestionnaires = pgTable(
 		isActive: boolean("is_active").default(true),
 		type: varchar("type", { length: 20 }).notNull().default("quiz"),
 		createdAt: timestamp("created_at").defaultNow(),
-	},
-	(table) => ({
-		questionnaireIdIdx: uniqueIndex("questionnaire_id_idx").on(table.questionnaireId),
-	})
+	}
 );
