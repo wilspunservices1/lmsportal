@@ -18,7 +18,7 @@ interface Question {
 
 const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
 	const [quizTitle, setQuizTitle] = useState("");
-	const [selectedCourse, setSelectedCourse] = useState("");
+	const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
 	const [question, setQuestion] = useState("");
 	const [options, setOptions] = useState<string[]>(["", ""]);
 	const [correctAnswer, setCorrectAnswer] = useState("");
@@ -82,7 +82,7 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
 					const data = await response.json();
 
 					setQuizTitle(data.title);
-					setSelectedCourse(data.courseId);
+					setSelectedCourses(data.courseIds || [data.courseId]);
 					setQuestions(
 						data.questions.map((q) => ({
 							id: q.id,
@@ -201,8 +201,8 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
 			return;
 		}
 
-		if (!selectedCourse) {
-			showAlert("error", "Please select a course");
+		if (selectedCourses.length === 0) {
+			showAlert("error", "Please select at least one course");
 			return;
 		}
 
@@ -222,7 +222,7 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
 				},
 				body: JSON.stringify({
 					title: quizTitle,
-					courseId: selectedCourse,
+					courseIds: selectedCourses,
 					questions: questions.map((q) => ({
 						question: q.question,
 						options: q.options,
@@ -270,20 +270,49 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
 				{/* Course Selection */}
 				<div className="mb-6">
 					<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-						Select Course
+						Select Courses
 					</label>
 					<select
-						value={selectedCourse}
-						onChange={(e) => setSelectedCourse(e.target.value)}
+						onChange={(e) => {
+							const courseId = e.target.value;
+							if (courseId && !selectedCourses.includes(courseId)) {
+								setSelectedCourses([...selectedCourses, courseId]);
+							}
+							e.target.value = "";
+						}}
 						className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primaryColor focus:border-transparent"
 					>
-						<option value="">Select a course</option>
-						{courses.map((course) => (
+						<option value="">+ Add a course</option>
+						{courses.filter(c => !selectedCourses.includes(c.id)).map((course) => (
 							<option key={course.id} value={course.id}>
 								{course.title}
 							</option>
 						))}
 					</select>
+					
+					{/* Selected Courses Tags */}
+					{selectedCourses.length > 0 && (
+						<div className="flex flex-wrap gap-2 mt-3">
+							{selectedCourses.map((courseId) => {
+								const course = courses.find(c => c.id === courseId);
+								return (
+									<span
+										key={courseId}
+										className="inline-flex items-center gap-2 bg-primaryColor text-white px-3 py-1 rounded-full text-sm"
+									>
+										{course?.title}
+										<button
+											type="button"
+											onClick={() => setSelectedCourses(selectedCourses.filter(id => id !== courseId))}
+											className="hover:bg-white hover:bg-opacity-20 rounded-full p-0.5"
+										>
+											✕
+										</button>
+									</span>
+								);
+							})}
+						</div>
+					)}
 				</div>
 
 				{/* Quiz Title Input */}
