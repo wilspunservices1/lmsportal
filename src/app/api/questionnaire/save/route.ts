@@ -7,7 +7,7 @@ import { z } from "zod";
 
 const questionnaireSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  courseId: z.string().min(1, "Course ID is required"),
+  courseIds: z.array(z.string()).min(1, "At least one course is required"),
   questions: z
     .array(
       z.object({
@@ -31,18 +31,18 @@ export async function POST(request: Request) {
 
     const {
       title,
-      courseId,
+      courseIds,
       questions: questionData,
       isRequired,
       minPassScore,
     } = parsedData;
 
-    // First create the questionnaire
+    // First create the questionnaire (without courseId)
     const [newQuestionnaire] = await db
       .insert(questionnaires)
       .values({
         title,
-        courseId,
+        courseId: courseIds[0], // Use first course as primary
         isRequired,
         minPassScore,
       })
@@ -65,12 +65,14 @@ export async function POST(request: Request) {
 
     await db.insert(questions).values(questionValues);
 
-    // Insert into course_questionnaires                   //edited by jayesh chak on 03/02/2025
-    await db.insert(courseQuestionnaires).values({
+    // Insert into course_questionnaires for ALL selected courses
+    const courseQuestionnaireValues = courseIds.map((courseId) => ({
       courseId,
       questionnaireId: newQuestionnaire.id,
       isActive: true,
-    }); //edited by jayesh chak on 03/02/2025
+    }));
+
+    await db.insert(courseQuestionnaires).values(courseQuestionnaireValues);
 
     return NextResponse.json(
       {
