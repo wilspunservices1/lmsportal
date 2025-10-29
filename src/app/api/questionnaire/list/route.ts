@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { questionnaires } from "@/db/schemas/questionnaire";
 import { questions } from "@/db/schemas/questions";
+import { courseQuestionnaires } from "@/db/schemas/coursequestionnaires";
 import { eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
@@ -14,22 +15,33 @@ export async function GET(req: NextRequest) {
 		const { searchParams } = new URL(req.url);
 		const courseId = searchParams.get("courseId");
 
-		// Build base query
-		let query = db
-			.select({
-				id: questionnaires.id,
-				title: questionnaires.title,
-				courseId: questionnaires.courseId,
-				createdAt: questionnaires.createdAt,
-			})
-			.from(questionnaires);
+		let allQuestionnaires;
 
-		// Apply filter if courseId is provided
 		if (courseId) {
-			query = query.where(eq(questionnaires.courseId, courseId));
+			// Get questionnaires assigned to this course via junction table
+			const courseQuizzes = await db
+				.select({
+					id: questionnaires.id,
+					title: questionnaires.title,
+					courseId: questionnaires.courseId,
+					createdAt: questionnaires.createdAt,
+				})
+				.from(courseQuestionnaires)
+				.innerJoin(questionnaires, eq(courseQuestionnaires.questionnaireId, questionnaires.id))
+				.where(eq(courseQuestionnaires.courseId, courseId));
+			
+			allQuestionnaires = courseQuizzes;
+		} else {
+			// Get all questionnaires
+			allQuestionnaires = await db
+				.select({
+					id: questionnaires.id,
+					title: questionnaires.title,
+					courseId: questionnaires.courseId,
+					createdAt: questionnaires.createdAt,
+				})
+				.from(questionnaires);
 		}
-
-		const allQuestionnaires = await query;
 
 		if (!allQuestionnaires) {
 			return NextResponse.json({
@@ -60,6 +72,7 @@ export async function GET(req: NextRequest) {
 					courseId: questionnaire.courseId,
 					createdAt: questionnaire.createdAt?.toISOString() || new Date().toISOString(),
 					status: questionnaire.status || "active",
+					questionsCount: questionsList.length,
 					questions: questionsList.map(
 						(q: { id: any; question: any; options: string; correctAnswer: any }) => ({
 							id: q.id,
