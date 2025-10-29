@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { questionnaires } from '@/db/schemas/questionnaire';
 import { questions } from '@/db/schemas/questions';
+import { courseQuestionnaires } from '@/db/schemas/coursequestionnaires';
 import { eq } from 'drizzle-orm';
 
 export async function GET(
@@ -44,10 +45,19 @@ export async function GET(
       correctAnswer: q.correctAnswer,
     }));
 
+    // Get all assigned courses
+    const assignedCourses = await db
+      .select({ courseId: courseQuestionnaires.courseId })
+      .from(courseQuestionnaires)
+      .where(eq(courseQuestionnaires.questionnaireId, questionnaire[0].id));
+
+    const courseIds = assignedCourses.map(c => c.courseId);
+
     return NextResponse.json({
       id: questionnaire[0].id,
       title: questionnaire[0].title,
       courseId: questionnaire[0].courseId,
+      courseIds: courseIds,
       questions: formattedQuestions,
       createdAt: questionnaire[0].createdAt,
     });
@@ -120,11 +130,11 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { title, courseId, questions: questionData, isRequired, minPassScore } = body;
+    const { title, courseIds, questions: questionData, isRequired, minPassScore } = body;
 
-    if (!title || !courseId || !questionData || questionData.length === 0) {
+    if (!title || !courseIds || courseIds.length === 0 || !questionData || questionData.length === 0) {
       return NextResponse.json(
-        { error: 'Title, courseId, and at least one question are required' },
+        { error: 'Title, courseIds, and at least one question are required' },
         { status: 400 }
       );
     }
@@ -135,7 +145,7 @@ export async function PUT(
       const [updatedQuestionnaire] = await tx.update(questionnaires)
         .set({
           title,
-          courseId,
+          courseId: courseIds[0],
           isRequired,
           minPassScore,
         })
@@ -156,11 +166,23 @@ export async function PUT(
           tx.insert(questions).values({
             questionnaireId: params.id,
             question: q.question,
-            options: JSON.stringify(q.options), // Ensure options are stored as JSON
+            options: JSON.stringify(q.options),
             correctAnswer: q.correctAnswer,
           }).returning()
         )
       );
+
+      // Update course_questionnaires: delete old entries and insert new ones
+      await tx.delete(courseQuestionnaires)
+        .where(eq(courseQuestionnaires.questionnaireId, params.id));
+
+      const courseQuestionnaireValues = courseIds.map((courseId: string) => ({
+        courseId,
+        questionnaireId: params.id,
+        isActive: true,
+      }));
+
+      await tx.insert(courseQuestionnaires).values(courseQuestionnaireValues);
 
       return { questionnaire: updatedQuestionnaire, questions: updatedQuestions };
     });
