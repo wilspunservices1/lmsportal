@@ -20,24 +20,24 @@ export async function GET(req: Request) {
 
 		const user_id = session.user.id;
 
-		// Fetch latest quiz scores for the user
-		const latestAttempts = await db
+		// Fetch all quiz attempts for the user
+		const allAttempts = await db
 			.select({
 				questionnaire_id: quizAttempts.questionnaire_id,
 				score: quizAttempts.score,
 			})
 			.from(quizAttempts)
-			.where(eq(quizAttempts.user_id, user_id))
-			.orderBy(desc(quizAttempts.created_at));
+			.where(eq(quizAttempts.user_id, user_id));
 
 		// If no attempts found, return empty progress
-		if (!latestAttempts.length) {
+		if (!allAttempts.length) {
 			return NextResponse.json({ scores: {} });
 		}
 
-		// Format scores as an object { questionnaire_id: score }
-		const scores = latestAttempts.reduce((acc, attempt) => {
-			acc[attempt.questionnaire_id] = attempt.score;
+		// Get the BEST score for each questionnaire
+		const scores = allAttempts.reduce((acc, attempt) => {
+			const currentBest = acc[attempt.questionnaire_id] || 0;
+			acc[attempt.questionnaire_id] = Math.max(currentBest, attempt.score);
 			return acc;
 		}, {} as Record<string, number>);
 
