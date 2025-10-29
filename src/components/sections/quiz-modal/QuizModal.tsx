@@ -197,22 +197,38 @@ const QuizModal: React.FC<QuizModalProps> = ({
 
 			console.log("Quiz submitted successfully!", data);
 
-			// Update local states with the latest attempt's score.
-			setQuizScores((prev: any) => ({
-				...prev,
-				[questionnaireId]: scorePercentage,
-			}));
+			// Update local states with the best score
+			setQuizScores((prev: any) => {
+				const currentBest = prev[questionnaireId] || 0;
+				return {
+					...prev,
+					[questionnaireId]: Math.max(currentBest, scorePercentage),
+				};
+			});
 
 			setProgressRefresh((prev: number) => prev + 1);
 
-			Swal.fire({
-				icon: "success",
-				title: isFinalExam ? "Exam Submitted" : "Quiz Attempted",
-				text: isFinalExam
-					? "Your final exam has been submitted successfully!"
-					: "Your quiz has been submitted successfully!",
-				timer: 3000,
-				showConfirmButton: false,
+			// Show summary on every attempt
+			const summaryHtml = quizData.questions
+				.map((q, i) => {
+					const userAnswer = selectedAnswers[i] || "Not answered";
+					const correctAnswer = q.correct_answer || (q as any).correctAnswer;
+					const isCorrect = userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
+					return `
+						<div style="text-align: left; margin-bottom: 15px; padding: 10px; border: 1px solid ${isCorrect ? '#10b981' : '#ef4444'}; border-radius: 5px; background: ${isCorrect ? '#f0fdf4' : '#fef2f2'};">
+							<strong>Q${i + 1}:</strong> ${q.question}<br/>
+							<span style="color: ${isCorrect ? '#10b981' : '#ef4444'};">Your Answer: ${userAnswer} - ${isCorrect ? 'Correct ✓' : 'Wrong ✗'}</span>
+						</div>
+					`;
+				})
+				.join("");
+
+			await Swal.fire({
+				icon: scorePercentage >= 80 ? "success" : "warning",
+				title: `Score: ${scorePercentage}%`,
+				html: `<div style="max-height: 400px; overflow-y: auto;">${summaryHtml}</div>`,
+				width: "800px",
+				confirmButtonText: "Close",
 			});
 
 			onClose();
