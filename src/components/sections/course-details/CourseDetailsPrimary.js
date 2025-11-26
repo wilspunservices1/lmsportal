@@ -596,15 +596,9 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 											data-aos="fade-up"
 										>
 											<div className="text-size-21 font-medium text-primaryColor font-inter leading-25px">
-												$
-												{courseDetails.price
-													? parseFloat(courseDetails.price).toFixed(2)
-													: "0.00"}{" "}
+												<PriceDisplay usdPrice={parseFloat(courseDetails.price) || 0} size="lg" />{" "}
 												<del className="text-sm text-lightGrey4 font-semibold">
-													/ $
-													{parseFloat(
-														courseDetails.estimatedPrice
-													).toFixed(2)}
+													/ <PriceDisplay usdPrice={parseFloat(courseDetails.estimatedPrice) || 0} showCurrencyCode={false} />
 												</del>
 											</div>
 											<div className="flex items-center">
