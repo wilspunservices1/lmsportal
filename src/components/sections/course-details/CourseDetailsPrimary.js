@@ -21,6 +21,7 @@ import ManageQuestionnaire from "../questionnaire/ManageQuestionnaire";
 import { Autoplay } from "swiper/modules";
 
 import { useEffect } from "react";
+import PriceDisplay from "@/components/shared/PriceDisplay";
 
 let cid = 0;
 
@@ -747,9 +748,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 																Regular Price:
 															</span>
 															<span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-																{courseDetails.price
-																	? `$${courseDetails.price}`
-																	: "$0"}
+																<PriceDisplay usdPrice={parseFloat(courseDetails.price) || 0} />
 															</span>
 														</p>
 													</li>
