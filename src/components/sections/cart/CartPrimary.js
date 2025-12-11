@@ -14,9 +14,7 @@ import PriceDisplay from "@/components/shared/PriceDisplay";
 import PaymentMethodSelector from "@/components/shared/PaymentMethodSelector";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { convertPrice } from "@/utils/currency";
-import { useCartContext } from "@/contexts/CartContext";
-import useSweetAlert from "@/hooks/useSweetAlert";
-import CartProduct from "@/components/shared/cart/CartProduct";
+
 
 const CartPrimary = () => {
   const { cartProducts: currentProducts, clearCart } = useCartContext();
