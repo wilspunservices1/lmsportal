@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "lib": [
       "dom",
       "dom.iterable",
@@ -12,10 +13,10 @@
     "incremental": true,
     "module": "esnext",
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve", // Use react-jsx for JSX transformation in React 17 and above
+    "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
       "@/*": [

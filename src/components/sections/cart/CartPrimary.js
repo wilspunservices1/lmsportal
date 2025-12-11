@@ -6,18 +6,24 @@ import useSweetAlert from "@/hooks/useSweetAlert";
 import countTotalPrice from "@/libs/countTotalPrice";
 import Link from "next/link";
 import getStripe from "@/utils/loadStripe";
+import { initializePaymobPayment } from "@/utils/loadPaymob";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import PriceDisplay from "@/components/shared/PriceDisplay";
+import PaymentMethodSelector from "@/components/shared/PaymentMethodSelector";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { convertPrice } from "@/utils/currency";
+import { useCartContext } from "@/contexts/CartContext";
+import useSweetAlert from "@/hooks/useSweetAlert";
+import CartProduct from "@/components/shared/cart/CartProduct";
 
 const CartPrimary = () => {
   const { cartProducts: currentProducts, clearCart } = useCartContext();
   const creteAlert = useSweetAlert();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('stripe');
   const router = useRouter();
   const { currency } = useCurrency();
 
@@ -50,6 +56,90 @@ const CartPrimary = () => {
     }
   };
 
+  // Function to handle Stripe checkout
+  const handleStripeCheckout = async (items, userEmail) => {
+    const stripe = await getStripe();
+
+
+
+    const response = await fetch(`/api/stripe/checkout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        items,
+        email: userEmail,
+        userId,
+        currency: currency.toLowerCase(),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create Stripe checkout session");
+    }
+
+    const { sessionId } = await response.json();
+
+    if (sessionId) {
+      await stripe.redirectToCheckout({ sessionId });
+    } else {
+      throw new Error("Failed to create Stripe checkout session");
+    }
+  };
+
+  // Function to handle Paymob checkout
+  const handlePaymobCheckout = async (items, userEmail, phone) => {
+
+
+    const response = await fetch('/api/paymob/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        items, 
+        userId, 
+        email: userEmail, 
+        phone: phone || '+966500000000'
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create Paymob checkout session');
+    }
+
+    const data = await response.json();
+    
+    if (data.iframeUrl) {
+      // Open payment iframe in new window
+      const paymentWindow = window.open(
+        data.iframeUrl, 
+        'paymob_payment', 
+        'width=800,height=600,scrollbars=yes,resizable=yes'
+      );
+      
+      if (!paymentWindow) {
+        throw new Error('Please allow popups to complete payment');
+      }
+      
+      // Monitor payment completion
+      const checkPaymentStatus = setInterval(() => {
+        try {
+          if (paymentWindow.closed) {
+            clearInterval(checkPaymentStatus);
+            // Redirect to success page or refresh cart
+            router.push('/payProgress/success?payment_method=paymob');
+          }
+        } catch (e) {
+          // Cross-origin error, ignore
+        }
+      }, 1000);
+      
+      return data;
+    } else {
+      throw new Error('Failed to initialize Paymob payment');
+    }
+  };
+
   // Function to handle checkout
   const handleCheckout = async () => {
     if (!session) {
@@ -66,8 +156,6 @@ const CartPrimary = () => {
     setLoading(true);
 
     try {
-      const stripe = await getStripe();
-
       const items = cartProducts.map((product) => {
         const usdPrice = parseFloat(product.price);
         const convertedPrice = convertPrice(usdPrice, currency);
@@ -82,39 +170,12 @@ const CartPrimary = () => {
 
       const userEmail = session.user.email;
       
-      console.log('Sending to Stripe:', { currency: currency.toLowerCase(), items });
-
-      const response = await fetch(`/api/stripe/checkout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items,
-          email: userEmail,
-          userId,
-          currency: currency.toLowerCase(),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          "Failed to create checkout session response not ok cartPrimary."
-        );
-      }
-
-      const { sessionId } = await response.json();
-
-      if (sessionId) {
-        await stripe.redirectToCheckout({ sessionId });
-      } else {
-        creteAlert(
-          "error",
-          "Failed to create checkout session await failed for redirectToCheckout CartsPrimary."
-        );
+      if (paymentMethod === 'stripe') {
+        await handleStripeCheckout(items, userEmail);
+      } else if (paymentMethod === 'paymob') {
+        await handlePaymobCheckout(items, userEmail);
       }
     } catch (error) {
-      console.error("Error during checkout:", error);
       creteAlert(
         "error",
         error.message || "Failed to proceed to checkout. Please try again."
@@ -255,14 +316,18 @@ const CartPrimary = () => {
                   <PriceDisplay usdPrice={totalPrice || 0} />
                 </span>
               </h4>
+              <PaymentMethodSelector 
+                selectedMethod={paymentMethod}
+                onMethodChange={setPaymentMethod}
+              />
               <div>
                 <button
                   type="button"
-                  className="text-size-13 text-whiteColor dark:text-whiteColor-dark dark:hover:text-whiteColor leading-1 px-5 py-18px md:px-10 bg-blackColor dark:bg-blackColor-dark hover:bg-primaryColor dark:hover:bg-primaryColor"
+                  className="text-size-13 text-whiteColor dark:text-whiteColor-dark dark:hover:text-whiteColor leading-1 px-5 py-18px md:px-10 bg-blackColor dark:bg-blackColor-dark hover:bg-primaryColor dark:hover:bg-primaryColor w-full"
                   onClick={handleCheckout}
                   disabled={loading}
                 >
-                  {loading ? "Processing..." : "PROCEED TO CHECKOUT"}
+                  {loading ? "Processing..." : `PAY WITH ${paymentMethod.toUpperCase()}`}
                 </button>
               </div>
             </div>

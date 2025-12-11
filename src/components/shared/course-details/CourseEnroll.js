@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import useSweetAlert from "@/hooks/useSweetAlert";
 import getStripe from "@/utils/loadStripe";
+import initializePaymobPayment from "@/utils/loadPaymob";
 import { useState, useEffect } from "react";
 import SkeletonButton from "@/components/Loaders/BtnSkeleton";
 import Link from "next/link";
@@ -29,26 +30,18 @@ const CourseEnroll = ({ type, course }) => {
 	const { addProductToCart, cartProducts } = useCartContext();
 	const { data: session } = useSession();
 
-	// Restricted course access
-	const RESTRICTED_COURSE_ID = 'd22308b2-9975-4b27-b3b5-1eb1641d9b8e';
-	const AUTHORIZED_USER_ID = '10d437d6-c35e-46f5-8d4f-f2de25434bf2';
-	const isRestrictedCourse = courseId === RESTRICTED_COURSE_ID;
-	const hasAccess = session?.user?.id === AUTHORIZED_USER_ID;
-	const isRestricted = isRestrictedCourse && !hasAccess;
+	// Restricted course access - disabled for production
+	const isRestricted = false;
 	const creteAlert = useSweetAlert();
 	const router = useRouter();
-	const [loading, setLoading] = useState(false); // Loading state for enrollment
-	const [error, setError] = useState(""); // Error state to store error message
-	const [isEnrolled, setIsEnrolled] = useState(false); // To check if the user is enrolled
-	const [isCheckingEnrollment, setIsCheckingEnrollment] = useState(true); // Loading state for enrollment check
-	const [firstLectureId, setFirstLectureId] = useState(null); // To store the lecture ID to navigate to
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
+	const [isEnrolled, setIsEnrolled] = useState(false);
+	const [isCheckingEnrollment, setIsCheckingEnrollment] = useState(true);
+	const [firstLectureId, setFirstLectureId] = useState(null);
 
 	const userId = session?.user?.id;
-
-	// Check if the course is already in the cart
 	const isInCart = cartProducts.some((product) => product.courseId === courseId);
-
-	// Fetch the user's enrolled courses and check if the current course is enrolled
 
 	useEffect(() => {
 		const fetchCourseDetails = async () => {
@@ -65,34 +58,28 @@ const CourseEnroll = ({ type, course }) => {
 				const data = await response.json();
 				const courseDetails = data.data;
 
-				console.log("Course Details:", courseDetails); // Debugging the course data
-
 				const chapters = courseDetails.chapters || [];
 				let foundLectureId = null;
 
-				// Loop through chapters to find the first chapter with order == 1
 				for (const chapter of chapters) {
 					if (parseInt(chapter.order) === 1) {
-						// Check if chapter.order == 1
 						const sortedLectures = (chapter.lectures || []).sort(
-							(a, b) => parseInt(a.order) - parseInt(b.order) // Sort lectures by order
+							(a, b) => parseInt(a.order) - parseInt(b.order)
 						);
 
-						// Find the first lecture with order == 1 within this chapter
 						const firstLecture = sortedLectures.find(
 							(lecture) => parseInt(lecture.order) === 1
 						);
 
 						if (firstLecture) {
-							foundLectureId = firstLecture.id; // Set the first lecture ID
-							break; // Exit after finding the first lecture
+							foundLectureId = firstLecture.id;
+							break;
 						}
 					}
 				}
 
 				if (foundLectureId) {
-					setFirstLectureId(foundLectureId); // Store the first lecture ID
-					console.log("First Lecture ID:", foundLectureId); // Log the first lecture ID
+					setFirstLectureId(foundLectureId);
 				} else {
 					setError("No lectures found for this course.");
 				}
@@ -118,7 +105,7 @@ const CourseEnroll = ({ type, course }) => {
 						headers: {
 							"Content-Type": "application/json",
 						},
-						credentials: "include", // Include cookies for authentication
+						credentials: "include",
 					});
 
 					if (!response.ok) {
@@ -127,33 +114,12 @@ const CourseEnroll = ({ type, course }) => {
 
 					const enrolledCourses = await response.json();
 
-					// Find the course matching the current courseId
 					const enrolledCourse = enrolledCourses.find(
 						(enrolledCourse) => enrolledCourse.courseId === courseId
 					);
 
 					if (enrolledCourse) {
 						setIsEnrolled(true);
-
-						// Extract the first lecture ID
-						const chapters = enrolledCourse.chapters || [];
-
-						// Find the first lecture ID
-						let foundLectureId = null;
-						for (const chapter of chapters) {
-							const lectureIds = chapter.lectureIds || [];
-							if (lectureIds.length > 0) {
-								foundLectureId = lectureIds[0]; // Take the first lecture ID
-								break;
-							}
-						}
-
-						if (foundLectureId) {
-							// setFirstLectureId(foundLectureId);
-						} else {
-							// Handle case where no lectures are found
-							setError("No lectures found for this course.");
-						}
 					} else {
 						setIsEnrolled(false);
 					}
@@ -172,38 +138,56 @@ const CourseEnroll = ({ type, course }) => {
 		checkEnrollment();
 	}, [userId, courseId]);
 
+	const handlePaymobEnroll = async () => {
+		if (!session) {
+			creteAlert("error", "You need to sign in to proceed with enrollment.");
+			router.push("/login");
+		} else {
+			setLoading(true);
+			setError("");
+
+			try {
+				const items = [{
+					name: title,
+					price: parseFloat(price).toFixed(2),
+					image: thumbnail,
+					quantity: 1,
+					courseId,
+				}];
+
+				await initializePaymobPayment(items, userId, session.user.email);
+			} catch (error) {
+				console.error("Paymob enrollment error:", error);
+				setError("Payment initialization failed. Please try again.");
+			} finally {
+				setLoading(false);
+			}
+		}
+	};
+
 	const handleEnrollClick = async () => {
 		if (!session) {
 			creteAlert("error", "You need to sign in to proceed with enrollment.");
 			router.push("/login");
 		} else {
-			// Start the loading process
 			setLoading(true);
-			setError(""); // Reset error message
+			setError("");
 
 			try {
 				const stripe = await getStripe();
 
-				// Prepare items for the checkout
 				const items = [
 					{
 						name: title,
-						price: parseFloat(price).toFixed(2), // Ensure price is properly formatted
+						price: parseFloat(price).toFixed(2),
 						image: thumbnail,
-						quantity: 1, // Default to quantity of 1
-						courseId, // Include the courseId in the item data
+						quantity: 1,
+						courseId,
 					},
 				];
 
 				const userEmail = session.user.email;
 
-				console.log("📤 Sending payload to Stripe API:", {
-					items,
-					email: userEmail,
-					userId,
-				});
-
-				// Make a request to your checkout API route
 				const response = await fetch("/api/stripe/checkout", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
@@ -212,10 +196,8 @@ const CourseEnroll = ({ type, course }) => {
 
 				const { sessionId } = await response.json();
 
-				// If the session is created, redirect to Stripe Checkout
 				if (sessionId) {
 					await stripe.redirectToCheckout({ sessionId });
-					console.log("Check Out Complete");
 				} else {
 					throw new Error("Failed to create checkout session.");
 				}
@@ -223,7 +205,6 @@ const CourseEnroll = ({ type, course }) => {
 				console.error("Checkout error:", error);
 				setError(typeof error === 'string' ? error : error?.message || "Something went wrong during checkout.");
 			} finally {
-				// End the loading process
 				setLoading(false);
 			}
 		}
@@ -318,24 +299,34 @@ const CourseEnroll = ({ type, course }) => {
 							</button>
 						)}
 
-						{/* Conditionally Render "Go to Course" or "Enroll Now" Button */}
 						{isEnrolled && firstLectureId ? (
 							<button
-								onClick={() => router.push(`/lessons/${firstLectureId}`)} // Redirect to first lecture
+								onClick={() => router.push(`/lessons/${firstLectureId}`)}
 								className="w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px mb-10px leading-1.8 border border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark"
 							>
 								Go to Course
 							</button>
 						) : (
-							<button
-								onClick={handleEnrollClick}
-								className={`w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px mb-10px leading-1.8 border border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark ${
-									loading ? "cursor-not-allowed opacity-50" : ""
-								}`}
-								disabled={loading}
-							>
-								{loading ? "Processing..." : "Enroll Now"}
-							</button>
+							<>
+								<button
+									onClick={handleEnrollClick}
+									className={`w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px mb-10px leading-1.8 border border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark ${
+										loading ? "cursor-not-allowed opacity-50" : ""
+									}`}
+									disabled={loading}
+								>
+									{loading ? "Processing..." : "Pay with Stripe"}
+								</button>
+								<button
+									onClick={handlePaymobEnroll}
+									className={`w-full text-size-15 text-whiteColor bg-primaryColor px-25px py-10px mb-10px leading-1.8 border border-primaryColor hover:text-primaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-primaryColor dark:hover:bg-whiteColor-dark ${
+										loading ? "cursor-not-allowed opacity-50" : ""
+									}`}
+									disabled={loading}
+								>
+									{loading ? "Processing..." : "Pay with Paymob"}
+								</button>
+							</>
 						)}
 					</>
 				)}
@@ -376,7 +367,7 @@ const CourseEnroll = ({ type, course }) => {
 					type="submit"
 					className="w-full text-xl text-primaryColor bg-whiteColor px-25px py-10px mb-10px font-bold leading-1.8 border border-primaryColor hover:text-whiteColor hover:bg-primaryColor inline-block rounded group dark:bg-whiteColor-dark dark:text-whiteColor dark:hover:bg-primaryColor"
 				>
-					<i className="icofont-email"></i> training@meqmp.com
+					<i className="icofont-email"></i> {process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@meridian-lms.com'}
 				</button>
 			</div>
 		</div>
