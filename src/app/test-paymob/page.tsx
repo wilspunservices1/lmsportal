@@ -21,7 +21,7 @@ const TestPaymobPage = () => {
       const testItems = [
         {
           name: 'Test Course',
-          price: '10.00',
+          price: '100.00',
           courseId: 'test-course-id',
           quantity: 1
         }

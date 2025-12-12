@@ -65,7 +65,9 @@ export async function POST(req: NextRequest) {
       }
 
       const userId = userData[0].id;
-      const currentEnrolledCourses = userData[0].enrolledCourses as string[] || [];
+      const currentEnrolledCourses = userData[0].enrolledCourses || [];
+      console.log('Current enrolled courses type:', typeof currentEnrolledCourses);
+      console.log('Current enrolled courses:', currentEnrolledCourses);
 
       // Get course IDs from order items
       const courseIds = transaction.order.items.map((item: any) => {
@@ -106,14 +108,31 @@ export async function POST(req: NextRequest) {
         items,
       });
 
-      // Update user's enrolled courses
-      const newEnrolledCourses = Array.from(new Set([...currentEnrolledCourses, ...courseIds]));
-      console.log('Updating user enrolled courses:', { userId, newEnrolledCourses });
+      // **Prepare the Courses to be Added to EnrolledCourses (same as Stripe)**
+      const newCourses = courseIds.map((courseId: string) => ({
+        courseId,
+        progress: 0,
+        completedLectures: [],
+      }));
+
+      // **Update EnrolledCourses, Only Adding New Courses**
+      const existingCourses = currentEnrolledCourses || [];
+      const updatedEnrolledCourses = [
+        ...existingCourses,
+        ...newCourses.filter(
+          (newCourse) =>
+            !existingCourses.some(
+              (existingCourse: any) => existingCourse.courseId === newCourse.courseId
+            )
+        ),
+      ];
+
+      console.log('Updating user enrolled courses:', { userId, updatedEnrolledCourses });
       
       await db
         .update(user)
         .set({ 
-          enrolledCourses: newEnrolledCourses,
+          enrolledCourses: updatedEnrolledCourses,
           updatedAt: new Date()
         })
         .where(eq(user.id, userId));
@@ -182,7 +201,7 @@ export async function POST(req: NextRequest) {
 
       console.log('=== PAYMOB PAYMENT PROCESSED SUCCESSFULLY ===');
       console.log('User ID:', userId);
-      console.log('Enrolled courses updated:', newEnrolledCourses);
+      console.log('Enrolled courses updated:', updatedEnrolledCourses);
       return NextResponse.json({ status: 'success' });
     }
 

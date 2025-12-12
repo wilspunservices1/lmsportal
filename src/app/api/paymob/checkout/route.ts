@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const publicKey = process.env.PAYMOB_PUBLIC_KEY;
 
     // Create payment intention using official Paymob API (amount in cents)
-    const totalAmountCents = items.reduce((sum: number, item: any) => sum + (parseFloat(item.price) * 100), 0);
+    const totalAmountCents = Math.round(items.reduce((sum: number, item: any) => sum + (parseFloat(item.price) * 100), 0));
     
     const intentResponse = await fetch('https://ksa.paymob.com/v1/intention', {
       method: 'POST',
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         },
         items: items.map((item: any) => ({
           name: item.name.substring(0, 50), // Max 50 chars
-          amount: parseFloat(item.price) * 100, // Amount in cents
+          amount: Math.round(parseFloat(item.price) * 100), // Amount in cents as integer
           description: `Course ID: ${item.courseId} - ${item.name}`.substring(0, 255), // Max 255 chars
           quantity: 1
         })),
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
           floor: 'N/A',
           state: 'Riyadh'
         },
-        notification_url: `https://1d194d01b5cf.ngrok-free.app/api/paymob/webhook`,
+        notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/paymob/webhook`,
         redirection_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payProgress/success?payment_method=paymob`,
         expiration: 3600
       })

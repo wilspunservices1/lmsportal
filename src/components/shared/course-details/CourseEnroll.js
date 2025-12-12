@@ -7,7 +7,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import useSweetAlert from "@/hooks/useSweetAlert";
 import getStripe from "@/utils/loadStripe";
-import initializePaymobPayment from "@/utils/loadPaymob";
 import { useState, useEffect } from "react";
 import SkeletonButton from "@/components/Loaders/BtnSkeleton";
 import Link from "next/link";
@@ -30,8 +29,12 @@ const CourseEnroll = ({ type, course }) => {
 	const { addProductToCart, cartProducts } = useCartContext();
 	const { data: session } = useSession();
 
-	// Restricted course access - disabled for production
-	const isRestricted = false;
+	// Restricted course access
+	const RESTRICTED_COURSE_ID = 'd22308b2-9975-4b27-b3b5-1eb1641d9b8e';
+	const AUTHORIZED_USER_ID = '10d437d6-c35e-46f5-8d4f-f2de25434bf2';
+	const isRestrictedCourse = courseId === RESTRICTED_COURSE_ID;
+	const hasAccess = session?.user?.id === AUTHORIZED_USER_ID;
+	const isRestricted = isRestrictedCourse && !hasAccess;
 	const creteAlert = useSweetAlert();
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
@@ -41,6 +44,8 @@ const CourseEnroll = ({ type, course }) => {
 	const [firstLectureId, setFirstLectureId] = useState(null);
 
 	const userId = session?.user?.id;
+
+	// Check if the course is already in the cart
 	const isInCart = cartProducts.some((product) => product.courseId === courseId);
 
 	useEffect(() => {
@@ -61,6 +66,7 @@ const CourseEnroll = ({ type, course }) => {
 				const chapters = courseDetails.chapters || [];
 				let foundLectureId = null;
 
+				// Loop through chapters to find the first chapter with order == 1
 				for (const chapter of chapters) {
 					if (parseInt(chapter.order) === 1) {
 						const sortedLectures = (chapter.lectures || []).sort(
@@ -84,7 +90,6 @@ const CourseEnroll = ({ type, course }) => {
 					setError("No lectures found for this course.");
 				}
 			} catch (error) {
-				console.error("Error fetching course details:", error);
 				setError(String(error?.message || "Failed to fetch course details."));
 			} finally {
 				setIsCheckingEnrollment(false);
@@ -124,7 +129,6 @@ const CourseEnroll = ({ type, course }) => {
 						setIsEnrolled(false);
 					}
 				} catch (error) {
-					console.error("Error checking enrollment:", error);
 					setError(typeof error === 'string' ? error : error?.message || "Failed to check enrollment.");
 				} finally {
 					setIsCheckingEnrollment(false);
@@ -137,33 +141,6 @@ const CourseEnroll = ({ type, course }) => {
 
 		checkEnrollment();
 	}, [userId, courseId]);
-
-	const handlePaymobEnroll = async () => {
-		if (!session) {
-			creteAlert("error", "You need to sign in to proceed with enrollment.");
-			router.push("/login");
-		} else {
-			setLoading(true);
-			setError("");
-
-			try {
-				const items = [{
-					name: title,
-					price: parseFloat(price).toFixed(2),
-					image: thumbnail,
-					quantity: 1,
-					courseId,
-				}];
-
-				await initializePaymobPayment(items, userId, session.user.email);
-			} catch (error) {
-				console.error("Paymob enrollment error:", error);
-				setError("Payment initialization failed. Please try again.");
-			} finally {
-				setLoading(false);
-			}
-		}
-	};
 
 	const handleEnrollClick = async () => {
 		if (!session) {
@@ -202,7 +179,6 @@ const CourseEnroll = ({ type, course }) => {
 					throw new Error("Failed to create checkout session.");
 				}
 			} catch (error) {
-				console.error("Checkout error:", error);
 				setError(typeof error === 'string' ? error : error?.message || "Something went wrong during checkout.");
 			} finally {
 				setLoading(false);
@@ -307,26 +283,15 @@ const CourseEnroll = ({ type, course }) => {
 								Go to Course
 							</button>
 						) : (
-							<>
-								<button
-									onClick={handleEnrollClick}
-									className={`w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px mb-10px leading-1.8 border border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark ${
-										loading ? "cursor-not-allowed opacity-50" : ""
-									}`}
-									disabled={loading}
-								>
-									{loading ? "Processing..." : "Pay with Stripe"}
-								</button>
-								<button
-									onClick={handlePaymobEnroll}
-									className={`w-full text-size-15 text-whiteColor bg-primaryColor px-25px py-10px mb-10px leading-1.8 border border-primaryColor hover:text-primaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-primaryColor dark:hover:bg-whiteColor-dark ${
-										loading ? "cursor-not-allowed opacity-50" : ""
-									}`}
-									disabled={loading}
-								>
-									{loading ? "Processing..." : "Pay with Paymob"}
-								</button>
-							</>
+							<button
+								onClick={handleEnrollClick}
+								className={`w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px mb-10px leading-1.8 border border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark ${
+									loading ? "cursor-not-allowed opacity-50" : ""
+								}`}
+								disabled={loading}
+							>
+								{loading ? "Processing..." : "Enroll Now"}
+							</button>
 						)}
 					</>
 				)}
@@ -367,7 +332,7 @@ const CourseEnroll = ({ type, course }) => {
 					type="submit"
 					className="w-full text-xl text-primaryColor bg-whiteColor px-25px py-10px mb-10px font-bold leading-1.8 border border-primaryColor hover:text-whiteColor hover:bg-primaryColor inline-block rounded group dark:bg-whiteColor-dark dark:text-whiteColor dark:hover:bg-primaryColor"
 				>
-					<i className="icofont-email"></i> {process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@meridian-lms.com'}
+					<i className="icofont-email"></i> training@meqmp.com
 				</button>
 			</div>
 		</div>
