@@ -108,30 +108,8 @@ const CartPrimary = () => {
     const data = await response.json();
     
     if (data.iframeUrl) {
-      // Open payment iframe in new window
-      const paymentWindow = window.open(
-        data.iframeUrl, 
-        'paymob_payment', 
-        'width=800,height=600,scrollbars=yes,resizable=yes'
-      );
-      
-      if (!paymentWindow) {
-        throw new Error('Please allow popups to complete payment');
-      }
-      
-      // Monitor payment completion
-      const checkPaymentStatus = setInterval(() => {
-        try {
-          if (paymentWindow.closed) {
-            clearInterval(checkPaymentStatus);
-            // Redirect to success page or refresh cart
-            router.push('/payProgress/success?payment_method=paymob');
-          }
-        } catch (e) {
-          // Cross-origin error, ignore
-        }
-      }, 1000);
-      
+      // Redirect to Paymob payment page directly
+      window.location.href = data.iframeUrl;
       return data;
     } else {
       throw new Error('Failed to initialize Paymob payment');

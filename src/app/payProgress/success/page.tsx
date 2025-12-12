@@ -13,6 +13,16 @@ const SuccessPage = () => {
     try {
       const method = searchParams.get('payment_method') || 'stripe';
       const order = searchParams.get('order_id');
+      const success = searchParams.get('success');
+      const hmac = searchParams.get('hmac');
+      
+      // For Paymob, check if payment was actually successful
+      if (method === 'paymob') {
+        if (success !== 'true' && !hmac) {
+          setError("Payment was not completed. Please try again.");
+          return;
+        }
+      }
       
       setPaymentMethod(method);
       setOrderId(order);
