@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const { items, userId, email, phone } = await req.json();
+    
+    console.log('Received items:', JSON.stringify(items, null, 2));
 
     console.log('Secret Key:', process.env.PAYMOB_SECRET_KEY?.substring(0, 10) + '...');
     console.log('Public Key:', process.env.PAYMOB_PUBLIC_KEY?.substring(0, 10) + '...');
