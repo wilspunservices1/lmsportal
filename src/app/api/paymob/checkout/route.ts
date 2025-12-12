@@ -12,7 +12,8 @@ export async function POST(req: Request) {
     const publicKey = process.env.PAYMOB_PUBLIC_KEY;
 
     // Create payment intention using official Paymob API (amount in cents)
-    const totalAmountCents = Math.round(items.reduce((sum: number, item: any) => sum + (parseFloat(item.price) * 100), 0));
+    const totalAmountCents = Math.max(10, Math.round(items.reduce((sum: number, item: any) => sum + (parseFloat(item.price) * 100), 0)));
+    console.log('Total amount in cents:', totalAmountCents);
     
     const intentResponse = await fetch('https://ksa.paymob.com/v1/intention', {
       method: 'POST',
@@ -31,7 +32,7 @@ export async function POST(req: Request) {
         },
         items: items.map((item: any) => ({
           name: item.name.substring(0, 50), // Max 50 chars
-          amount: Math.round(parseFloat(item.price) * 100), // Amount in cents as integer
+          amount: Math.max(10, Math.round(parseFloat(item.price) * 100)), // Minimum 10 cents
           description: `Course ID: ${item.courseId} - ${item.name}`.substring(0, 255), // Max 255 chars
           quantity: 1
         })),
