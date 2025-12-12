@@ -55,10 +55,13 @@ export async function POST(req: Request) {
     });
     
     const intentData = await intentResponse.json();
-    console.log('Intent Response:', intentData);
+    console.log('Intent Response Status:', intentResponse.status);
+    console.log('Intent Response:', JSON.stringify(intentData, null, 2));
     
     if (!intentResponse.ok) {
-      throw new Error(`Payment intent failed: ${intentData.detail || 'Unknown error'}`);
+      console.error('Paymob API Error:', intentData);
+      const errorMessage = intentData.detail || intentData.message || JSON.stringify(intentData) || 'Unknown error';
+      throw new Error(`Payment intent failed: ${errorMessage}`);
     }
 
     return NextResponse.json({
