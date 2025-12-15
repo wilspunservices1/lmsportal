@@ -6,7 +6,7 @@ import { formatDate } from "@/actions/formatDate";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import useSweetAlert from "@/hooks/useSweetAlert";
-import getStripe from "@/utils/loadStripe";
+
 import { useState, useEffect } from "react";
 import SkeletonButton from "@/components/Loaders/BtnSkeleton";
 import Link from "next/link";
@@ -151,8 +151,6 @@ const CourseEnroll = ({ type, course }) => {
 			setError("");
 
 			try {
-				const stripe = await getStripe();
-
 				const items = [
 					{
 						name: title,
@@ -165,18 +163,22 @@ const CourseEnroll = ({ type, course }) => {
 
 				const userEmail = session.user.email;
 
-				const response = await fetch("/api/stripe/checkout", {
+				const response = await fetch("/api/paymob/checkout", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ items, email: userEmail, userId }),
+					body: JSON.stringify({ items, userId, email: userEmail, phone: "+966500000000" }),
 				});
 
-				const { sessionId } = await response.json();
+				if (!response.ok) {
+					throw new Error("Failed to create Paymob checkout session");
+				}
 
-				if (sessionId) {
-					await stripe.redirectToCheckout({ sessionId });
+				const data = await response.json();
+
+				if (data.iframeUrl) {
+					window.location.href = data.iframeUrl;
 				} else {
-					throw new Error("Failed to create checkout session.");
+					throw new Error("Failed to initialize Paymob payment");
 				}
 			} catch (error) {
 				setError(typeof error === 'string' ? error : error?.message || "Something went wrong during checkout.");
