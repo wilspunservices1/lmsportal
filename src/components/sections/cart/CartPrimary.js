@@ -5,7 +5,6 @@ import { useCartContext } from "@/contexts/CartContext";
 import useSweetAlert from "@/hooks/useSweetAlert";
 import countTotalPrice from "@/libs/countTotalPrice";
 import Link from "next/link";
-import getStripe from "@/utils/loadStripe";
 import { initializePaymobPayment } from "@/utils/loadPaymob";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
@@ -21,7 +20,7 @@ const CartPrimary = () => {
   const creteAlert = useSweetAlert();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('stripe');
+  const [paymentMethod, setPaymentMethod] = useState('paymob');
   const router = useRouter();
   const { currency } = useCurrency();
 
@@ -54,37 +53,7 @@ const CartPrimary = () => {
     }
   };
 
-  // Function to handle Stripe checkout
-  const handleStripeCheckout = async (items, userEmail) => {
-    const stripe = await getStripe();
 
-
-
-    const response = await fetch(`/api/stripe/checkout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        items,
-        email: userEmail,
-        userId,
-        currency: currency.toLowerCase(),
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to create Stripe checkout session");
-    }
-
-    const { sessionId } = await response.json();
-
-    if (sessionId) {
-      await stripe.redirectToCheckout({ sessionId });
-    } else {
-      throw new Error("Failed to create Stripe checkout session");
-    }
-  };
 
   // Function to handle Paymob checkout
   const handlePaymobCheckout = async (items, userEmail, phone) => {
@@ -146,11 +115,7 @@ const CartPrimary = () => {
 
       const userEmail = session.user.email;
       
-      if (paymentMethod === 'stripe') {
-        await handleStripeCheckout(items, userEmail);
-      } else if (paymentMethod === 'paymob') {
-        await handlePaymobCheckout(items, userEmail);
-      }
+      await handlePaymobCheckout(items, userEmail);
     } catch (error) {
       creteAlert(
         "error",
@@ -292,6 +257,7 @@ const CartPrimary = () => {
                   <PriceDisplay usdPrice={totalPrice || 0} />
                 </span>
               </h4>
+
               <PaymentMethodSelector 
                 selectedMethod={paymentMethod}
                 onMethodChange={setPaymentMethod}
