@@ -4,7 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/db"; // Ensure this path is correct
 // import bcrypt from "bcrypt";
 import bcrypt from "bcryptjs";
-import { user } from "@/db/schemas/user";
+import { user as userSchema } from "@/db/schemas/user";
 import { eq, sql } from "drizzle-orm";
 import { getServerSession } from "next-auth/next";
 import { v4 as uuidv4 } from "uuid";
@@ -34,7 +34,7 @@ export const options = {
 				// Get all users and find match manually (fallback approach)
 				const allUsers = await db
 					.select()
-					.from(user);
+					.from(userSchema);
 				
 				// Find user with case-insensitive email match
 				const foundUser = allUsers.find(
@@ -65,36 +65,50 @@ export const options = {
 				const email = user.email ? user.email.toLowerCase() : "";
 
 				// Check if the user already exists in the database (case-insensitive)
-				let foundUser = await db
-					.select()
-					.from(user)
-					.where(sql`LOWER(${user.email}) = ${email}`)
-					.limit(1)
-					.then((res) => res[0]);
+				const allUsers = await db.select().from(userSchema);
+				let foundUser = allUsers.find(u => u.email.toLowerCase() === email);
 
 				if (!foundUser) {
-					// If the user doesn't exist, create a new user
-					foundUser = await db
-						.insert(user)
-						.values({
-							email: email, // Store email in lowercase
-							username: profile.login || profile.name || email.split("@")[0], // Fallback to email prefix if no username
-							name: profile.name || email.split("@")[0],
-							image: profile.picture || user.image,
-							roles: ["user"], // ✅ Fix: just use array, Drizzle will handle conversion
-							isVerified: true, // Consider OAuth users as verified
-							activationToken: uuidv4(),
-						})
-						.returning()
-						.then((res) => res[0]);
+					try {
+						const uniqueIdentifier = uuidv4();
+						const hashedPassword = await bcrypt.hash(uuidv4(), 10);
+						const baseUsername = (profile?.name || email.split("@")[0]).replace(/\s+/g, "").toLowerCase();
+						
+						await db.insert(userSchema).values({
+							uniqueIdentifier,
+							email,
+							password: hashedPassword,
+							username: `${baseUsername}${Date.now()}`,
+							name: profile?.name || email.split("@")[0],
+							image: profile?.picture,
+							roles: JSON.stringify(["user"]),
+							isVerified: true,
+							activationToken: null,
+						});
+					} catch (error) {
+						console.error('OAuth user creation error:', error);
+						return false;
+					}
 				}
 			}
 			return true;
 		},
-		async jwt({ token, user }) {
-			if (user) {
-				token.id = user.id;
-				token.roles = user.roles; // Updated to handle multiple roles as JSON
+		async jwt({ token, user, account }) {
+			if (user && account) {
+				if (account.provider === "google" || account.provider === "github") {
+					// For OAuth users, get the database user ID
+					const email = user.email?.toLowerCase();
+					const allUsers = await db.select().from(userSchema);
+					const dbUser = allUsers.find(u => u.email.toLowerCase() === email);
+					if (dbUser) {
+						token.id = dbUser.id;
+						token.roles = dbUser.roles;
+					}
+				} else {
+					// For credentials login
+					token.id = user.id;
+					token.roles = user.roles;
+				}
 			}
 			return token;
 		},
