@@ -16,6 +16,8 @@ const LoginForm = ({ csrfToken, switchToSignUp }) => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showResendButton, setShowResendButton] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
 
   const signInOAuth = async (provider) => {
     try {
@@ -30,6 +32,33 @@ const LoginForm = ({ csrfToken, switchToSignUp }) => {
     } catch (err) {
       setLoading("Login Now");
       setError(err.message || "An unexpected error occurred");
+    }
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      setResendLoading(true);
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          email, 
+          resendOnly: true 
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setError("Verification email sent! Please check your inbox and spam folder.");
+        setShowResendButton(false);
+      } else {
+        setError(data.message || "Failed to send verification email");
+      }
+    } catch (err) {
+      setError("Failed to send verification email. Please try again.");
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -50,12 +79,16 @@ const LoginForm = ({ csrfToken, switchToSignUp }) => {
       if (res?.error) {
         if (res.error.includes("verify your email")) {
           setError("Please verify your email before logging in.");
+          setShowResendButton(true);
         } else if (res.error.includes("No user found")) {
           setError("No user found with this email.");
+          setShowResendButton(false);
         } else if (res.error.includes("Password does not match")) {
           setError("Invalid email or password.");
+          setShowResendButton(false);
         } else {
           setError("An unexpected error occurred. Please try again.");
+          setShowResendButton(false);
         }
       } else {
         router.push("/");
@@ -179,6 +212,16 @@ const LoginForm = ({ csrfToken, switchToSignUp }) => {
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                 {error}
+                {showResendButton && (
+                  <button
+                    type="button"
+                    onClick={handleResendVerification}
+                    disabled={resendLoading}
+                    className="ml-2 text-blue-600 hover:text-blue-800 underline font-medium"
+                  >
+                    {resendLoading ? "Sending..." : "Resend verification email"}
+                  </button>
+                )}
               </div>
             )}
 

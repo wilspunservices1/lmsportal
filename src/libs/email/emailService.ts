@@ -6,11 +6,20 @@ import path from "path";
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT as string, 10),
-  secure: true, // true for 465, false for other ports
+  secure: process.env.SMTP_PORT === '465',
   auth: {
-    user: process.env.SMTP_MAIL, // Your email address
-    pass: process.env.SMTP_PASSWORD, // Your email password
+    user: process.env.SMTP_MAIL,
+    pass: process.env.SMTP_PASSWORD,
   },
+  tls: {
+    rejectUnauthorized: false,
+    ciphers: 'SSLv3'
+  },
+  connectionTimeout: 60000,
+  greetingTimeout: 30000,
+  socketTimeout: 60000,
+  debug: true,
+  logger: true
 });
 
 // Function to load and process the HTML template
@@ -47,11 +56,18 @@ export async function sendEmail({
   }
 
   const mailOptions = {
-    from: process.env.SMTP_MAIL,
+    from: `"Meridian Learning Management System" <${process.env.SMTP_MAIL}>`,
     to,
     subject,
     text,
-    html, // Use the processed HTML template if available
+    html,
+    headers: {
+      'X-Mailer': 'Meridian LMS v1.0',
+      'Reply-To': process.env.SMTP_MAIL,
+      'List-Unsubscribe': '<mailto:unsubscribe@meqmp.com>',
+      'X-Entity-ID': 'MEQMP-LMS-001',
+      'Message-ID': `<${Date.now()}.${Math.random()}@meqmp.com>`
+    }
   };
 
   try {

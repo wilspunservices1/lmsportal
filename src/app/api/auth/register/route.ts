@@ -29,9 +29,66 @@ function generateUserName(fullName: string): string {
 export async function POST(req: Request) {
 	try {
 		const body = await req.json();
-		let { email, password, username } = body;
+		let { email, password, username, resendOnly } = body;
 
-		// Check for required fields
+		// Handle resend verification email request
+		if (resendOnly) {
+			if (!email) {
+				return NextResponse.json({ message: "Email is required" }, { status: 400 });
+			}
+
+			email = email.toLowerCase();
+
+			// Find existing unverified user
+			const existingUser = await db
+				.select()
+				.from(user)
+				.where(sql`LOWER(${user.email}) = ${email}`)
+				.then((res) => res[0]);
+
+			if (!existingUser) {
+				return NextResponse.json({ message: "User not found" }, { status: 404 });
+			}
+
+			if (existingUser.isVerified) {
+				return NextResponse.json({ message: "Email is already verified" }, { status: 400 });
+			}
+
+			// Generate new activation token
+			const newActivationToken = uuidv4();
+
+			// Update user with new token
+			await db
+				.update(user)
+				.set({ activationToken: newActivationToken })
+				.where(eq(user.id, existingUser.id));
+
+			// Send verification email
+			try {
+				console.log('Sending verification email to:', email);
+				console.log('Activation link:', `${BASE_URL}/pass/activate?token=${newActivationToken}`);
+				
+				const emailResult = await sendEmail({
+					to: email,
+					subject: "Email Verification Required - Meridian LMS",
+					text: "Please verify your email address to complete registration.",
+					templateName: "activationEmailTemplate",
+					templateData: {
+						name: existingUser.name || existingUser.username,
+						activationLink: `${BASE_URL}/pass/activate?token=${newActivationToken}`,
+					},
+				});
+				
+				console.log('Email sent successfully:', emailResult.messageId);
+			} catch (emailError) {
+				console.error('Failed to send verification email:', emailError);
+				return NextResponse.json({ message: "Failed to send verification email" }, { status: 500 });
+			}
+
+			return NextResponse.json({ message: "Verification email sent successfully" }, { status: 200 });
+		}
+
+		// Check for required fields for registration
 		if (!email || !password || !username) {
 			return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
 		}
@@ -59,18 +116,24 @@ export async function POST(req: Request) {
 		const uniqueIdentifier = await generateUniqueIdentifier("user");
 
 		// Send activation email using the centralized sendEmail function
-		const emailSent = await sendEmail({
-			to: email,
-			subject: "Activate Your Account",
-			text: "Please activate your account.",
-			templateName: "activationEmailTemplate",
-			templateData: {
-				name: username,
-				activationLink: `${BASE_URL}/pass/activate?token=${activationToken}`,
-			},
-		});
-
-		if (!emailSent) {
+		try {
+			console.log('Sending registration email to:', email);
+			console.log('Activation link:', `${BASE_URL}/pass/activate?token=${activationToken}`);
+			
+			const emailSent = await sendEmail({
+				to: email,
+				subject: "Email Verification Required - Meridian LMS",
+				text: "Please verify your email address to complete registration.",
+				templateName: "activationEmailTemplate",
+				templateData: {
+					name: username,
+					activationLink: `${BASE_URL}/pass/activate?token=${activationToken}`,
+				},
+			});
+			
+			console.log('Registration email sent successfully:', emailSent.messageId);
+		} catch (emailError) {
+			console.error('Failed to send registration email:', emailError);
 			return NextResponse.json(
 				{ message: "Failed to send verification email. Try again later." },
 				{ status: 500 }

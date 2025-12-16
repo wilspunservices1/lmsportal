@@ -102,17 +102,21 @@ const SignUpForm = ({ switchToLogin }) => {
     setFormState({ ...formState, isLoading: true, error: "", success: "" });
 
     try {
-      const res = await fetch("/api/auth/resend-activation", {
+      const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formState.email }),
+        body: JSON.stringify({ 
+          email: formState.email,
+          resendOnly: true 
+        }),
       });
 
       const data = await res.json();
       if (res.ok) {
         setFormState({
           ...formState,
-          success: "A new activation link has been sent to your email!",
+          success: "Verification email sent! Please check your inbox and spam folder.",
+          error: "",
           showResend: false,
           isLoading: false,
         });
@@ -120,6 +124,7 @@ const SignUpForm = ({ switchToLogin }) => {
         setFormState({
           ...formState,
           error: data.message || "Failed to resend activation email.",
+          success: "",
           isLoading: false,
         });
       }
