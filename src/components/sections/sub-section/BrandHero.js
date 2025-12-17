@@ -73,29 +73,31 @@ const BrandHero = () => {
   const allBrands = [...brands, ...brands];
 
   return (
-    <div>
+    <div className="py-6 md:py-8">
       <div data-aos="fade-up">
-        <div className="container2-md flex items-center justify-center bg-white dark:bg-whiteColor-dark rounded-md mx-auto md:-translate-y-1/2 w-full shadow-brand overflow-hidden">
-          {/* Marquee Container */}
-          <motion.div
-            className="flex"
-            initial={{ x: 0 }} // Start from the left
-            animate={{ x: "-50%" }} // Move to the left by 50% of the container width
-            transition={{
-              ease: "linear",
-              duration: 20,
-              repeat: Infinity, // Loop infinitely
-            }}
-          >
-            {/* Render each brand twice for seamless looping */}
-            {allBrands.map((brand, idx) => (
-              <div key={idx} className="flex-shrink-0 px-4 py-5">
-                <a href="#">
-                  <Image src={brand} alt={`brand${idx + 1}`} width={100} height={50} />
-                </a>
-              </div>
-            ))}
-          </motion.div>
+        <div className="w-4/5 mx-auto">
+          <div className="bg-white dark:bg-whiteColor-dark rounded-md shadow-brand overflow-hidden py-4">
+            {/* Marquee Container */}
+            <motion.div
+              className="flex items-center"
+              initial={{ x: 0 }}
+              animate={{ x: "-50%" }}
+              transition={{
+                ease: "linear",
+                duration: 20,
+                repeat: Infinity,
+              }}
+            >
+              {/* Render each brand twice for seamless looping */}
+              {allBrands.map((brand, idx) => (
+                <div key={idx} className="flex-shrink-0 flex items-center justify-center px-8 md:px-12">
+                  <a href="#" className="block">
+                    <Image src={brand} alt={`brand${idx + 1}`} width={100} height={50} className="object-contain" />
+                  </a>
+                </div>
+              ))}
+            </motion.div>
+          </div>
         </div>
       </div>
     </div>

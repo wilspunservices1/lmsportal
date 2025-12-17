@@ -45,6 +45,7 @@ export const options = {
 					throw new Error("No user found with this email.");
 				}
 
+				// Skip verification check if user was created via OAuth (no activation token)
 				if (!foundUser.isVerified && foundUser.activationToken) {
 					throw new Error("Please verify your email before logging in.");
 				}
