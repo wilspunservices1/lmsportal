@@ -236,7 +236,7 @@ const LessonPrimary = ({ lessonId }) => {
 											title={lesson.title}
 											onComplete={handleMarkAsComplete}
 											isCompleted={isCompleted}
-											videoDuration={parseInt(lesson.duration) * 60}
+											videoDuration={parseInt(lesson.duration)}
 										/>
 									) : (
 										<div className="flex items-center justify-center bg-black aspect-video">

@@ -3,8 +3,8 @@
 import { useState } from 'react';
 
 interface PaymentMethodSelectorProps {
-  selectedMethod: 'paymob';
-  onMethodChange: (method: 'paymob') => void;
+  selectedMethod: 'paymob' | 'stripe';
+  onMethodChange: (method: 'paymob' | 'stripe') => void;
 }
 
 const PaymentMethodSelector = ({ selectedMethod, onMethodChange }: PaymentMethodSelectorProps) => {
@@ -37,6 +37,34 @@ const PaymentMethodSelector = ({ selectedMethod, onMethodChange }: PaymentMethod
                 </div>
                 <div className="text-sm text-contentColor dark:text-contentColor-dark">
                   Local payment methods, Mobile wallets
+                </div>
+              </div>
+            </div>
+          </label>
+        </div>
+
+        {/* Stripe Option */}
+        <div className="flex items-center gap-3 p-4 border border-borderColor dark:border-borderColor-dark rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <input
+            type="radio"
+            id="stripe"
+            name="paymentMethod"
+            value="stripe"
+            checked={selectedMethod === 'stripe'}
+            onChange={() => onMethodChange('stripe')}
+            className="w-4 h-4 text-primaryColor"
+          />
+          <label htmlFor="stripe" className="flex items-center gap-3 cursor-pointer flex-1">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                <span className="text-white text-xs font-bold">S</span>
+              </div>
+              <div>
+                <div className="font-medium text-blackColor dark:text-blackColor-dark">
+                  Stripe (Test Mode)
+                </div>
+                <div className="text-sm text-contentColor dark:text-contentColor-dark">
+                  Credit/Debit Cards - Testing Only
                 </div>
               </div>
             </div>

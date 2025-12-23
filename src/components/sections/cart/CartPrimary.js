@@ -6,6 +6,7 @@ import useSweetAlert from "@/hooks/useSweetAlert";
 import countTotalPrice from "@/libs/countTotalPrice";
 import Link from "next/link";
 import { initializePaymobPayment } from "@/utils/loadPaymob";
+import getStripe from "@/utils/loadStripe";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -54,6 +55,33 @@ const CartPrimary = () => {
   };
 
 
+
+  // Function to handle Stripe checkout
+  const handleStripeCheckout = async (items, userEmail) => {
+    const stripe = await getStripe();
+
+    const response = await fetch('/api/stripe/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        items, 
+        email: userEmail,
+        userId
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create Stripe checkout session');
+    }
+
+    const { sessionId } = await response.json();
+    
+    if (sessionId) {
+      await stripe.redirectToCheckout({ sessionId });
+    } else {
+      throw new Error('Failed to initialize Stripe payment');
+    }
+  };
 
   // Function to handle Paymob checkout
   const handlePaymobCheckout = async (items, userEmail, phone) => {
@@ -115,7 +143,11 @@ const CartPrimary = () => {
 
       const userEmail = session.user.email;
       
-      await handlePaymobCheckout(items, userEmail);
+      if (paymentMethod === 'stripe') {
+        await handleStripeCheckout(items, userEmail);
+      } else {
+        await handlePaymobCheckout(items, userEmail);
+      }
     } catch (error) {
       creteAlert(
         "error",

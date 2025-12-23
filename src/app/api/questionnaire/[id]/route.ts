@@ -132,6 +132,8 @@ export async function PUT(
     const body = await request.json();
     const { title, courseIds, questions: questionData, isRequired, minPassScore } = body;
 
+    console.log('PUT questionnaire - courseIds:', courseIds);
+
     if (!title || !courseIds || courseIds.length === 0 || !questionData || questionData.length === 0) {
       return NextResponse.json(
         { error: 'Title, courseIds, and at least one question are required' },
@@ -172,17 +174,27 @@ export async function PUT(
         )
       );
 
-      // Update course_questionnaires: delete old entries and insert new ones
+      // Update course_questionnaires: delete old entries first
+      console.log('Deleting old course assignments for questionnaire:', params.id);
       await tx.delete(courseQuestionnaires)
         .where(eq(courseQuestionnaires.questionnaireId, params.id));
 
-      const courseQuestionnaireValues = courseIds.map((courseId: string) => ({
-        courseId,
-        questionnaireId: params.id,
-        isActive: true,
-      }));
-
-      await tx.insert(courseQuestionnaires).values(courseQuestionnaireValues);
+      // Insert new course assignments
+      if (courseIds.length > 0) {
+        console.log('Inserting new course assignments:', courseIds);
+        for (const courseId of courseIds) {
+          try {
+            await tx.insert(courseQuestionnaires).values({
+              courseId,
+              questionnaireId: params.id,
+              isActive: true,
+            });
+          } catch (insertError) {
+            console.error('Error inserting course assignment:', insertError);
+            // Continue with next course if one fails
+          }
+        }
+      }
 
       return { questionnaire: updatedQuestionnaire, questions: updatedQuestions };
     });
@@ -194,7 +206,7 @@ export async function PUT(
   } catch (error) {
     console.error('Error updating questionnaire:', error instanceof Error ? error.message : error);
     return NextResponse.json(
-      { error: 'Failed to update questionnaire' },
+      { error: 'Failed to update questionnaire', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
