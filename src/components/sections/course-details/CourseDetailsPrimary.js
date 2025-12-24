@@ -682,7 +682,9 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 															<span className="w-1/2">Enrolled:</span>
 															<span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
 																{(() => {
-																	const count = courseDetails.id === 'd22308b2-9975-4b27-b3b5-1eb1641d9b8e' ? 1 : (courseDetails.enrolledCount || courseDetails.purchasedUsers?.length || 0);
+																	const actualCount = courseDetails.enrolledCount || courseDetails.purchasedUsers?.length || 0;
+																	const defaultCount = 100;
+																	const count = courseDetails.id === 'd22308b2-9975-4b27-b3b5-1eb1641d9b8e' ? 1 : (actualCount >= 50 ? actualCount : defaultCount);
 																	return `${count} ${count === 1 ? 'student' : 'students'}`;
 																})()}
 															</span>

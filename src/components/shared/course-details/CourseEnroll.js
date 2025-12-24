@@ -302,7 +302,7 @@ const CourseEnroll = ({ type, course }) => {
 			<ul>
 				<li className="flex items-center justify-between py-10px border-b border-borderColor dark:border-borderColor-dark">
 					<p className="text-sm font-medium text-contentColor dark:text-contentColor-dark leading-1.8">
-						Developed By:
+						Created By:
 					</p>
 					<p className="text-xs text-contentColor dark:text-contentColor-dark px-10px py-6px bg-borderColor dark:bg-borderColor-dark rounded-full leading-13px">
 						Meridian

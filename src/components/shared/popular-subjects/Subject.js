@@ -1,13 +1,44 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const Subject = ({ subject, type }) => {
   const { title, desc, navButton, svg, translate, image, id, category } =
     subject;
-  const path = `/courses?category=${
+  const [hasCourses, setHasCourses] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const checkCourses = async () => {
+      try {
+        const response = await fetch(`/api/courses?category=${category}&isPublished=true&limit=1`);
+        const data = await response.json();
+        setHasCourses(data.total > 0);
+      } catch (error) {
+        console.error('Error checking courses:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    if (category) {
+      checkCourses();
+    } else {
+      setIsLoading(false);
+    }
+  }, [category]);
+  
+  const path = hasCourses ? `/courses?category=${
     category ? category.split(" ").join("_").toLowerCase() : "#"
-  }`;
+  }` : "#";
+  
+  const handleClick = (e) => {
+    if (!hasCourses) {
+      e.preventDefault();
+      alert('Coming Soon! No courses available in this category yet.');
+    }
+  };
   return (
     <div data-aos="fade-up">
       <div className={translate ? "md:translate-y-[30px]" : ""}>

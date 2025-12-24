@@ -2,26 +2,21 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import Image from "next/image";
-import { useCallback } from "react";
-
-// Import your Google review images
-const reviewImages = [
-  { src: require("@/assets/images/testimonial/review1.png"), alt: "Google review 1" },
-  { src: require("@/assets/images/testimonial/review2.png"), alt: "Google review 2" },
-  { src: require("@/assets/images/testimonial/review3.png"), alt: "Google review 3" },
-  { src: require("@/assets/images/testimonial/review4.png"), alt: "Google review 4" },
-  { src: require("@/assets/images/testimonial/review5.png"), alt: "Google review 5" },
-  { src: require("@/assets/images/testimonial/review6.png"), alt: "Google review 6" },
-  { src: require("@/assets/images/testimonial/review7.png"), alt: "Google review 7" },
-  { src: require("@/assets/images/testimonial/review8.png"), alt: "Google review 8" },
-  { src: require("@/assets/images/testimonial/review9.png"), alt: "Google review 9" },
-  { src: require("@/assets/images/testimonial/review10.png"), alt: "Google review 10" },
-  { src: require("@/assets/images/testimonial/review11.png"), alt: "Google review 11" },
-  { src: require("@/assets/images/testimonial/review12.png"), alt: "Google review 12" },
-  { src: require("@/assets/images/testimonial/review13.png"), alt: "Google review 13" }
-];
+import { useCallback, useEffect, useState } from "react";
 
 const TestimonialsSlider = () => {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/google-reviews')
+      .then(res => res.json())
+      .then(data => {
+        setReviews(data.reviews || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
   // Style objects
   const containerStyle = {
     position: 'relative',
@@ -87,6 +82,9 @@ const TestimonialsSlider = () => {
   const handleMouseLeave = useCallback((e) => {
     e.currentTarget.style.backgroundColor = '#e5e7eb';
   }, []);
+
+  if (loading) return <div className="text-center py-10">Loading reviews...</div>;
+  if (reviews.length === 0) return <div className="text-center py-10">No reviews available</div>;
 
   return (
     <div style={containerStyle}>

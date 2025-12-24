@@ -69,6 +69,10 @@ export async function POST(req: NextRequest) {
       console.log('Current enrolled courses type:', typeof currentEnrolledCourses);
       console.log('Current enrolled courses:', currentEnrolledCourses);
 
+      // Check if this is a renewal
+      const isRenewal = transaction.order.extras?.isRenewal === 'true';
+      console.log('🔄 Is Renewal (Paymob):', isRenewal);
+
       // Get course IDs from order items
       const courseIds = transaction.order.items.map((item: any) => {
         // Extract course ID from item description or name
@@ -84,6 +88,7 @@ export async function POST(req: NextRequest) {
           courseId: courses.id,
           name: courses.title,
           price: courses.price,
+          accessDurationMonths: courses.accessDurationMonths,
         })
         .from(courses)
         .where(inArray(courses.id, courseIds));
@@ -109,23 +114,47 @@ export async function POST(req: NextRequest) {
       });
 
       // **Prepare the Courses to be Added to EnrolledCourses (same as Stripe)**
-      const newCourses = courseIds.map((courseId: string) => ({
-        courseId,
-        progress: 0,
-        completedLectures: [],
-      }));
+      const enrollmentDate = new Date();
+      const newCourses = courseIds.map((courseId: string) => {
+        const course = courseDetails.find(c => c.courseId === courseId);
+        const accessDuration = isRenewal ? 1 : (course?.accessDurationMonths ? parseInt(course.accessDurationMonths.toString()) : null);
+        
+        // Calculate expiry date
+        const expiryDate = new Date(enrollmentDate);
+        if (accessDuration) {
+          expiryDate.setMonth(expiryDate.getMonth() + accessDuration);
+        }
+        
+        return {
+          courseId,
+          progress: 0,
+          completedLectures: [],
+          enrollmentDate: enrollmentDate.toISOString(),
+          expiryDate: accessDuration ? expiryDate.toISOString() : null,
+        };
+      });
 
       // **Update EnrolledCourses, Only Adding New Courses**
       const existingCourses = currentEnrolledCourses || [];
-      const updatedEnrolledCourses = [
-        ...existingCourses,
-        ...newCourses.filter(
-          (newCourse) =>
-            !existingCourses.some(
-              (existingCourse: any) => existingCourse.courseId === newCourse.courseId
-            )
-        ),
-      ];
+      const updatedEnrolledCourses = isRenewal
+        ? existingCourses.map((ec: any) => {
+            if (courseIds.includes(ec.courseId)) {
+              const newExpiry = new Date();
+              newExpiry.setMonth(newExpiry.getMonth() + 1);
+              console.log('✅ Renewing course (Paymob):', ec.courseId, 'New expiry:', newExpiry.toISOString());
+              return { ...ec, expiryDate: newExpiry.toISOString() };
+            }
+            return ec;
+          })
+        : [
+            ...existingCourses,
+            ...newCourses.filter(
+              (newCourse) =>
+                !existingCourses.some(
+                  (existingCourse: any) => existingCourse.courseId === newCourse.courseId
+                )
+            ),
+          ];
 
       console.log('Updating user enrolled courses:', { userId, updatedEnrolledCourses });
       

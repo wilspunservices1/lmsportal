@@ -6,6 +6,9 @@ export async function POST(req: Request) {
     
     console.log('Received items:', JSON.stringify(items, null, 2));
 
+    const isRenewal = items.some((item: any) => item.isRenewal);
+    console.log('Is Renewal:', isRenewal);
+
     console.log('Secret Key:', process.env.PAYMOB_SECRET_KEY?.substring(0, 10) + '...');
     console.log('Public Key:', process.env.PAYMOB_PUBLIC_KEY?.substring(0, 10) + '...');
     console.log('Integration ID:', process.env.PAYMOB_INTEGRATION_ID);
@@ -30,7 +33,9 @@ export async function POST(req: Request) {
         special_reference: `test_${Date.now()}`,
         extras: {
           three_d_secure: false,
-          userId: userId
+          userId: userId,
+          isRenewal: isRenewal.toString(),
+          courseIds: items.map((item: any) => item.courseId).join(',')
         },
         items: items.map((item: any) => ({
           name: item.name.substring(0, 50), // Max 50 chars

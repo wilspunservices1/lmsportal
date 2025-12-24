@@ -74,6 +74,7 @@ const CreateCoursePrimary = () => {
 
 	const [initialCourseData, setInitialCourseData] = useState(null);
 	const [courseId, setCourseId] = useState("");
+	const [accessDuration, setAccessDuration] = useState("");
 	const showAlert = useSweetAlert();
 	const router = useRouter();
 	const { id } = useParams();
@@ -101,6 +102,9 @@ const CreateCoursePrimary = () => {
 					);
 					setInitialChapters(sortedChapters);
 					setCourseId(data.data.id);
+					if (data.data.accessDurationMonths) {
+						setAccessDuration(data.data.accessDurationMonths.toString());
+					}
 				} catch (error) {
 					console.error("Error fetching course data:", error);
 				}
@@ -241,18 +245,26 @@ const CreateCoursePrimary = () => {
 	// ---------------------------- END: Final Exam Selection ---------------------------- //
 
 	// Function to update course status
-	const updateCourseStatus = async (courseId) => {
-		if (!courseId && initialCourseData) {
-			courseId = initialCourseData.id;
+	const updateCourseStatus = async (passedCourseId) => {
+		const finalCourseId = passedCourseId || courseId || id || initialCourseData?.id;
+		
+		if (!finalCourseId) {
+			showAlert("error", "Course ID is missing. Please save the course first.");
+			return;
 		}
 
 		try {
-			const response = await fetch(`/api/courses/${courseId}`, {
+			const updateData = { isPublished: true };
+			if (accessDuration) {
+				updateData.accessDurationMonths = parseInt(accessDuration);
+			}
+
+			const response = await fetch(`/api/courses/${finalCourseId}`, {
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ isPublished: true }),
+				body: JSON.stringify(updateData),
 			});
 
 			if (!response.ok) {
@@ -277,7 +289,7 @@ const CreateCoursePrimary = () => {
 			} else if (chapters[0]?.lectures[0]?.id) {
 				router.push(`/lessons/${chapters[0]?.lectures[0]?.id}`);
 			} else {
-				router.push(`/courses/${courseId}`);
+				router.push(`/courses/${finalCourseId}`);
 			}
 		} catch (error) {
 			console.error("Failed to publish course:", error.message);
@@ -463,26 +475,58 @@ const CreateCoursePrimary = () => {
 						</div>
 
 						{/* Preview and Publish Buttons */}
-						<div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-30px gap-y-5">
-							<div className="lg:col-start-1 lg:col-span-4">
-								<Link
-									href={`/lessons/${chapters[0]?.lectures[0]?.id}`}
-									className="text-whiteColor bg-primaryColor w-full p-13px hover:text-whiteColor hover:bg-secondaryColor inline-block rounded group text-center"
-									aria-label="Preview course"
-								>
-									Preview
-								</Link>
-							</div>
+						<div className="mt-10">
+							{/* Access Duration Section */}
+						<div className="bg-whiteColor dark:bg-whiteColor-dark shadow-accordion dark:shadow-accordion-dark rounded-md p-6 mb-5">
+							<h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+								Course Access Duration
+							</h3>
+							<select
+								id="accessDuration"
+								value={accessDuration}
+								onChange={(e) => setAccessDuration(e.target.value)}
+								className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primaryColor focus:border-primaryColor bg-white dark:bg-gray-800"
+							>
+								<option value="">Select duration</option>
+								<option value="1">1 Month</option>
+								<option value="2">2 Months</option>
+								<option value="3">3 Months</option>
+								<option value="4">4 Months</option>
+								<option value="5">5 Months</option>
+								<option value="6">6 Months</option>
+								<option value="7">7 Months</option>
+								<option value="8">8 Months</option>
+								<option value="9">9 Months</option>
+								<option value="10">10 Months</option>
+								<option value="11">11 Months</option>
+								<option value="12">12 Months</option>
+							</select>
+							<p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+								Students will get access for this duration from their enrollment date
+							</p>
+						</div>
 
-							<div className="lg:col-start-5 lg:col-span-8">
-								<button
-									type="button"
-									onClick={() => updateCourseStatus(courseId)}
-									className="text-whiteColor bg-primaryColor w-full p-13px hover:text-whiteColor hover:bg-secondaryColor inline-block rounded group dark:hover:text-whiteColor dark:hover:bg-secondaryColor text-center"
-									aria-label="Create course"
-								>
-									Publish Course
-								</button>
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-30px gap-y-5">
+								<div className="lg:col-start-1 lg:col-span-4">
+									<Link
+										href={`/lessons/${chapters[0]?.lectures[0]?.id}`}
+										className="text-whiteColor bg-primaryColor w-full p-13px hover:text-whiteColor hover:bg-secondaryColor inline-block rounded group text-center"
+										aria-label="Preview course"
+									>
+										Preview
+									</Link>
+								</div>
+
+								<div className="lg:col-start-5 lg:col-span-8">
+									<button
+										type="button"
+										onClick={() => updateCourseStatus(courseId)}
+										className="text-whiteColor bg-primaryColor w-full p-13px hover:text-whiteColor hover:bg-secondaryColor inline-block rounded group dark:hover:text-whiteColor dark:hover:bg-secondaryColor text-center"
+										aria-label="Create course"
+									>
+										Publish Course
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>

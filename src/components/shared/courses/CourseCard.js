@@ -127,7 +127,7 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
       )}
 
       <div className={`${type === "primaryMd" ? "" : "sm:px-15px mb-30px"} ${!isActive ? "opacity-80" : ""}`}>
-        <div className="p-15px bg-whiteColor shadow-brand dark:bg-darkdeep3-dark dark:shadow-brand-dark">
+        <div className="p-15px bg-whiteColor shadow-brand dark:bg-darkdeep3-dark dark:shadow-brand-dark h-[365px] flex flex-col">
           {/* Card image */}
           <div className="relative mb-2">
             <Link
@@ -174,7 +174,7 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
           </div>
 
           {/* Card content */}
-          <div>
+          <div className="flex-1 flex flex-col justify-between">
             <div className="grid grid-cols-2 mb-3">
               <div className="flex items-center">
                 <div>
@@ -210,8 +210,9 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
             </h5>
 
             {/* Show price or "Go to Course" button based on enrollment status */}
+            <div className="mt-auto">
             {!isEnrolled ? (
-              <div className="text-lg font-semibold text-primaryColor mb-4">
+              <div className="text-lg font-semibold text-primaryColor mb-4" style={{display: 'none'}}>
                 <PriceDisplay usdPrice={parseFloat(price)} />
                 <del className="text-sm text-lightGrey4 font-semibold ml-1">
                   / <PriceDisplay usdPrice={parseFloat(estimatedPrice)} />
@@ -240,6 +241,7 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
                 )}
               </div>
             )}
+            </div>
           </div>
 
           {/* Course Progress */}

@@ -110,13 +110,13 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
     setIsLoading(true);
     setError(null);
     try {
-      // Fetch filters considering only published courses
-      const response = await fetch(`/api/courses/filters?isPublished=true`);
+      // Add timestamp to prevent caching
+      const response = await fetch(`/api/courses/filters?isPublished=true&t=${Date.now()}`);
       if (!response.ok) {
         throw new Error("Failed to fetch filters");
       }
       const filterData = await response.json();
-      setFilters(filterData); // Store filter data in state as an array
+      setFilters(filterData);
     } catch (error) {
       setError(error.message || "An unknown error occurred");
     } finally {

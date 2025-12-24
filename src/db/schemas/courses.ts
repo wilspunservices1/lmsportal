@@ -7,6 +7,7 @@ import {
   timestamp,
   pgTable,
   json,
+  integer,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, InferInsertModel, sql } from "drizzle-orm";
 import { user } from "./user";
@@ -56,6 +57,7 @@ export const courses = pgTable("courses", {
     .default(sql`'[]'`)
     .notNull(),
   descriptionPdfUrl: text("descriptionPdfUrl"),
+  accessDurationMonths: integer("access_duration_months"),
 });
 
 export type Course = InferSelectModel<typeof courses>;

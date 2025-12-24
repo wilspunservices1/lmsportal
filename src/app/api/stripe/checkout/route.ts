@@ -7,9 +7,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 export async function POST(req: Request) {
   try {
-    const { items, userId, currency = 'usd' } = await req.json() // Assuming items, userId, and currency are passed in the body
+    const { items, userId, currency = 'usd' } = await req.json()
     
     console.log('Stripe API received:', { currency, items: items.length })
+
+    const isRenewal = items.some((item: any) => item.isRenewal);
 
     // Ensure price is passed as integer in cents and courseId is included
     const lineItems = items.map((item: any) => ({
@@ -37,6 +39,7 @@ export async function POST(req: Request) {
       metadata: {
         userId, // Pass userId for order processing
         courseIds: courseIds.join(','), // Join courseIds into a comma-separated string
+        isRenewal: isRenewal.toString(),
       },
     })
 

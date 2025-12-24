@@ -6,9 +6,9 @@ import MobileMenuOpen from "@/components/shared/buttons/MobileMenuOpen";
 import useIsTrue from "@/hooks/useIsTrue";
 import DropdownUser from "@/components/shared/user/DropdownUser";
 import { useSession } from "next-auth/react";
-import SearchField from "./_comp/SearchField"; // Updated SearchField component
-import { useSearch } from "@/contexts/SearchContext"; // Import Search context
-import SearchIcon from "./_comp/SearchIcon"; // Search Icon for the search button
+import SearchField from "./_comp/SearchField";
+import { useSearch } from "@/contexts/SearchContext";
+import SearchIcon from "./_comp/SearchIcon";
 import CurrencySelector from "@/components/shared/CurrencySelector";
 
 const NavbarRight = () => {
@@ -22,25 +22,28 @@ const NavbarRight = () => {
   const { toggleDrawer, isDrawerOpen } = useSearch(); // Access both toggleDrawer and isDrawerOpen from context
 
   return (
-    <div className="lg:col-start-10 lg:col-span-3">
+    <div className="w-full lg:col-start-10 lg:col-span-3 flex-shrink-0">
       <ul className="relative nav-list flex justify-end items-center">
-        {/* Search Icon to toggle search field */}
+        {/* Search Icon - desktop only */}
+        <button id="search-toggle" className="hidden" onClick={toggleDrawer}></button>
         {!isDrawerOpen && (
           <li
-            className="px-2 text-gray-500 flex items-center hover:text-gray-600 hover:cursor-pointer lg:px-2 lg:py-4 group"
+            className="hidden lg:flex px-2 text-gray-500 items-center hover:text-gray-600 hover:cursor-pointer lg:px-2 lg:py-4 group"
             onClick={toggleDrawer}
           >
             <SearchIcon />
           </li>
         )}
 
-        {/* Render the search field inline */}
+        {/* Render the search field inline - desktop only */}
         {isDrawerOpen && (
-          <SearchField />
+          <li className="hidden lg:block">
+            <SearchField />
+          </li>
         )}
 
-        {/* Currency Selector */}
-        <li className="px-2 lg:px-2 lg:py-4">
+        {/* Currency Selector - desktop only */}
+        <li className="hidden lg:block px-2 lg:px-2 lg:py-4">
           <CurrencySelector />
         </li>
 
@@ -60,7 +63,7 @@ const NavbarRight = () => {
 
         {/* Login button if no session */}
         {!session && (
-          <li className="hidden lg:block ml-2">
+          <li className="lg:ml-2">
             <Link
               href="/login"
               className="text-xs text-whiteColor bg-primaryColor block border-primaryColor border hover:text-primaryColor hover:bg-white px-3 py-2 rounded-standard dark:hover:bg-whiteColor-dark dark:hover:text-whiteColor whitespace-nowrap"
@@ -75,7 +78,7 @@ const NavbarRight = () => {
         )}
 
         {/* Mobile menu button */}
-        <li className="block lg:hidden">
+        <li className="block lg:hidden ml-2">
           <MobileMenuOpen />
         </li>
       </ul>

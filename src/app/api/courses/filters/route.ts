@@ -118,9 +118,14 @@ export async function GET(req: NextRequest) {
         } else {
           extras = course.extras as Extras;
         }
+        
         if (extras.languages && Array.isArray(extras.languages)) {
           languages = extras.languages.map(
-            (lang) => lang.charAt(0).toUpperCase() + lang.slice(1).toLowerCase()
+            (lang) => {
+              // Handle both lowercase and proper case
+              const langStr = typeof lang === 'string' ? lang : String(lang);
+              return langStr.charAt(0).toUpperCase() + langStr.slice(1).toLowerCase();
+            }
           );
         }
       }

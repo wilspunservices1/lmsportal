@@ -23,9 +23,10 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 	const [estimatedPrice, setEstimatedPrice] = useState("");
 	const [category, setCategory] = useState("");
 	const [offer, setOffer] = useState("paid");
+	const [skillLevel, setSkillLevel] = useState("Beginner");
 	const [imagePath, setImagePath] = useState("");
-	const [videoPath, setVideoPath] = useState(""); // Manage videoPath properly
-	const [description, setDescription] = useState(""); // Rich text description state
+	const [videoPath, setVideoPath] = useState("");
+	const [description, setDescription] = useState("");
 	const showAlert = useSweetAlert();
 	const { data: session } = useSession() as { data: Session | null };
 	const [isLoading, setIsLoading] = useState(false);
@@ -46,8 +47,9 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 			setEstimatedPrice(initialData.estimatedPrice?.toString() || "");
 			setCategory(initialData.categories || "");
 			setOffer(initialData.isFree ? "Free" : "paid");
+			setSkillLevel(initialData.skillLevel || "Beginner");
 			setImagePath(initialData.thumbnail || "");
-			setVideoPath(initialData.demoVideoUrl || ""); // Correctly set the initial video URL
+			setVideoPath(initialData.demoVideoUrl || "");
 			setDescription(initialData.description || "");
 		}
 	}, [initialData]);
@@ -127,7 +129,7 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 				: null,
 			isFree: offer === "Free",
 			tag: slug,
-			skillLevel: "Beginner",
+			skillLevel: skillLevel,
 			categories: category,
 			insName: session?.user?.name || "Unknown Instructor",
 			thumbnail: imagePath,
@@ -282,6 +284,24 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 									<option value="Web Application" />
 									<option value="Business Continuity" />
 								</datalist>
+								<i className="icofont-simple-down absolute top-1/2 right-3 -translate-y-1/2 block text-lg z-10"></i>
+							</div>
+						</div>
+						{/* Skill Level */}
+						<div>
+							<label className="text-xs uppercase text-placeholder block font-semibold text-opacity-50 leading-1.8">
+								Skill Level
+							</label>
+							<div className="bg-whiteColor relative rounded-md">
+								<select
+									className="text-base bg-transparent text-blackColor2 w-full p-13px pr-30px focus:outline-none block appearance-none relative z-20 focus:shadow-select rounded-md"
+									value={skillLevel}
+									onChange={(e) => setSkillLevel(e.target.value)}
+								>
+									<option value="Beginner">Beginner</option>
+									<option value="Intermediate">Intermediate</option>
+									<option value="Advanced">Advanced</option>
+								</select>
 								<i className="icofont-simple-down absolute top-1/2 right-3 -translate-y-1/2 block text-lg z-10"></i>
 							</div>
 						</div>

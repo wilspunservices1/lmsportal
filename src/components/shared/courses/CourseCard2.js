@@ -184,18 +184,8 @@ const CourseCard2 = ({ course, card, isList, isNotSidebar, enrolledCourses }) =>
 							</h4>
 							{/* Price or "Go to Course" button based on enrollment status */}
 							{!isEnrolled ? (
-								<div className="text-lg font-medium text-black-brerry-light mb-4">
-									${parseFloat(price).toFixed(2)}
-									<del className="text-sm text-lightGrey4 font-semibold">
-										/ ${parseFloat(estimatedPrice).toFixed(2)}
-									</del>
-									<span
-										className={`ml-6 text-base font-semibold ${
-											isFree ? "text-greencolor" : "text-secondaryColor3"
-										}`}
-									>
-										{isFree ? "Free" : "Paid"}
-									</span>
+								<div className="mb-4">
+									{/* Price hidden */}
 								</div>
 							) : (
 								<div className="mb-4">

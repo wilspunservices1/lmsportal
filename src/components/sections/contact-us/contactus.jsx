@@ -164,7 +164,7 @@ const ContactUs = () => {
                   <br />
                   Mississauga, Ontario, L5A 3S6
                   <br />
-                  Phone: +1 (647) 705 7675
+                  Phone: <a href="tel:+16477057675" className="text-blue-600 hover:underline">+1 (647) 705 7675</a>
                 </p>
               </div>
 
@@ -178,7 +178,7 @@ const ContactUs = () => {
                   <br />
                   King Saud Street, Nawras, Dammam
                   <br />
-                  Phone: +966 50 939 4640
+                  Phone: <a href="tel:+966509394640" className="text-blue-600 hover:underline">+966 50 939 4640</a>
                 </p>
               </div>
 
@@ -190,7 +190,7 @@ const ContactUs = () => {
                   <br />
                   Block 611 Area Al-Hamriyah
                   <br />
-                  Phone: +973 3808 7754
+                  Phone: <a href="tel:+97338087754" className="text-blue-600 hover:underline">+973 3808 7754</a>
                 </p>
               </div>
 

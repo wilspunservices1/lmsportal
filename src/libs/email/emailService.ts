@@ -41,26 +41,28 @@ export async function sendEmail({
   to,
   subject,
   text,
+  html,
   templateName,
   templateData,
 }: {
   to: string;
   subject: string;
-  text: string;
+  text?: string;
+  html?: string;
   templateName?: string;
   templateData?: Record<string, string>;
 }) {
-  let html = "";
+  let emailHtml = html || "";
   if (templateName && templateData) {
-    html = loadTemplate(templateName, templateData);
+    emailHtml = loadTemplate(templateName, templateData);
   }
 
   const mailOptions = {
     from: `"Meridian Learning Management System" <${process.env.SMTP_MAIL}>`,
     to,
     subject,
-    text,
-    html,
+    text: text || "",
+    html: emailHtml,
     headers: {
       'X-Mailer': 'Meridian LMS v1.0',
       'Reply-To': process.env.SMTP_MAIL,

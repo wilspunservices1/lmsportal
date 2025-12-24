@@ -143,6 +143,7 @@ export async function PATCH(
 			"isPublished",
 			"extras",
 			"certificateId",
+			"accessDurationMonths",
 		];
 
 		for (const field of fieldsToCheck) {

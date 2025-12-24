@@ -40,6 +40,9 @@ export async function POST(req: NextRequest) {
 
 		const userId = session.metadata?.userId ?? "";
 		const courseIdsString = session.metadata?.courseIds ?? "";
+		const isRenewal = session.metadata?.isRenewal === "true";
+
+		console.log("🔍 Webhook metadata:", { userId, courseIdsString, isRenewal });
 
 		if (!userId) {
 			console.error("Missing userId in session metadata");
@@ -68,6 +71,7 @@ export async function POST(req: NextRequest) {
 					courseId: courses.id,
 					name: courses.title,
 					price: courses.price,
+					accessDurationMonths: courses.accessDurationMonths,
 				})
 				.from(courses)
 				.where(inArray(courses.id, purchasedCourseIds));
@@ -112,11 +116,25 @@ export async function POST(req: NextRequest) {
 			);
 
 			// **Prepare the Courses to be Added to EnrolledCourses**
-			const newCourses = purchasedCourseIds.map((courseId: string) => ({
-				courseId,
-				progress: 0, // Initially set the progress to 0
-				completedLectures: [], // Initialize completedLectures as an empty array
-			}));
+			const enrollmentDate = new Date();
+			const newCourses = purchasedCourseIds.map((courseId: string) => {
+				const course = courseDetails.find(c => c.courseId === courseId);
+				const accessDuration = isRenewal ? 1 : (course?.accessDurationMonths ? parseInt(course.accessDurationMonths.toString()) : null);
+				
+				// Calculate expiry date
+				const expiryDate = new Date(enrollmentDate);
+				if (accessDuration) {
+					expiryDate.setMonth(expiryDate.getMonth() + accessDuration);
+				}
+				
+				return {
+					courseId,
+					progress: 0,
+					completedLectures: [],
+					enrollmentDate: enrollmentDate.toISOString(),
+					expiryDate: accessDuration ? expiryDate.toISOString() : null,
+				};
+			});
 
 			// **Fetch the User's Current EnrolledCourses**
 			const existingUser = await db
@@ -137,15 +155,26 @@ export async function POST(req: NextRequest) {
 			const existingCourses = existingUser[0].enrolledCourses || [];
 
 			// **Update EnrolledCourses, Only Adding New Courses**
-			const updatedEnrolledCourses = [
-				...existingCourses,
-				...newCourses.filter(
-					(newCourse) =>
-						!existingCourses.some(
-							(existingCourse: any) => existingCourse.courseId === newCourse.courseId
-						)
-				),
-			];
+			console.log("🔄 Is Renewal:", isRenewal);
+			const updatedEnrolledCourses = isRenewal
+				? existingCourses.map((ec: any) => {
+						if (purchasedCourseIds.includes(ec.courseId)) {
+							const newExpiry = new Date();
+							newExpiry.setMonth(newExpiry.getMonth() + 1);
+							console.log("✅ Renewing course:", ec.courseId, "New expiry:", newExpiry.toISOString());
+							return { ...ec, expiryDate: newExpiry.toISOString() };
+						}
+						return ec;
+				  })
+				: [
+					...existingCourses,
+					...newCourses.filter(
+						(newCourse) =>
+							!existingCourses.some(
+								(existingCourse: any) => existingCourse.courseId === newCourse.courseId
+							)
+					),
+				  ];
 
 			await db
 				.update(user)

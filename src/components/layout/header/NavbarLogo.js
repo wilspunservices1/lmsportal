@@ -4,7 +4,7 @@ import logo1 from "@/assets/images/logo/favicon.png";
 import Link from "next/link";
 const NavbarLogo = () => {
   return (
-    <div className="lg:col-start-1 lg:col-span-2">
+    <div className="lg:col-start-1 lg:col-span-2 flex-shrink-0">
       <Link href="/" className="flex items-center justify-center w-full py-2">
         <Image
           priority="false"

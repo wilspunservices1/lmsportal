@@ -1,5 +1,6 @@
 import FixedShadow from "@/components/shared/others/FixedShadow";
 import PreloaderPrimary from "@/components/shared/others/PreloaderPrimary";
+import dynamic from "next/dynamic";
 import { Hind, Inter } from "next/font/google";
 import "@/assets/css/icofont.min.css";
 import "@/assets/css/popup.css";
@@ -15,6 +16,8 @@ import { getSession } from "@/libs/auth";
 import { Providers } from './providers';
 import { CurrencyProvider } from '@/contexts/CurrencyContext';
 import CurrencyNotification from '@/components/shared/CurrencyNotification';
+
+const WhatsAppButton = dynamic(() => import('@/components/shared/others/WhatsAppButton'), { ssr: false });
 
 export const inter = Inter({
   subsets: ["latin"],
@@ -49,6 +52,7 @@ export default async function RootLayout({ children }) {
             <CurrencyProvider>
               {children}
               <CurrencyNotification />
+              <WhatsAppButton />
             </CurrencyProvider>
           </SessionProvider>
         </Providers>

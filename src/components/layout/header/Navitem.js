@@ -1,7 +1,11 @@
+"use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Navitem({ navItem, idx, children }) {
   const { name, path, dropdown, isRelative } = navItem;
+  const pathname = usePathname();
+  const isActive = pathname === path;
 
   return (
     <li key={idx} className={`nav-item group ${isRelative ? "relative" : ""}`}>
@@ -9,7 +13,10 @@ export default function Navitem({ navItem, idx, children }) {
         href={path}
         className="px-5 lg:px-10px 2xl:px-15px 3xl:px-5 py-10 lg:py-5 2xl:py-30px 3xl:py-10 leading-sm 2xl:leading-lg text-base lg:text-sm 2xl:text-base font-semibold block group-hover:text-primaryColor dark:text-whiteColor"
       >
-        {name} {dropdown && <i className="icofont-rounded-down"></i>}
+        <span className={`relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0.5 after:bg-primaryColor after:transition-all after:duration-300 group-hover:after:w-full ${isActive ? 'text-primaryColor after:!w-full' : ''}`}>
+          {name}
+        </span>
+        {dropdown && <i className="icofont-rounded-down"></i>}
       </Link>
 
       {/* dropdown */}
