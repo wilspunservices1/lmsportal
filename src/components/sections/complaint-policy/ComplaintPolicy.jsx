@@ -115,8 +115,8 @@ Record-Keeping
             <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
               <h3 className="font-semibold mb-4 text-xl">Saudi Arabia Office</h3>
               <div className="space-y-2 text-gray-700 dark:text-gray-300">
-                <p>Office 11, 3rd Floor Building 4236</p>
-                <p>King Saud Street, Nawras, Dammam</p>
+                <p>Ground Floor, Building 9</p>
+                <p>Askan District, Dammam, Saudi Arabia</p>
                 <p className="font-medium">Phone: +966 50 939 4640</p>
               </div>
             </div>

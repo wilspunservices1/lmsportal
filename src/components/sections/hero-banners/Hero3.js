@@ -3,9 +3,7 @@ const {
   default: TiltWrapper,
 } = require("@/components/shared/wrappers/TiltWrapper");
 const { default: Image } = require("next/image");
-import homebanner1 from "@/assets/images/herobanner/homebanner1.jpeg";
-import homebanner2 from "@/assets/images/herobanner/homebanner2.jpeg";
-import { useState, useEffect } from "react";
+import homebanner1 from "@/assets/images/about/about_10.png";
 import AppleImage from "@/components/shared/animaited-images/AppleImage";
 import BalbImage from "@/components/shared/animaited-images/BalbImage";
 import BookImage from "@/components/shared/animaited-images/BookImage";
@@ -16,15 +14,6 @@ import HeadingXl from "@/components/shared/headings/HeadingXl";
 import HreoName from "@/components/shared/section-names/HreoName";
 import Link from "next/link";
 const Hero3 = () => {
-  const [currentImage, setCurrentImage] = useState(0);
-  const images = [homebanner1, homebanner2];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % 2);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
   return (
     <section data-aos="fade-up">
       {/* banner section */}
@@ -63,16 +52,13 @@ const Hero3 = () => {
                   {/* banner right */}
             <div data-aos="fade-up">
               <TiltWrapper>
-                <div className="tilt relative">
-                  {images.map((img, idx) => (
-                    <Image
-                      key={idx}
-                      className={`w-full rounded-lg transition-opacity duration-1000 ${idx === currentImage ? 'opacity-100' : 'opacity-0 absolute inset-0'}`}
-                      src={img}
-                      alt={`Banner ${idx + 1}`}
-                      placeholder="blur"
-                    />
-                  ))}
+                <div className="tilt">
+                  <Image
+                    className="w-full rounded-lg"
+                    src={homebanner1}
+                    alt="Banner"
+
+                  />
                 </div>
               </TiltWrapper>
             </div>

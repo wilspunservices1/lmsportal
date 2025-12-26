@@ -20,8 +20,30 @@ function generateNameFromUsername(username: string) {
 
 export async function POST(req: Request) {
 	try {
-		const body = await req.json();
-		const { email, phone, username, password, instructorBio, qualifications } = body;
+		// Check if request is FormData or JSON
+		const contentType = req.headers.get('content-type');
+		let email, phone, username, password, instructorBio, qualifications;
+		
+		if (contentType?.includes('multipart/form-data')) {
+			// Handle FormData (new form with resume)
+			const formData = await req.formData();
+			const name = formData.get("name") as string;
+			email = formData.get("email") as string;
+			const company = formData.get("company") as string;
+			phone = formData.get("phone") as string;
+			const bio = formData.get("bio") as string;
+			const linkedIn = formData.get("linkedIn") as string;
+			const resume = formData.get("resume") as File;
+			
+			username = name;
+			password = uuidv4(); // Generate random password
+			instructorBio = bio || "";
+			qualifications = JSON.stringify({ company, linkedIn, resume: resume?.name });
+		} else {
+			// Handle JSON (old form)
+			const body = await req.json();
+			({ email, phone, username, password, instructorBio, qualifications } = body);
+		}
 
 		// Check for required fields
 		if (!email || !password || !username) {
@@ -38,7 +60,6 @@ export async function POST(req: Request) {
 		if (!existingUser) {
 			// If user doesn't exist, create a new user account
 			const hashPassword = await bcrypt.hash(password, 10);
-			// Check if the role has changed and update the uniqueIdentifier accordingly
 			const uniqueIdentifier = await generateUniqueIdentifier("instructor");
 			const activationToken = uuidv4();
 
@@ -58,29 +79,35 @@ export async function POST(req: Request) {
 				.returning()
 				.then((res: any[]) => res[0]);
 
-			// Send activation email
-			await sendEmail({
-				to: email,
-				subject: "Activate Your Account",
-				text: "Please activate your account.",
-				templateName: "activationEmailTemplate",
-				templateData: {
-					name: username,
-					activationLink: `${BASE_URL}/pass/activate?token=${activationToken}`,
-				},
-			});
+			// Send activation email (non-blocking)
+			try {
+				await sendEmail({
+					to: email,
+					subject: "Activate Your Account",
+					text: "Please activate your account.",
+					templateName: "activationEmailTemplate",
+					templateData: {
+						name: username,
+						activationLink: `${BASE_URL}/pass/activate?token=${activationToken}`,
+					},
+				});
+			} catch (emailError) {
+				console.error("Failed to send activation email:", emailError);
+			}
 
 			// Create instructor application
 			await db.insert(instructorApplications).values({
 				userId: newUser.id,
 				instructorBio,
-				qualifications: qualifications ? JSON.stringify(qualifications) : "[]",
+				qualifications: typeof qualifications === 'string' ? qualifications : JSON.stringify(qualifications || []),
 			});
 
-			await sendEmail({
-				to: process.env.INSTRUCTOR_EMAIL_RECEIVER!,
-				subject: `Instructor Application – ${username}`,
-				text: `
+			// Send notification emails (non-blocking)
+			try {
+				await sendEmail({
+					to: process.env.INSTRUCTOR_EMAIL_RECEIVER!,
+					subject: `Instructor Application – ${username}`,
+					text: `
       New Instructor Application
       
       Name: ${username}
@@ -89,20 +116,22 @@ export async function POST(req: Request) {
       Bio: ${instructorBio}
       Qualifications: ${Array.isArray(qualifications) ? qualifications.join(", ") : qualifications}
       `,
-			});
+				});
 
-			// Optionally, notify admin about the new application
-			await sendEmail({
-				to: "training@meqmp.com", // Replace with admin email
-				subject: "New Instructor Application",
-				text: `User ${username} has applied to become an instructor.`,
-				templateName: "newInstructorApplication",
-				templateData: {
-					username,
-					email,
-					link: `${BASE_URL}/dashboards/roles`,
-				},
-			});
+				await sendEmail({
+					to: "training@meqmp.com",
+					subject: "New Instructor Application",
+					text: `User ${username} has applied to become an instructor.`,
+					templateName: "newInstructorApplication",
+					templateData: {
+						username,
+						email,
+						link: `${BASE_URL}/dashboards/roles`,
+					},
+				});
+			} catch (emailError) {
+				console.error("Failed to send notification emails:", emailError);
+			}
 
 			return NextResponse.json(
 				{
@@ -116,13 +145,15 @@ export async function POST(req: Request) {
 			await db.insert(instructorApplications).values({
 				userId: existingUser.id,
 				instructorBio,
-				qualifications: qualifications ? JSON.stringify(qualifications) : "[]",
+				qualifications: typeof qualifications === 'string' ? qualifications : JSON.stringify(qualifications || []),
 			});
 
-			await sendEmail({
-				to: process.env.INSTRUCTOR_EMAIL_RECEIVER!,
-				subject: `Instructor Application – ${username}`,
-				text: `
+			// Send notification emails (non-blocking)
+			try {
+				await sendEmail({
+					to: process.env.INSTRUCTOR_EMAIL_RECEIVER!,
+					subject: `Instructor Application – ${username}`,
+					text: `
       New Instructor Application
       
       Name: ${username}
@@ -131,20 +162,22 @@ export async function POST(req: Request) {
       Bio: ${instructorBio}
       Qualifications: ${Array.isArray(qualifications) ? qualifications.join(", ") : qualifications}
       `,
-			});
+				});
 
-			// Notify admin about the new application
-			await sendEmail({
-				to: "training@meqmp.com", // Replace with admin email
-				subject: "New Instructor Application",
-				text: `User ${username} has applied to become an instructor.`,
-				templateName: "newInstructorApplication",
-				templateData: {
-					username,
-					email,
-					link: `${BASE_URL}/admin/instructor-applications`,
-				},
-			});
+				await sendEmail({
+					to: "training@meqmp.com",
+					subject: "New Instructor Application",
+					text: `User ${username} has applied to become an instructor.`,
+					templateName: "newInstructorApplication",
+					templateData: {
+						username,
+						email,
+						link: `${BASE_URL}/admin/instructor-applications`,
+					},
+				});
+			} catch (emailError) {
+				console.error("Failed to send notification emails:", emailError);
+			}
 
 			return NextResponse.json(
 				{

@@ -29,12 +29,14 @@ const CourseEnroll = ({ type, course }) => {
 	const { addProductToCart, cartProducts } = useCartContext();
 	const { data: session } = useSession();
 
-	// Restricted course access
+	const userId = session?.user?.id;
+	const isAdmin = session?.user?.roles?.includes('admin') || session?.user?.role === 'admin';
+
 	const RESTRICTED_COURSE_ID = 'd22308b2-9975-4b27-b3b5-1eb1641d9b8e';
 	const AUTHORIZED_USER_ID = '10d437d6-c35e-46f5-8d4f-f2de25434bf2';
 	const isRestrictedCourse = courseId === RESTRICTED_COURSE_ID;
 	const hasAccess = session?.user?.id === AUTHORIZED_USER_ID;
-	const isRestricted = isRestrictedCourse && !hasAccess;
+	const isRestricted = isRestrictedCourse && !hasAccess && !isAdmin;
 	const creteAlert = useSweetAlert();
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
@@ -43,9 +45,6 @@ const CourseEnroll = ({ type, course }) => {
 	const [isCheckingEnrollment, setIsCheckingEnrollment] = useState(true);
 	const [firstLectureId, setFirstLectureId] = useState(null);
 
-	const userId = session?.user?.id;
-
-	// Check if the course is already in the cart
 	const isInCart = cartProducts.some((product) => product.courseId === courseId);
 
 	useEffect(() => {
@@ -66,7 +65,6 @@ const CourseEnroll = ({ type, course }) => {
 				const chapters = courseDetails.chapters || [];
 				let foundLectureId = null;
 
-				// Loop through chapters to find the first chapter with order == 1
 				for (const chapter of chapters) {
 					if (parseInt(chapter.order) === 1) {
 						const sortedLectures = (chapter.lectures || []).sort(
@@ -102,10 +100,16 @@ const CourseEnroll = ({ type, course }) => {
 	useEffect(() => {
 		const checkEnrollment = async () => {
 			if (userId) {
+				if (isAdmin) {
+					setIsEnrolled(true);
+					setIsCheckingEnrollment(false);
+					return;
+				}
+
 				try {
 					setIsCheckingEnrollment(true);
 
-					const response = await fetch(`/api/user/${userId}/enrollCourses`, {
+					const response = await fetch(`/api/user/${userId}/enrollCourses?t=${Date.now()}`, {
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
@@ -120,14 +124,10 @@ const CourseEnroll = ({ type, course }) => {
 					const enrolledCourses = await response.json();
 
 					const enrolledCourse = enrolledCourses.find(
-						(enrolledCourse) => enrolledCourse.courseId === courseId
+						(enrolledCourse) => String(enrolledCourse.courseId) === String(courseId)
 					);
 
-					if (enrolledCourse) {
-						setIsEnrolled(true);
-					} else {
-						setIsEnrolled(false);
-					}
+					setIsEnrolled(!!enrolledCourse);
 				} catch (error) {
 					setError(typeof error === 'string' ? error : error?.message || "Failed to check enrollment.");
 				} finally {
@@ -139,8 +139,10 @@ const CourseEnroll = ({ type, course }) => {
 			}
 		};
 
+		const interval = setInterval(checkEnrollment, 3000);
 		checkEnrollment();
-	}, [userId, courseId]);
+		return () => clearInterval(interval);
+	}, [userId, courseId, isAdmin]);
 
 	const handleEnrollClick = async () => {
 		if (!session) {
@@ -250,41 +252,51 @@ const CourseEnroll = ({ type, course }) => {
 					</div>
 				) : (
 					<>
-						{isInCart ? (
-							<button
-								className="w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px border mb-10px leading-1.8 border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark"
-								disabled
-							>
-								Already Added
-							</button>
+						{isAdmin ? (
+							<div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg mb-3">
+								<p className="text-sm text-blue-700 dark:text-blue-300 font-medium text-center">
+									👑 Admin Access - Full Course Unlocked
+								</p>
+							</div>
 						) : (
-							<button
-								onClick={() =>
-									addProductToCart({
-										courseId,
-										discount,
-										estimatedPrice,
-										insName,
-										isFree: course.isFree,
-										price,
-										thumbnail,
-										title,
-									})
-								}
-								className="w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px border mb-10px leading-1.8 border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark"
-							>
-								Add To Cart
-							</button>
+							<>
+								{isInCart ? (
+									<button
+										className="w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px border mb-10px leading-1.8 border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark"
+										disabled
+									>
+										Already Added
+									</button>
+								) : (
+									<button
+										onClick={() =>
+											addProductToCart({
+												courseId,
+												discount,
+												estimatedPrice,
+												insName,
+												isFree: course.isFree,
+												price,
+												thumbnail,
+												title,
+											})
+										}
+										className="w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px border mb-10px leading-1.8 border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark"
+									>
+										Add To Cart
+									</button>
+								)}
+							</>
 						)}
 
-						{isEnrolled && firstLectureId ? (
+						{(isEnrolled || isAdmin) && firstLectureId ? (
 							<button
 								onClick={() => router.push(`/lessons/${firstLectureId}`)}
 								className="w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px mb-10px leading-1.8 border border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark"
 							>
 								Go to Course
 							</button>
-						) : (
+						) : !isAdmin ? (
 							<button
 								onClick={handleEnrollClick}
 								className={`w-full text-size-15 text-whiteColor bg-secondaryColor px-25px py-10px mb-10px leading-1.8 border border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor inline-block rounded group dark:hover:text-secondaryColor dark:hover:bg-whiteColor-dark ${
@@ -294,7 +306,7 @@ const CourseEnroll = ({ type, course }) => {
 							>
 								{loading ? "Processing..." : "Enroll Now"}
 							</button>
-						)}
+						) : null}
 					</>
 				)}
 			</div>
@@ -306,14 +318,6 @@ const CourseEnroll = ({ type, course }) => {
 					</p>
 					<p className="text-xs text-contentColor dark:text-contentColor-dark px-10px py-6px bg-borderColor dark:bg-borderColor-dark rounded-full leading-13px">
 						Meridian
-					</p>
-				</li>
-				<li className="flex items-center justify-between py-10px border-b border-borderColor dark:border-borderColor-dark">
-					<p className="text-sm font-medium text-contentColor dark:text-contentColor-dark leading-1.8">
-						Start Date:
-					</p>
-					<p className="text-xs text-contentColor dark:text-contentColor-dark px-10px py-6px bg-borderColor dark:bg-borderColor-dark rounded-full leading-13px">
-						{formatDate(updatedAt)}
 					</p>
 				</li>
 				<li className="flex items-center justify-between py-10px border-b border-borderColor dark:border-borderColor-dark">

@@ -98,9 +98,9 @@ export async function GET(
       }
     });
 
-    // Step 6: Filter enrolledCourses to only include courses that have been purchased
+    // Step 6: Filter enrolledCourses to include courses that have been purchased OR allotted for free
     const validEnrolledCourses = filteredCourses.filter((course: any) =>
-      purchasedCourseIds.has(course.courseId)
+      purchasedCourseIds.has(course.courseId) || course.isFreeAllotment === true
     );
 
     // Step 7: Fetch chapters for valid enrolled courses (only IDs)

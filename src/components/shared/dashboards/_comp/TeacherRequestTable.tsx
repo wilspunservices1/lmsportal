@@ -1,5 +1,3 @@
-// src/components/InstructorApplicationTable.tsx
-
 import React, { useState, useEffect } from "react";
 import useSweetAlert from "@/hooks/useSweetAlert";
 import DotLoader from "@/components/sections/create-course/_comp/Icons/DotLoader";
@@ -29,7 +27,6 @@ const InstructorApplicationTable: React.FC = () => {
   const showAlert = useSweetAlert();
 
   useEffect(() => {
-    // Fetch instructor applications
     const fetchApplications = async () => {
       try {
         const response = await fetch(`/api/admin/teacher-requests`);
@@ -37,7 +34,7 @@ const InstructorApplicationTable: React.FC = () => {
           throw new Error("Failed to fetch instructor applications");
         }
         const data = await response.json();
-        setApplications(data.applications);
+        setApplications(data.applications || []);
       } catch (error) {
         console.error(error);
         showAlert("error", "Failed to fetch instructor applications");
@@ -47,11 +44,8 @@ const InstructorApplicationTable: React.FC = () => {
     };
 
     fetchApplications();
+  }, []);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Removed showAlert from dependency array to fix infinite loop
-
-  // Function to handle actions on applications
   const handleApplicationAction = async (
     applicationId: string,
     action: "approve" | "reject"
@@ -73,7 +67,6 @@ const InstructorApplicationTable: React.FC = () => {
         throw new Error(`Failed to ${action} the application`);
       }
 
-      // Remove the application from the state
       setApplications((prev) => prev.filter((app) => app.id !== applicationId));
 
       showAlert(
@@ -82,13 +75,13 @@ const InstructorApplicationTable: React.FC = () => {
       );
     } catch (error) {
       console.error(error);
-      showAlert("error", `Failed to ${action} the application`);
+      const msg = error instanceof Error ? error.message : `Failed to ${action} the application`;
+      showAlert("error", msg);
     } finally {
       setActionLoadingId(null);
     }
   };
 
-  // Function to toggle the dropdown menu
   const handleDropdownToggle = (applicationId: string) => {
     setSelectedApplicationId((prevSelectedId) =>
       prevSelectedId === applicationId ? null : applicationId
@@ -107,7 +100,6 @@ const InstructorApplicationTable: React.FC = () => {
     );
   }
 
-  // Helper function to truncate text
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength) + "...";
@@ -155,7 +147,7 @@ const InstructorApplicationTable: React.FC = () => {
                 {app.instructorBio ? truncateText(app.instructorBio, 12) : "N/A"}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                {app.qualifications && app.qualifications.length > 0
+                {Array.isArray(app.qualifications) && app.qualifications.length > 0
                   ? truncateText(app.qualifications.join(", "), 12)
                   : "N/A"}
               </td>
@@ -178,7 +170,6 @@ const InstructorApplicationTable: React.FC = () => {
                       aria-expanded={selectedApplicationId === app.id}
                     >
                       <span className="sr-only">Open options</span>
-                      {/* Replace '...' with an icon if preferred */}
                       ...
                     </button>
                     {selectedApplicationId === app.id && (

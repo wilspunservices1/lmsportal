@@ -10,7 +10,9 @@ import useTab from "@/hooks/useTab";
 import NoData from "@/components/shared/others/NoData";
 import SkeletonResultsText from "@/components/Loaders/LineSkeleton";
 import CourseGridCardSkeleton from "@/components/Loaders/GridCard";
+import ComingSoon from "@/components/sections/coming-soon/ComingSoon";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 const sortInputs = [
   "Sort by New",
@@ -32,6 +34,8 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
   const [error, setError] = useState(null);
   const coursesRef = useRef(null);
 
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
   const { data: session } = useSession();
   const [enrolledCourses, setEnrolledCourses] = useState([]);
 
@@ -73,9 +77,11 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
       }
 
       // Append multiple categories
-      currentCategories.forEach((category) => {
-        params.append("category", category);
-      });
+      if (currentCategories.length > 0) {
+        currentCategories.forEach((category) => {
+          params.append("category", category);
+        });
+      }
 
       // Append multiple skill levels
       currentSkillLevels.forEach((skillLevel) => {
@@ -90,12 +96,16 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
       params.set("page", currentPage);
       params.set("limit", limit);
 
+      console.log("Fetching courses with params:", params.toString());
+      console.log("Current categories:", currentCategories);
+
       const response = await fetch(`/api/courses?${params.toString()}`);
       if (!response.ok) {
         throw new Error("Courses not found with the given filters");
       }
 
       const result = await response.json();
+      console.log("API Response - Total courses:", result.total, "Data length:", result.data?.length);
       setAllCourses(result.data);
       setTotalCourses(result.total);
     } catch (error) {
@@ -124,11 +134,18 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
     }
   };
 
+  // Set category filter from URL parameter on mount
+  useEffect(() => {
+    if (categoryParam) {
+      const decodedCategory = decodeURIComponent(categoryParam);
+      setCurrentCategories([decodedCategory]);
+      setCurrentPage(1);
+    }
+  }, [categoryParam]);
+
   // Fetch all courses and filters when component mounts
   useEffect(() => {
-    fetchFilters(); // Fetch filters
-    fetchCourses(); // Fetch initial courses
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchFilters();
   }, []);
 
   // Trigger course fetching when filters or sorting changes
@@ -274,8 +291,9 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
               <div className="flex flex-col">
                 {/* Dynamic categories and filters from API */}
                 {Array.isArray(filters) && filters.length > 0 ? (
-                  filters?.map(({ name, inputs }, idx) => (
-                    name !== "Tags" && (
+                  filters?.map(({ name, inputs }, idx) => {
+                    if (name === "Tags" || !inputs || !Array.isArray(inputs)) return null;
+                    return (
                       <div
                         key={idx}
                         className="pt-30px pr-15px pl-10px pb-23px 2xl:pt-10 2xl:pr-25px 2xl:pl-5 2xl:pb-33px mb-30px border border-borderColor dark:border-borderColor-dark"
@@ -285,28 +303,28 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
                           {name}
                         </h4>
                         <ul
-                          className={`flex flex-col ${name === "Categories"
-                            ? "gap-y-4"
-                            : "gap-y-10px"
-                            }`}
+                          className={`flex flex-col ${
+                            name === "Categories" ? "gap-y-4" : "gap-y-10px"
+                          }`}
                         >
-                          {inputs?.map((input, idx1) => (
+                          {Array.isArray(inputs) && inputs.map((input, idx1) => (
                             <li key={idx1}>
                               <button
                                 onClick={() =>
                                   handleFilters(name, input.name || input)
                                 }
-                                className={`${(currentCategories.includes(
-                                  input.name || input
-                                ) &&
-                                  name === "Categories") ||
+                                className={`${
+                                  (currentCategories.includes(
+                                    input.name || input
+                                  ) &&
+                                    name === "Categories") ||
                                   (currentSkillLevels.includes(
                                     input.name || input
                                   ) &&
                                     name === "Skill Levels")
-                                  ? "bg-primaryColor text-contentColor-dark"
-                                  : "text-contentColor dark:text-contentColor-dark hover:text-contentColor-dark hover:bg-primaryColor"
-                                  } text-sm font-medium px-13px py-2 border border-borderColor dark:border-borderColor-dark flex justify-between leading-7 transition-all duration-300 w-full`}
+                                    ? "bg-primaryColor text-contentColor-dark"
+                                    : "text-contentColor dark:text-contentColor-dark hover:text-contentColor-dark hover:bg-primaryColor"
+                                } text-sm font-medium px-13px py-2 border border-borderColor dark:border-borderColor-dark flex justify-between leading-7 transition-all duration-300 w-full`}
                               >
                                 <span>{input.name ? input.name : input}</span>
                                 {input.totalCount && <span>{input.totalCount}</span>}
@@ -315,8 +333,8 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
                           ))}
                         </ul>
                       </div>
-                    )
-                  ))
+                    );
+                  })
                 ) : (
                   <p>No filters available</p>
                 )}
@@ -344,7 +362,7 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
                 ))}
               </div>
             ) : error ? (
-              <p> {String(error)}</p>
+              <p>{error}</p>
             ) : allCourses?.length ? (
               <>
                 <div className="tab-contents">
@@ -371,6 +389,8 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
                   />
                 )}
               </>
+            ) : categoryParam ? (
+              <ComingSoon />
             ) : (
               <NoData message={"No Courses Found"} />
             )}

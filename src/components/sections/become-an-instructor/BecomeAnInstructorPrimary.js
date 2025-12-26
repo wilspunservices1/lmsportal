@@ -11,13 +11,14 @@ import useSweetAlert from "@/hooks/useSweetAlert";
 
 const BecomeAnInstructorPrimary = () => {
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
+    company: "",
     phone: "",
-    password: "",
-    instructorBio: "",
-    qualifications: "",
+    bio: "",
+    linkedIn: "",
   });
+  const [resume, setResume] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(""); // State to hold the inline message
   const router = useRouter();
@@ -29,25 +30,42 @@ const BecomeAnInstructorPrimary = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle file upload
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === "application/pdf") {
+      setResume(file);
+    } else {
+      showAlert("error", "Please upload a PDF file");
+      e.target.value = null;
+    }
+  };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!resume) {
+      showAlert("error", "Please upload your resume (PDF)");
+      return;
+    }
+
     setLoading(true);
-    setMessage(""); // Reset message
+    setMessage("");
 
     try {
-      // Convert qualifications string to array
-      const qualificationsArray = formData.qualifications
-        .split(",")
-        .map((q) => q.trim());
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("company", formData.company);
+      formDataToSend.append("phone", formData.phone);
+      formDataToSend.append("bio", formData.bio);
+      formDataToSend.append("linkedIn", formData.linkedIn);
+      formDataToSend.append("resume", resume);
 
       const response = await fetch("/api/instructors", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          qualifications: qualificationsArray,
-        }),
+        body: formDataToSend,
       });
 
       const data = await response.json();
@@ -56,18 +74,20 @@ const BecomeAnInstructorPrimary = () => {
         throw new Error(data.message || "Failed to submit application");
       }
 
-      // Set the inline message
       setMessage(data.message);
+      showAlert("success", "Application submitted successfully!");
 
-      // Optionally clear the form
+      // Clear form
       setFormData({
-        username: "",
+        name: "",
         email: "",
+        company: "",
         phone: "",
-        password: "",
-        instructorBio: "",
-        qualifications: "",
+        bio: "",
+        linkedIn: "",
       });
+      setResume(null);
+      document.getElementById("resume-upload").value = null;
     } catch (error) {
       console.error("Error:", error);
       showAlert("error", error.message);
@@ -196,23 +216,23 @@ const BecomeAnInstructorPrimary = () => {
             >
               <div className="grid grid-cols-1 mb-15px gap-15px">
                 <div>
-                  <label className="mb-3 block font-semibold">Username</label>
+                  <label className="mb-3 block font-semibold">Name *</label>
                   <input
                     type="text"
-                    name="username"
-                    placeholder="Username"
-                    value={formData.username}
+                    name="name"
+                    placeholder="Full Name"
+                    value={formData.name}
                     onChange={handleChange}
                     required
                     className="w-full py-2 px-3 text-sm focus:outline-none text-contentColor dark:text-contentColor-dark bg-whiteColor dark:bg-whiteColor-dark border border-borderColor dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 leading-6 rounded-md font-no"
                   />
                 </div>
                 <div>
-                  <label className="mb-3 block font-semibold">Email</label>
+                  <label className="mb-3 block font-semibold">Email *</label>
                   <input
                     type="email"
                     name="email"
-                    placeholder="Email"
+                    placeholder="your.email@example.com"
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -220,23 +240,23 @@ const BecomeAnInstructorPrimary = () => {
                   />
                 </div>
                 <div>
-                  <label className="mb-3 block font-semibold">Phone Number</label>
+                  <label className="mb-3 block font-semibold">Company</label>
                   <input
                     type="text"
-                    name="phone"
-                    placeholder="+1-555-555-5555"
-                    value={formData.phone}
+                    name="company"
+                    placeholder="Company Name"
+                    value={formData.company}
                     onChange={handleChange}
                     className="w-full py-2 px-3 text-sm focus:outline-none text-contentColor dark:text-contentColor-dark bg-whiteColor dark:bg-whiteColor-dark border border-borderColor dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 leading-6 rounded-md font-no"
                   />
                 </div>
                 <div>
-                  <label className="mb-3 block font-semibold">Password</label>
+                  <label className="mb-3 block font-semibold">Phone Number *</label>
                   <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={formData.password}
+                    type="tel"
+                    name="phone"
+                    placeholder="+1-555-555-5555"
+                    value={formData.phone}
                     onChange={handleChange}
                     required
                     className="w-full py-2 px-3 text-sm focus:outline-none text-contentColor dark:text-contentColor-dark bg-whiteColor dark:bg-whiteColor-dark border border-borderColor dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 leading-6 rounded-md font-no"
@@ -246,9 +266,9 @@ const BecomeAnInstructorPrimary = () => {
               <div className="mb-15px">
                 <label className="mb-3 block font-semibold">Bio</label>
                 <textarea
-                  name="instructorBio"
-                  placeholder="Tell us about yourself..."
-                  value={formData.instructorBio}
+                  name="bio"
+                  placeholder="Tell us about yourself and your expertise..."
+                  value={formData.bio}
                   onChange={handleChange}
                   className="w-full py-2 px-3 text-sm text-contentColor dark:text-contentColor-dark bg-whiteColor dark:bg-whiteColor-dark border border-borderColor dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 leading-6 rounded-md"
                   cols="30"
@@ -256,12 +276,26 @@ const BecomeAnInstructorPrimary = () => {
                 />
               </div>
               <div className="mb-15px">
-                <label className="mb-3 block font-semibold">Qualifications</label>
+                <label className="mb-3 block font-semibold">Resume (PDF) *</label>
                 <input
-                  type="text"
-                  name="qualifications"
-                  placeholder="Enter qualifications separated by commas"
-                  value={formData.qualifications}
+                  type="file"
+                  id="resume-upload"
+                  accept=".pdf"
+                  onChange={handleFileChange}
+                  required
+                  className="w-full py-2 px-3 text-sm focus:outline-none text-contentColor dark:text-contentColor-dark bg-whiteColor dark:bg-whiteColor-dark border border-borderColor dark:border-borderColor-dark rounded-md font-no"
+                />
+                {resume && (
+                  <p className="mt-2 text-sm text-green-600">Selected: {resume.name}</p>
+                )}
+              </div>
+              <div className="mb-15px">
+                <label className="mb-3 block font-semibold">LinkedIn Profile</label>
+                <input
+                  type="url"
+                  name="linkedIn"
+                  placeholder="https://linkedin.com/in/yourprofile"
+                  value={formData.linkedIn}
                   onChange={handleChange}
                   className="w-full py-2 px-3 text-sm focus:outline-none text-contentColor dark:text-contentColor-dark bg-whiteColor dark:bg-whiteColor-dark border border-borderColor dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 leading-6 rounded-md font-no"
                 />

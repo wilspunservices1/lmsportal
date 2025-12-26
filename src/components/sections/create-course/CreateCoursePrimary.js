@@ -12,6 +12,7 @@ import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import CertificatesTemp from "./_comp/Certificates";
 import CourseFAQManager from "./_comp/CourseFAQManager";
+import CourseReviewManager from "./_comp/CourseReviewManager";
 
 const CreateCoursePrimary = () => {
 	const {
@@ -446,6 +447,21 @@ const CreateCoursePrimary = () => {
 										</p>
 									</div>
 									<CourseFAQManager courseId={id || courseId} />
+								</div>
+							</li>
+
+							{/* Course Reviews Section */}
+							<li className="accordion mb-5">
+								<div className="bg-whiteColor dark:bg-whiteColor-dark shadow-accordion dark:shadow-accordion-dark rounded-md p-6">
+									<div className="border-b pb-4 mb-4">
+										<h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+											Course Reviews
+										</h3>
+										<p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+											Manage reviews that will be displayed on the course page
+										</p>
+									</div>
+									<CourseReviewManager courseId={id || courseId} />
 								</div>
 							</li>
 

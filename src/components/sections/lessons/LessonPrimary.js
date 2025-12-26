@@ -182,7 +182,8 @@ const LessonPrimary = ({ lessonId }) => {
 	);
 
 	const isUserCourseCreator = user?.id === courseCreatorId;
-	const isEnrolled = isUserEnrolledInCourse || isUserCourseCreator;
+	const isAdmin = user?.roles?.includes('admin') || user?.role === 'admin';
+	const isEnrolled = isUserEnrolledInCourse || isUserCourseCreator || isAdmin;
 	const { videoUrl, title, isLocked, isPreview } = lesson;
 	const videoUrlFormatted = convertLocalPathToUrl(videoUrl);
 

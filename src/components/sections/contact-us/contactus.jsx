@@ -174,9 +174,9 @@ const ContactUs = () => {
                   Saudi Arabia
                 </h3>
                 <p className="text-gray-600">
-                  Office 11, 3rd Floor Building 4236
+                  Ground Floor, Building 9
                   <br />
-                  King Saud Street, Nawras, Dammam
+                  Askan District, Dammam, Saudi Arabia
                   <br />
                   Phone: <a href="tel:+966509394640" className="text-blue-600 hover:underline">+966 50 939 4640</a>
                 </p>

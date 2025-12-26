@@ -1,37 +1,55 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/libs/auth";
 import { db } from "@/db";
-import { reviews } from "@/db/schemas/reviews"; // Import your reviews schema
-import { courses } from "@/db/schemas/courses"; // Import courses schema
-import { user } from "@/db/schemas/user"; // Import user schema
-import { orders } from "@/db/schemas/orders"; // Import orders schema
+import { reviews } from "@/db/schemas/reviews";
+import { instructorReviews } from "@/db/schemas/instructorReviews";
+import { courses } from "@/db/schemas/courses";
+import { user } from "@/db/schemas/user";
+import { orders } from "@/db/schemas/orders";
 import { eq, and } from "drizzle-orm";
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
 	try {
-		// Get session data
 		const session = await getSession();
 		if (!session?.user) {
 			return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 		}
 
-		// Get the course_id from the params and review data from the body
 		const courseId = params.id;
-		const { rating, comment, avatar_url, is_visible } = await req.json();
+		const body = await req.json();
+		const { rating, comment, avatar_url, is_visible, reviewerName, type } = body;
 
-		// Ensure all required fields are present
+		// Handle instructor review
+		if (type === "instructor") {
+			if (!reviewerName || !rating || !comment) {
+				return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+			}
+
+			const newReview = await db
+				.insert(instructorReviews)
+				.values({
+					courseId,
+					reviewerName,
+					rating,
+					comment,
+					reviewDate: body.reviewDate || null,
+				})
+				.returning();
+
+			return NextResponse.json(newReview[0], { status: 201 });
+		}
+
+		// Handle student review (existing logic)
 		if (!rating || !comment || !courseId) {
 			return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
 		}
 
-		// Check if the course exists
 		const [courseExists] = await db.select().from(courses).where(eq(courses.id, courseId));
 
 		if (!courseExists) {
 			return NextResponse.json({ message: "Course not found" }, { status: 404 });
 		}
 
-		// Check if user has purchased the course
 		const [purchase] = await db
 			.select()
 			.from(orders)
@@ -41,7 +59,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 			return NextResponse.json({ message: "You must purchase this course to leave a review" }, { status: 403 });
 		}
 
-		// Check if user has already reviewed this course
 		const [existingReview] = await db
 			.select()
 			.from(reviews)
@@ -51,7 +68,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 			return NextResponse.json({ message: "You have already reviewed this course" }, { status: 409 });
 		}
 
-		// Insert the new review into the database
 		const newReview = await db
 			.insert(reviews)
 			.values({
@@ -60,7 +76,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 				rating,
 				comment,
 				avatar_url,
-				is_visible: is_visible ?? true, // Default to true if not provided
+				is_visible: is_visible ?? true,
 			})
 			.returning();
 
@@ -106,15 +122,24 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
 	try {
-		// Get query parameters
 		const url = new URL(req.url);
 		const courseId = params.id;
 		const userId = url.searchParams.get("userId");
 		const checkEligibility = url.searchParams.get("checkEligibility");
+		const type = url.searchParams.get("type"); // 'instructor' or 'student'
+
+		// Handle instructor reviews
+		if (type === "instructor") {
+			const instructorReviewsList = await db
+				.select()
+				.from(instructorReviews)
+				.where(eq(instructorReviews.courseId, courseId));
+
+			return NextResponse.json({ reviews: instructorReviewsList }, { status: 200 });
+		}
 
 		// Handle review eligibility check
 		if (checkEligibility === "true" && userId) {
-			// Check if user has purchased the course
 			const [purchase] = await db
 				.select()
 				.from(orders)
@@ -122,7 +147,6 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
 			const isPurchased = !!purchase;
 
-			// Check if user has already reviewed the course
 			const [existingReview] = await db
 				.select()
 				.from(reviews)
@@ -137,13 +161,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 			});
 		}
 
-		// Get session data (authentication) for regular review fetching
 		const session = await getSession();
 		if (!session?.user) {
 			return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 		}
 
-		// Initialize the query
 		let query = db
 			.select({
 				...reviews,
@@ -152,15 +174,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 			.from(reviews)
 			.leftJoin(user, eq(reviews.user_id, user.id));
 
-		// Filter by course_id (use params.id)
 		query = query.where(eq(reviews.course_id, courseId));
 
-		// Filter by user_id if provided
 		if (userId) {
 			query = query.where(and(eq(reviews.course_id, courseId), eq(reviews.user_id, userId)));
 		}
 
-		// Execute the query and fetch reviews
 		const reviewsList = await query;
 
 		if (reviewsList.length === 0) {

@@ -27,12 +27,15 @@ const UserTable: React.FC<UserTableProps> = ({
   >("inviteAdmin");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredUsers, setFilteredUsers] = useState<User[]>(users);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 15;
   const showAlert = useSweetAlert();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   // Ensure that the filtered users list updates when the users prop changes
   useEffect(() => {
     setFilteredUsers(users);
+    setCurrentPage(1);
   }, [users]);
 
   // Attach and clean up the click outside event listener once when the component mounts
@@ -298,7 +301,8 @@ const UserTable: React.FC<UserTableProps> = ({
       );
       showAlert("success", `Role updated to ${newRole}`);
     } catch (error: any) {
-      showAlert("error", error.message || "Failed to update the role");
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      showAlert("error", errorMsg || "Failed to update the role");
     } finally {
       setLoading(null);
     }
@@ -323,7 +327,8 @@ const UserTable: React.FC<UserTableProps> = ({
       showAlert("success", "User deleted successfully");
       setShowModal(false);
     } catch (error: any) {
-      showAlert("error", error.message || "Failed to delete the user");
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      showAlert("error", errorMsg || "Failed to delete the user");
     } finally {
       setLoading(null);
     }
@@ -343,7 +348,8 @@ const UserTable: React.FC<UserTableProps> = ({
       setShowModal(false);
       setEmailInput("");
     } catch (error: any) {
-      showAlert("error", error.message || "Failed to send invitation");
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      showAlert("error", errorMsg || "Failed to send invitation");
     }
   };
 
@@ -382,7 +388,7 @@ const UserTable: React.FC<UserTableProps> = ({
           </tr>
         </thead>
         <tbody className="divide-y  divide-gray-200">
-          {filteredUsers.map((user) => (
+          {filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((user) => (
             <tr key={user.id}>
               <td
                 className="px-6 py-4 whitespace-nowrap text-sm text-blue cursor-pointer hover:underline"
@@ -434,6 +440,27 @@ const UserTable: React.FC<UserTableProps> = ({
           ))}
         </tbody>
       </table>
+      {filteredUsers.length > itemsPerPage && (
+        <div className="flex justify-center items-center gap-2 mt-4 pb-4">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="text-sm">
+            Page {currentPage} of {Math.ceil(filteredUsers.length / itemsPerPage)}
+          </span>
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredUsers.length / itemsPerPage)))}
+            disabled={currentPage === Math.ceil(filteredUsers.length / itemsPerPage)}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
       {showModal && (
         <Modal
           isVisible={showModal}

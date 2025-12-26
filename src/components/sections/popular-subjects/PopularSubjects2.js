@@ -21,7 +21,7 @@ const PopularSubjects2 = () => {
       title: "Food Safety & HACCP",
       desc: "",
       navButton: false,
-      category: "Food & Safety",
+      category: "Food Safety & HACCP",
       svg: (
         <div className="relative w-20 h-[70px]">
           <img 
@@ -53,7 +53,7 @@ const PopularSubjects2 = () => {
       title: "Environmental Management",
       desc: "",
       navButton: false,
-      category: "Environmental System",
+      category: "Environmental Management",
       svg: (
         <div className="relative w-20 h-[60px]">
           <img 
@@ -84,7 +84,7 @@ const PopularSubjects2 = () => {
       title: "Health & Safety",
       desc: "",
       navButton: false,
-      category: "Fitness & Health",
+      category: "Health & Safety",
       svg: (
         <div className="relative w-20 h-[90px]">
           <img 
@@ -115,7 +115,7 @@ const PopularSubjects2 = () => {
       title: "Six Sigma",
       desc: "",
       navButton: false,
-      category: "Sigma Development",
+      category: "Six Sigma",
       svg: (
         <div className="relative w-20 h-[90px]">
           <img 
@@ -146,7 +146,7 @@ const PopularSubjects2 = () => {
       title: "Quality Management",
       desc: "",
       navButton: false,
-      category: "Business Quality",
+      category: "Quality Management",
       svg: (
         <div className="relative w-20 h-[90px]">
           <img 
@@ -178,7 +178,7 @@ const PopularSubjects2 = () => {
       title: "Project Management",
       desc: "",
       navButton: false,
-      category: "Management",
+      category: "Project Management",
       svg: (
         <div className="relative w-20 h-[90px]">
           <img 
@@ -210,7 +210,7 @@ const PopularSubjects2 = () => {
       title: "Business Continuity",
       desc: "",
       navButton: false,
-      category: "Business",
+      category: "Business Continuity",
       svg: (
         <div className="relative w-20 h-[90px]">
           <img 

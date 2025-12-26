@@ -129,8 +129,8 @@ const RefundPolicy = () => {
                 Saudi Arabia Office
               </h3>
               <div className="space-y-2 text-gray-700 dark:text-gray-300">
-                <p>Office 11, 3rd Floor Building 4236</p>
-                <p>King Saud Street, Nawras, Dammam</p>
+                <p>Ground Floor, Building 9</p>
+                <p>Askan District, Dammam, Saudi Arabia</p>
                 <p className="font-medium">Phone: +966 50 939 4640</p>
               </div>
             </div>

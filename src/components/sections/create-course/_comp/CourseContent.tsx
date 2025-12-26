@@ -22,6 +22,8 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 	const [regularPrice, setRegularPrice] = useState("");
 	const [estimatedPrice, setEstimatedPrice] = useState("");
 	const [category, setCategory] = useState("");
+	const [customCategory, setCustomCategory] = useState("");
+	const [showCustomInput, setShowCustomInput] = useState(false);
 	const [offer, setOffer] = useState("paid");
 	const [skillLevel, setSkillLevel] = useState("Beginner");
 	const [imagePath, setImagePath] = useState("");
@@ -267,25 +269,44 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 								<input
 									list="categories"
 									className="text-base bg-transparent text-blackColor2 w-full p-13px pr-30px focus:outline-none block appearance-none relative z-20 focus:shadow-select rounded-md"
-									value={category}
-									onChange={(e) =>
-										setCategory(e.target.value)
-									}
+									value={showCustomInput ? customCategory : category}
+									onChange={(e) => {
+										const value = e.target.value;
+										if (value === "__custom__") {
+											setShowCustomInput(true);
+											setCategory("");
+										} else {
+											setShowCustomInput(false);
+											setCategory(value);
+											setCustomCategory("");
+										}
+									}}
 									placeholder="Select or type a category"
 								/>
 								<datalist id="categories">
-									<option value="All" />
-									<option value="Food & Safety" />
+									<option value="Food Safety & HACCP" />
+									<option value="Environmental Management" />
 									<option value="Health & Safety" />
 									<option value="Six Sigma" />
 									<option value="Quality Management" />
 									<option value="Project Management" />
-									<option value="App Development" />
-									<option value="Web Application" />
 									<option value="Business Continuity" />
+									<option value="__custom__">+ Add Custom Category</option>
 								</datalist>
 								<i className="icofont-simple-down absolute top-1/2 right-3 -translate-y-1/2 block text-lg z-10"></i>
 							</div>
+							{showCustomInput && (
+								<input
+									type="text"
+									value={customCategory}
+									onChange={(e) => {
+										setCustomCategory(e.target.value);
+										setCategory(e.target.value);
+									}}
+									placeholder="Enter custom category name"
+									className="w-full py-10px px-5 text-sm focus:outline-none text-contentColor dark:text-contentColor-dark bg-whiteColor dark:bg-whiteColor-dark border-2 border-borderColor dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 leading-23px rounded-md mt-2"
+								/>
+							)}
 						</div>
 						{/* Skill Level */}
 						<div>

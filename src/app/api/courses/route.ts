@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/index"; // Adjust the path to your database connection
 import { courses } from "@/db/schemas/courses"; // Adjust path as necessary
 import { user } from "@/db/schemas/user";
-import { and, desc, eq, inArray, like, SQL, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, like, SQL, sql, or } from "drizzle-orm";
 import { files } from "@/db/schemas/files";
 import { chapters } from "@/db/schemas/courseChapters";
 import { lectures } from "@/db/schemas/lectures";
@@ -150,7 +150,7 @@ export async function GET(req: NextRequest) {
     const searchParams = url.searchParams;
 
     const search = searchParams.get("search") || "";
-    const categoryFilter = searchParams.get("category") || "";
+    const categories = searchParams.getAll("category") || [];
     const tag = searchParams.get("tag") || "";
     const skillLevel = searchParams.get("skillLevel") || "";
     const languageFilter = searchParams.get("language") || "";
@@ -187,14 +187,15 @@ export async function GET(req: NextRequest) {
       whereConditions.push(like(courses.title, `%${search}%`));
     }
 
-    // Handle category
-    if (categoryFilter) {
-      whereConditions.push(
+    // Handle categories - support multiple
+    if (categories.length > 0) {
+      const categoryConditions = categories.map(cat => 
         sql`EXISTS (
           SELECT 1 FROM json_array_elements_text(${courses.categories}) AS elem
-          WHERE elem = ${sql.param(categoryFilter)}
+          WHERE elem = ${sql.param(cat)}
         )`
       );
+      whereConditions.push(or(...categoryConditions));
     }
 
     // Handle tag

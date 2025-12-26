@@ -82,10 +82,10 @@ const ContactPrimary = () => {
                 Office address
               </h3>
               <p className="text-size-13 lg:text-size-15 text-contentColor dark:text-contentColor-dark leaing-5">
-                Digital Agency Network 2024
+                Office 11, 3rd Floor Building 4236
               </p>
               <p className="text-size-15 text-contentColor dark:text-contentColor-dark leaing-26px">
-                Eastbourne Terrace
+                King Saud Street, Nawras, Dammam
               </p>
             </div>
           </div>
