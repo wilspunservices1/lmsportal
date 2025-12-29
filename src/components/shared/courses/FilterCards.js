@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import CourseCard from "./CourseCard";
+import ComingSoon from "@/components/sections/coming-soon/ComingSoon";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -9,6 +11,8 @@ const FilterCards = ({ type }) => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const searchParams = useSearchParams();
+  const category = searchParams.get("category");
 
   const filterOptions = [
     "filter1 filter3",
@@ -21,9 +25,11 @@ const FilterCards = ({ type }) => {
     "filter4",
   ];
 
-  // Directly use the courses from API (already filtered to published only)
+  // Filter courses by category if provided
+  const filteredCourses = courses;
+
   const displayedCourses =
-    type === "lg" ? courses.slice(0, 8) : courses.slice(0, 6);
+    type === "lg" ? filteredCourses.slice(0, 8) : filteredCourses.slice(0, 6);
 
   // Fetch courses on component mount
   useEffect(() => {
@@ -31,7 +37,12 @@ const FilterCards = ({ type }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`/api/courses?status=published`); // Explicitly request published courses
+        const url = new URL(`${window.location.origin}/api/courses`);
+        url.searchParams.append("status", "published");
+        if (category) {
+          url.searchParams.append("category", category);
+        }
+        const response = await fetch(url.toString());
         if (!response.ok) {
           throw new Error("Failed to fetch courses");
         }
@@ -45,13 +56,13 @@ const FilterCards = ({ type }) => {
     };
 
     fetchCourses();
-  }, []);
+  }, [category]);
 
   // Initialize AOS
   useEffect(() => {
     AOS.init({
-      duration: 1200, // Customize as needed
-      once: true, // Whether animation should happen only once
+      duration: 1200,
+      once: true,
     });
   }, []);
 
@@ -68,6 +79,11 @@ const FilterCards = ({ type }) => {
 
   if (error) {
     return <div>Error: {error}</div>;
+  }
+
+  // Show ComingSoon if category is selected but has no courses
+  if (category && displayedCourses.length === 0) {
+    return <ComingSoon />;
   }
 
   if (displayedCourses.length === 0) {

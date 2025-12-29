@@ -43,22 +43,6 @@ const FooterAbout = () => {
         </ul>
       ) : (
         <div></div>
-        // <div className="flex items-center">
-        //   <div>
-        //     <i className="icofont-clock-time text-3xl text-whiteColor h-78px w-78px bg-primaryColor leading-78px mr-22px block text-center"></i>
-        //   </div>
-        //   <div>
-        //     <h6 className="text-lg text-whiteColor font-medium leading-29px">
-        //       OPENING HOURES
-        //     </h6>
-        //     <p className="text-sm text-whiteColor text-opacity-60 mb-1">
-        //       Mon - Sat(8.00 - 6.00)
-        //     </p>
-        //     <p className="text-sm text-whiteColor text-opacity-60">
-        //       Sunday - Closed
-        //     </p>
-        //   </div>
-        // </div>
       )}
     </div>
   );

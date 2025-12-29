@@ -56,7 +56,7 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
   }, [session]);
 
   // Fetch courses with filters applied
-  const fetchCourses = async () => {
+  const fetchCourses = async (categoriesToUse = currentCategories) => {
     setIsLoading(true);
     setError(null);
 
@@ -73,12 +73,12 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
         params.set("includeAllStatuses", "true");
       } else {
         // For regular users, only show published courses
-        params.set("isPublished", "true");
+        params.set("status", "published");
       }
 
       // Append multiple categories
-      if (currentCategories.length > 0) {
-        currentCategories.forEach((category) => {
+      if (categoriesToUse.length > 0) {
+        categoriesToUse.forEach((category) => {
           params.append("category", category);
         });
       }
@@ -96,16 +96,12 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
       params.set("page", currentPage);
       params.set("limit", limit);
 
-      console.log("Fetching courses with params:", params.toString());
-      console.log("Current categories:", currentCategories);
-
       const response = await fetch(`/api/courses?${params.toString()}`);
       if (!response.ok) {
         throw new Error("Courses not found with the given filters");
       }
 
       const result = await response.json();
-      console.log("API Response - Total courses:", result.total, "Data length:", result.data?.length);
       setAllCourses(result.data);
       setTotalCourses(result.total);
     } catch (error) {
@@ -140,6 +136,10 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
       const decodedCategory = decodeURIComponent(categoryParam);
       setCurrentCategories([decodedCategory]);
       setCurrentPage(1);
+      // Fetch immediately with the category
+      fetchCourses([decodedCategory]);
+    } else {
+      setCurrentCategories([]);
     }
   }, [categoryParam]);
 
@@ -150,10 +150,11 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
 
   // Trigger course fetching when filters or sorting changes
   useEffect(() => {
-    fetchCourses();
+    if (!categoryParam) {
+      fetchCourses();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    currentCategories,
     currentSkillLevels,
     sortInput,
     currentPage,
@@ -389,7 +390,7 @@ const CoursesPrimary = ({ isNotSidebar, isList, card }) => {
                   />
                 )}
               </>
-            ) : categoryParam ? (
+            ) : allCourses.length === 0 && currentCategories.length > 0 ? (
               <ComingSoon />
             ) : (
               <NoData message={"No Courses Found"} />

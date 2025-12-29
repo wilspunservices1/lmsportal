@@ -19,6 +19,7 @@ import LessonQuizes from "@/components/shared/lesson-quiz/LessonQuizes";
 import useSweetAlert from "@/hooks/useSweetAlert";
 import ManageQuestionnaire from "../questionnaire/ManageQuestionnaire";
 import { Autoplay } from "swiper/modules";
+import CourseReviewsDisplay from "./_comp/CourseReviewsDisplay";
 
 import { useEffect } from "react";
 import PriceDisplay from "@/components/shared/PriceDisplay";
@@ -765,6 +766,9 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 								)}
 								{/* course tab  */}
 								<CourseDetailsTab id={cid} type={type} course={courseDetails} />
+								{/* Reviews Section */}
+								<CourseReviewsDisplay courseId={currentId} />
+
 								{/* FAQs Section */}
 								{faqs.length > 0 && (
 									<div className="md:col-start-5 md:col-span-8 mb-5">

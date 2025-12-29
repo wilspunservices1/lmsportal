@@ -176,7 +176,7 @@ const ContactUs = () => {
                 <p className="text-gray-600">
                   Ground Floor, Building 9
                   <br />
-                  Askan District, Dammam, Saudi Arabia
+                  Iskan District, Dammam, Saudi Arabia
                   <br />
                   Phone: <a href="tel:+966509394640" className="text-blue-600 hover:underline">+966 50 939 4640</a>
                 </p>

@@ -3,7 +3,7 @@ const {
   default: TiltWrapper,
 } = require("@/components/shared/wrappers/TiltWrapper");
 const { default: Image } = require("next/image");
-import homebanner1 from "@/assets/images/about/about_10.png";
+import homebanner1 from "@/assets/images/herobanner/homebanner1.jpeg";
 import AppleImage from "@/components/shared/animaited-images/AppleImage";
 import BalbImage from "@/components/shared/animaited-images/BalbImage";
 import BookImage from "@/components/shared/animaited-images/BookImage";

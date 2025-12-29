@@ -116,7 +116,7 @@ Record-Keeping
               <h3 className="font-semibold mb-4 text-xl">Saudi Arabia Office</h3>
               <div className="space-y-2 text-gray-700 dark:text-gray-300">
                 <p>Ground Floor, Building 9</p>
-                <p>Askan District, Dammam, Saudi Arabia</p>
+                <p>Iskan District, Dammam, Saudi Arabia</p>
                 <p className="font-medium">Phone: +966 50 939 4640</p>
               </div>
             </div>

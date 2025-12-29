@@ -54,14 +54,18 @@ const CourseReviewManager = ({ courseId }) => {
 				body: JSON.stringify({ ...newReview, type: "instructor" }),
 			});
 
-			if (!response.ok) throw new Error("Failed to add review");
+			const data = await response.json();
+
+			if (!response.ok) {
+				throw new Error(data.message || "Failed to add review");
+			}
 
 			showAlert("success", "Review added successfully");
 			setNewReview({ reviewerName: "", rating: 5, comment: "", reviewDate: "" });
 			fetchReviews();
 		} catch (error) {
 			console.error("Error adding review:", error);
-			showAlert("error", "Failed to add review");
+			showAlert("error", error.message || "Failed to add review");
 		}
 	};
 

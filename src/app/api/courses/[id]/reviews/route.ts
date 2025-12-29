@@ -10,33 +10,44 @@ import { eq, and } from "drizzle-orm";
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
 	try {
-		const session = await getSession();
-		if (!session?.user) {
-			return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-		}
-
 		const courseId = params.id;
 		const body = await req.json();
-		const { rating, comment, avatar_url, is_visible, reviewerName, type } = body;
+		const { rating, comment, avatar_url, is_visible, reviewerName, type, reviewDate } = body;
 
-		// Handle instructor review
+		// Handle instructor review (no auth required)
 		if (type === "instructor") {
-			if (!reviewerName || !rating || !comment) {
+			if (!reviewerName || rating === undefined || !comment) {
 				return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
 			}
 
-			const newReview = await db
-				.insert(instructorReviews)
-				.values({
-					courseId,
-					reviewerName,
-					rating,
-					comment,
-					reviewDate: body.reviewDate || null,
-				})
-				.returning();
+			const parsedRating = parseInt(rating);
+			if (isNaN(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+				return NextResponse.json({ message: "Rating must be between 1 and 5" }, { status: 400 });
+			}
 
-			return NextResponse.json(newReview[0], { status: 201 });
+			try {
+				const newReview = await db
+					.insert(instructorReviews)
+					.values({
+						courseId,
+						reviewerName: reviewerName.trim(),
+						rating: parsedRating,
+						comment: comment.trim(),
+						reviewDate: reviewDate || null,
+					})
+					.returning();
+
+				return NextResponse.json(newReview[0], { status: 201 });
+			} catch (dbError) {
+				console.error("Database error inserting review:", dbError);
+				return NextResponse.json({ message: "Failed to save review to database", error: dbError.message }, { status: 500 });
+			}
+		}
+
+		// For student reviews, require authentication
+		const session = await getSession();
+		if (!session?.user) {
+			return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 		}
 
 		// Handle student review (existing logic)

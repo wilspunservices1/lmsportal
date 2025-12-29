@@ -1,21 +1,11 @@
 "use client";
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
-import homebanner1 from "@/assets/images/herobanner/homebanner1.jpeg";
+import React from "react";
 import homebanner2 from "@/assets/images/herobanner/homebanner2.jpeg";
 import TiltWrapper from "@/components/shared/wrappers/TiltWrapper";
 import SectionNameSecondary from "@/components/shared/section-names/SectionNameSecondary";
 import HeadingPrimaryXl from "@/components/shared/headings/HeadingPrimaryXl ";
 const About3 = () => {
-  const [currentImage, setCurrentImage] = useState(0);
-  const images = [homebanner1, homebanner2];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % 2);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
   return (
     <section>
       <div className="container">
@@ -28,15 +18,12 @@ const About3 = () => {
           >
             <TiltWrapper>
               <div className="tilt relative">
-                {images.map((img, idx) => (
-                  <Image
-                    key={idx}
-                    className={`w-full rounded-lg transition-opacity duration-1000 ${idx === currentImage ? 'opacity-100' : 'opacity-0 absolute inset-0'}`}
-                    src={img}
-                    alt={`Banner ${idx + 1}`}
-                    placeholder="blur"
-                  />
-                ))}
+                <Image
+                  className="w-full rounded-lg"
+                  src={homebanner2}
+                  alt="Banner"
+                  placeholder="blur"
+                />
               </div>
             </TiltWrapper>
           </div>
