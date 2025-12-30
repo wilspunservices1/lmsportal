@@ -11,6 +11,8 @@ import { useState, useEffect } from "react";
 import SkeletonButton from "@/components/Loaders/BtnSkeleton";
 import Link from "next/link";
 import PriceDisplay from "@/components/shared/PriceDisplay";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { convertPrice } from "@/utils/currency";
 
 const CourseEnroll = ({ type, course }) => {
 	const {
@@ -28,6 +30,7 @@ const CourseEnroll = ({ type, course }) => {
 
 	const { addProductToCart, cartProducts } = useCartContext();
 	const { data: session } = useSession();
+	const { currency } = useCurrency();
 
 	const userId = session?.user?.id;
 	const isAdmin = session?.user?.roles?.includes('admin') || session?.user?.role === 'admin';
@@ -220,12 +223,21 @@ const CourseEnroll = ({ type, course }) => {
 					</del>
 				</div>
 				<div>
-					<a
-						href="#"
-						className="uppercase text-sm font-semibold text-secondaryColor2 leading-27px px-2 bg-whitegrey1 dark:bg-whitegrey1-dark"
-					>
-						{parseFloat(discount).toFixed(2)}% OFF
-					</a>
+					{(() => {
+						const regularUSD = parseFloat(price);
+						const estimatedUSD = parseFloat(estimatedPrice);
+						const regularConverted = convertPrice(regularUSD, currency);
+						const estimatedConverted = convertPrice(estimatedUSD, currency);
+						const calculatedDiscount = ((estimatedConverted - regularConverted) / estimatedConverted) * 100;
+						return (
+							<a
+								href="#"
+								className="uppercase text-sm font-semibold text-secondaryColor2 leading-27px px-2 bg-whitegrey1 dark:bg-whitegrey1-dark"
+							>
+								{calculatedDiscount.toFixed(2)}% OFF
+							</a>
+						);
+					})()}
 				</div>
 			</div>
 
