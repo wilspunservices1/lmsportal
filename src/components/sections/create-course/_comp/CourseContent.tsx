@@ -110,14 +110,14 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 			return;
 		}
 
-		// Convert prices to USD for storage (prices are stored in USD)
+		// Convert prices from SAR to USD for storage (prices are stored in SAR, but we convert to USD for API)
 		const getCurrencyRate = (currencyCode: string): number => {
 			const currencyData = CURRENCIES.find(c => c.code === currencyCode);
 			return currencyData?.rate || 1;
 		};
 		
-		const usdRegularPrice = currency === 'USD' ? regularPriceValue : Math.round((regularPriceValue / getCurrencyRate(currency)) * 100) / 100;
-		const usdEstimatedPrice = estimatedPriceValue && currency !== 'USD' ? Math.round((estimatedPriceValue / getCurrencyRate(currency)) * 100) / 100 : estimatedPriceValue;
+		const sarRegularPrice = currency === 'SAR' ? regularPriceValue : regularPriceValue * getCurrencyRate(currency);
+		const sarEstimatedPrice = estimatedPriceValue && currency !== 'SAR' ? estimatedPriceValue * getCurrencyRate(currency) : estimatedPriceValue;
 
 		// Prepare course data for submission
 		const courseData = {
@@ -125,8 +125,8 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 			slug,
 			lesson: title,
 			duration: "0 hours",
-			price: usdRegularPrice,
-			estimatedPrice: usdEstimatedPrice || null,
+			price: sarRegularPrice,
+			estimatedPrice: sarEstimatedPrice || null,
 			isFree: offer === "Free",
 			tag: slug,
 			skillLevel: skillLevel,

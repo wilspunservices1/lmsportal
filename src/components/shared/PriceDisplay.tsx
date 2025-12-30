@@ -18,7 +18,7 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({
 }) => {
   const { currency } = useCurrency();
   
-  const convertedPrice = convertPrice(usdPrice, currency);
+  const convertedPrice = currency === 'SAR' ? usdPrice : (usdPrice / 3.75);
   const symbol = getCurrencySymbol(currency);
   
   const sizeClasses = {
