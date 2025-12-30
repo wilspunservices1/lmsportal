@@ -147,11 +147,18 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 	};
 
 	const handleChapterSaved = (response: any) => {
-		if (response && response.chapter && response.chapter.length > 0) {
-			setChapterId(response.chapter[0].id);
+		let chapterId = null;
+		
+		if (response?.chapter) {
+			// Handle both array (POST) and single object (PUT) responses
+			const chapter = Array.isArray(response.chapter) ? response.chapter[0] : response.chapter;
+			chapterId = chapter?.id;
+		}
+		
+		if (chapterId) {
+			setChapterId(chapterId);
 		} else {
 			console.error("Chapter ID not found in response:", response);
-			showAlert("error", "Chapter ID not found in response.");
 		}
 		setIsSaved(true);
 	};

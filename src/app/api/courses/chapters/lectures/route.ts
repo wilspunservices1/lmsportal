@@ -20,6 +20,11 @@ const extractMinutes = (duration: string) => {
 // Update chapter duration based on all lecture durations
 // Utility function to sum durations in minutes
 const updateChapterDuration = async (chapterId: string) => {
+  // Skip if it's a temporary ID
+  if (chapterId.toString().startsWith('temp_')) {
+    return;
+  }
+
   // Sum all lecture durations for the chapter in minutes
   const totalDurationInMinutes = await db
     .select({ totalDuration: sql`SUM(CAST(lectures.duration AS int))` })
@@ -32,13 +37,16 @@ const updateChapterDuration = async (chapterId: string) => {
     .update(chapters)
     .set({ duration: `${totalDurationInMinutes} minutes` })
     .where(eq(chapters.id, chapterId)).returning();
-
-  
 };
 
 
 // Update course duration based on all chapter durations
 const updateCourseDuration = async (courseId: string) => {
+  // Skip if courseId is missing or temporary
+  if (!courseId || courseId.toString().startsWith('temp_')) {
+    return;
+  }
+
   // Sum all chapter durations for the course
   const totalDurationInMinutes = await db
     .select({ totalDuration: sql`SUM(CAST(SPLIT_PART(chapters.duration, ' ', 1) AS int))` })
@@ -53,7 +61,6 @@ const updateCourseDuration = async (courseId: string) => {
     .update(courses)
     .set({ duration: newCourseDuration })
     .where(eq(courses.id, courseId)).returning();
-    // console.log("updatedChapterDeration -> updatedCourse",updatedCourse)
 };
 
 // Create or update a lecture
@@ -70,19 +77,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Ensure the chapter exists
-    const foundChapter = await db
-      .select()
-      .from(chapters)
-      .where(eq(chapters.id, chapterId))
-      .limit(1)
-      .then((res) => res[0]);
+    // Ensure the chapter exists (skip for temporary IDs)
+    if (!chapterId.toString().startsWith('temp_')) {
+      const foundChapter = await db
+        .select()
+        .from(chapters)
+        .where(eq(chapters.id, chapterId))
+        .limit(1)
+        .then((res) => res[0]);
 
-    if (!foundChapter) {
-      return NextResponse.json(
-        { message: "Chapter not found." },
-        { status: 404 }
-      );
+      if (!foundChapter) {
+        return NextResponse.json(
+          { message: "Chapter not found." },
+          { status: 404 }
+        );
+      }
     }
 
     // Get the current max order of the lectures in the chapter
@@ -329,11 +338,13 @@ export async function PUT(req: NextRequest) {
 
     const updatedLecture = await db.update(lectures).set(updateData).where(eq(lectures.id, lectureId)).returning();
 
-    // After updating, recalculate durations
-    if (chapterId || duration) {
-      await updateChapterDuration(existingLecture.chapterId); // Recalculate using the chapter ID of the lecture
-      const chapter = await db.select().from(chapters).where(eq(chapters.id, existingLecture.chapterId)).then(res => res[0]);
-      await updateCourseDuration(chapter.courseId);
+    // After updating, recalculate durations only if chapter exists
+    if ((chapterId || duration) && existingLecture.chapterId) {
+      await updateChapterDuration(existingLecture.chapterId);
+      const chapter = await db.select().from(chapters).where(eq(chapters.id, existingLecture.chapterId)).limit(1).then(res => res[0]);
+      if (chapter) {
+        await updateCourseDuration(chapter.courseId);
+      }
     }
 
     return NextResponse.json({ message: "Lecture updated successfully", lecture: updatedLecture }, { status: 200 });

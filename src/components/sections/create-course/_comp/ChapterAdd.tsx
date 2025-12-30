@@ -93,8 +93,7 @@ const ChapterAdd: React.FC<ChapterDetailsComponentProps> = ({
       if (response.ok) {
         const result = await response.json();
         onSave(chapterDetails);
-        const newChapterId = result.chapter?.[0]?.id || chapterId;
-        setChapterId(newChapterId);
+        setChapterId(result);
         showAlert("success", result.message);
         setIsEditing(false);
       } else {
