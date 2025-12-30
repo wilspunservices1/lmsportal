@@ -15,6 +15,8 @@ type Props = {
 		links: string[];
 		filePaths: string[];
 	};
+	descriptionPdfUrl?: string;
+	onPdfUpload?: (pdfUrl: string) => void;
 };
 
 type LanguageOption = {
@@ -30,7 +32,7 @@ const languageOptions: LanguageOption[] = [
 	{ value: "Chinese", label: "Chinese" },
 ];
 
-const CourseRight: React.FC<Props> = ({ courseId, extras }) => {
+const CourseRight: React.FC<Props> = ({ courseId, extras, descriptionPdfUrl, onPdfUpload }) => {
 	const [languages, setLanguages] = useState<LanguageOption[]>([]);
 	const [links, setLinks] = useState<string[]>([""]);
 	const [filePaths, setFilePaths] = useState<string[]>([]);
@@ -248,7 +250,7 @@ const CourseRight: React.FC<Props> = ({ courseId, extras }) => {
 					<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 						Upload a PDF document for course description
 					</p>
-					<CoursePDFUpload courseId={courseId} />
+					<CoursePDFUpload courseId={courseId} initialPdfUrl={descriptionPdfUrl} onPdfUpload={onPdfUpload} />
 				</div>
 			</div>
 

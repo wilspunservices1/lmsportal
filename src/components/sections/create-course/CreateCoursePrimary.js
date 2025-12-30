@@ -259,6 +259,9 @@ const CreateCoursePrimary = () => {
 			if (accessDuration) {
 				updateData.accessDurationMonths = parseInt(accessDuration);
 			}
+			if (initialCourseData?.descriptionPdfUrl) {
+				updateData.descriptionPdfUrl = initialCourseData.descriptionPdfUrl;
+			}
 
 			const response = await fetch(`/api/courses/${finalCourseId}`, {
 				method: "PATCH",
@@ -547,11 +550,18 @@ const CreateCoursePrimary = () => {
 						</div>
 					</div>
 
-					{/* Right side - Course Extras Setup */}
-					<CourseRight
-						courseId={id || courseId}
-						extras={initialCourseData?.extras || {}}
-					/>
+					{courseId && (
+						<CourseRight
+							courseId={courseId}
+							extras={initialCourseData?.extras || {}}
+							descriptionPdfUrl={initialCourseData?.descriptionPdfUrl}
+							onPdfUpload={(pdfUrl) => {
+								if (initialCourseData) {
+									setInitialCourseData({ ...initialCourseData, descriptionPdfUrl: pdfUrl });
+								}
+							}}
+						/>
+					)}
 				</div>
 			</div>
 		</div>

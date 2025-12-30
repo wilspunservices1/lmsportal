@@ -191,78 +191,43 @@ function formatDuration(totalMinutes: number): string {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, title, description, order, duration, chapterId } = body;
+    const { id, title, description, order, duration, chapterId, courseId } = body;
 
     const updateId = id || chapterId;
 
     if (!updateId) {
       return NextResponse.json(
-        { message: "id is required." },
+        { message: "id or chapterId is required." },
         { status: 400 }
       );
     }
 
-    if (title && description) {
-      const updatedChapter = await db
-        .update(chapters)
-        .set({
-          title,
-          description,
-          order: order || undefined,
-        })
-        .where(eq(chapters.id, updateId))
-        .returning();
-
-      if (updatedChapter.length === 0) {
-        return NextResponse.json(
-          { message: "Chapter not found." },
-          { status: 404 }
-        );
-      }
-
+    if (!title || !description) {
       return NextResponse.json(
-        { message: "Chapter updated successfully", chapter: updatedChapter },
-        { status: 200 }
+        { message: "title and description are required." },
+        { status: 400 }
       );
     }
-
-    const chapterLectures = await db
-      .select()
-      .from(lectures)
-      .where(eq(lectures.chapterId, updateId));
-
-    if (chapterLectures.length === 0) {
-      return NextResponse.json(
-        { message: "No lectures found for this chapter." },
-        { status: 404 }
-      );
-    }
-
-    let totalDuration = 0;
-    chapterLectures.forEach((lecture) => {
-      totalDuration += parseDuration(lecture.duration);
-    });
-
-    const formattedDuration = formatDuration(totalDuration);
 
     const updatedChapter = await db
       .update(chapters)
-      .set({ duration: formattedDuration })
+      .set({
+        title,
+        description,
+        ...(order ? { order } : {}),
+      })
       .where(eq(chapters.id, updateId))
       .returning();
 
     if (updatedChapter.length === 0) {
       return NextResponse.json(
-        { message: "Chapter not found or no changes made." },
+        { message: "Chapter not found." },
         { status: 404 }
       );
     }
 
     return NextResponse.json(
-      {
-        message: "Chapter duration updated successfully",
-        chapter: updatedChapter,
-      },
+      { message: "Chapter updated successfully", chapter: updatedChapter },
       { status: 200 }
     );
   } catch (error) {

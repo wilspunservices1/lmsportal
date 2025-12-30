@@ -75,7 +75,7 @@ const ChapterAdd: React.FC<ChapterDetailsComponentProps> = ({
     try {
       setIsLoading(true); // Start loading state
 
-      const isNewChapter = !chapterId;
+      const isNewChapter = !chapterId || chapterId.toString().startsWith('temp_');
       const method = isNewChapter ? "POST" : "PUT";
 
       const response = await fetch("/api/courses/chapters", {
@@ -92,13 +92,15 @@ const ChapterAdd: React.FC<ChapterDetailsComponentProps> = ({
 
       if (response.ok) {
         const result = await response.json();
-        onSave(chapterDetails); // Update the parent component with the new chapter details
-        setChapterId(result); // Update the chapterId in the parent component
+        onSave(chapterDetails);
+        const newChapterId = result.chapter?.[0]?.id || chapterId;
+        setChapterId(newChapterId);
         showAlert("success", result.message);
         setIsEditing(false);
       } else {
         const errorData = await response.json();
-        showAlert("error", `Failed to create chapter: ${errorData.message}`);
+        console.error("API Error:", errorData);
+        showAlert("error", `Failed to save chapter: ${errorData.message}`);
       }
     } catch (error) {
       console.error("An error occurred:", error);

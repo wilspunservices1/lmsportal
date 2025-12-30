@@ -4,11 +4,15 @@ import React, { useState } from "react";
 
 interface CoursePDFUploadProps {
   courseId: string;
+  initialPdfUrl?: string;
+  onPdfUpload?: (pdfUrl: string) => void;
 }
 
-const CoursePDFUpload: React.FC<CoursePDFUploadProps> = ({ courseId }) => {
+const CoursePDFUpload: React.FC<CoursePDFUploadProps> = ({ courseId, initialPdfUrl, onPdfUpload }) => {
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedPDF, setUploadedPDF] = useState<{url: string, name: string} | null>(null);
+  const [uploadedPDF, setUploadedPDF] = useState<{url: string, name: string} | null>(
+    initialPdfUrl ? { url: initialPdfUrl, name: "Course Description PDF" } : null
+  );
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -40,6 +44,10 @@ const CoursePDFUpload: React.FC<CoursePDFUploadProps> = ({ courseId }) => {
       if (response.ok) {
         console.log("PDF uploaded:", data.pdfUrl);
         setUploadedPDF({ url: data.pdfUrl, name: file.name });
+        
+        if (onPdfUpload) {
+          onPdfUpload(data.pdfUrl);
+        }
       } else {
         console.error("Upload error:", data.error);
       }
