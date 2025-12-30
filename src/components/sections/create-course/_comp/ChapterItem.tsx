@@ -355,11 +355,12 @@ const ChapterItem: React.FC<ChapterItemProps> = ({
 					title={chapter.title || ""}
 					description={chapter.description || ""}
 					initialOrder={
-						chapter.order ? parseInt(chapter.order, 10) : index + 1 // Use index + 1 as the default order
+						chapter.order ? parseInt(chapter.order, 10) : index + 1
 					}
 					initialDuration={chapter.duration || "0 minutes"}
 					onSave={handleSaveChapterDetails}
 					courseId={courseId || ""}
+					chapterId={chapter.id?.toString()}
 					setChapterId={handleChapterSaved}
 				/>
 				{isSaved && (

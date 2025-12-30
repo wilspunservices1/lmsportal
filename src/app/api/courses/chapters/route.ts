@@ -190,25 +190,47 @@ function formatDuration(totalMinutes: number): string {
 // Update a chapter's duration by summing up the durations of all lectures
 export async function PUT(req: NextRequest) {
   try {
-    // Parse the request body
     const body = await req.json();
-    const { chapterId } = body;
+    const { id, title, description, order, duration, chapterId } = body;
 
-    // Validate the required fields
-    if (!chapterId) {
+    const updateId = id || chapterId;
+
+    if (!updateId) {
       return NextResponse.json(
-        { message: "chapterId is required." },
+        { message: "id is required." },
         { status: 400 }
       );
     }
 
-    // Fetch all lectures associated with the chapter
+    if (title && description) {
+      const updatedChapter = await db
+        .update(chapters)
+        .set({
+          title,
+          description,
+          order: order || undefined,
+        })
+        .where(eq(chapters.id, updateId))
+        .returning();
+
+      if (updatedChapter.length === 0) {
+        return NextResponse.json(
+          { message: "Chapter not found." },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(
+        { message: "Chapter updated successfully", chapter: updatedChapter },
+        { status: 200 }
+      );
+    }
+
     const chapterLectures = await db
       .select()
       .from(lectures)
-      .where(eq(lectures.chapterId, chapterId));
+      .where(eq(lectures.chapterId, updateId));
 
-    // If no lectures found for the chapter
     if (chapterLectures.length === 0) {
       return NextResponse.json(
         { message: "No lectures found for this chapter." },
@@ -216,23 +238,19 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Calculate the total duration of all lectures
     let totalDuration = 0;
     chapterLectures.forEach((lecture) => {
       totalDuration += parseDuration(lecture.duration);
     });
 
-    // Format the total duration
     const formattedDuration = formatDuration(totalDuration);
 
-    // Update the chapter's duration
     const updatedChapter = await db
       .update(chapters)
       .set({ duration: formattedDuration })
-      .where(eq(chapters.id, chapterId))
+      .where(eq(chapters.id, updateId))
       .returning();
 
-    // Check if the update was successful
     if (updatedChapter.length === 0) {
       return NextResponse.json(
         { message: "Chapter not found or no changes made." },

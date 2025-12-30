@@ -9,14 +9,15 @@ interface ChapterDetailsComponentProps {
   description: string;
   initialOrder: number;
   initialDuration: string;
-  courseId: string; // Adding courseId to identify the course
+  courseId: string;
+  chapterId?: string;
   onSave: (details: {
     title: string;
     description: string;
     order: string;
     duration: string;
   }) => void;
-  setChapterId: (id: string) => void; // Add setChapterId to the props
+  setChapterId: (id: string) => void;
 }
 
 const ChapterAdd: React.FC<ChapterDetailsComponentProps> = ({
@@ -25,8 +26,9 @@ const ChapterAdd: React.FC<ChapterDetailsComponentProps> = ({
   initialOrder,
   initialDuration,
   courseId,
+  chapterId,
   onSave,
-  setChapterId, // Receive setChapterId as a prop
+  setChapterId,
 }) => {
   const [localTitle, setLocalTitle] = useState(title);
   const [localDescription, setLocalDescription] = useState(description);
@@ -73,14 +75,18 @@ const ChapterAdd: React.FC<ChapterDetailsComponentProps> = ({
     try {
       setIsLoading(true); // Start loading state
 
+      const isNewChapter = !chapterId;
+      const method = isNewChapter ? "POST" : "PUT";
+
       const response = await fetch("/api/courses/chapters", {
-        method: "POST",
+        method,
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...chapterDetails,
           courseId,
+          ...(isNewChapter ? {} : { id: chapterId }),
         }),
       });
 
