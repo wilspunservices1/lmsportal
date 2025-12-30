@@ -139,9 +139,7 @@ const CourseEnroll = ({ type, course }) => {
 			}
 		};
 
-		const interval = setInterval(checkEnrollment, 3000);
 		checkEnrollment();
-		return () => clearInterval(interval);
 	}, [userId, courseId, isAdmin]);
 
 	const handleEnrollClick = async () => {

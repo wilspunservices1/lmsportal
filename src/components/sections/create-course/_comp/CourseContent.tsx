@@ -102,10 +102,10 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 			return;
 		}
 
-		if (estimatedPriceValue < regularPriceValue) {
+		if (estimatedPriceValue && estimatedPriceValue < regularPriceValue) {
 			showAlert(
 				"error",
-				"Estimated price cannot be greater than the regular price."
+				"Estimated price cannot be less than the regular price."
 			);
 			return;
 		}
@@ -116,8 +116,8 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 			return currencyData?.rate || 1;
 		};
 		
-		const usdRegularPrice = currency === 'USD' ? regularPriceValue : regularPriceValue / getCurrencyRate(currency);
-		const usdEstimatedPrice = estimatedPriceValue && currency !== 'USD' ? estimatedPriceValue / getCurrencyRate(currency) : estimatedPriceValue;
+		const usdRegularPrice = currency === 'USD' ? regularPriceValue : Math.round((regularPriceValue / getCurrencyRate(currency)) * 100) / 100;
+		const usdEstimatedPrice = estimatedPriceValue && currency !== 'USD' ? Math.round((estimatedPriceValue / getCurrencyRate(currency)) * 100) / 100 : estimatedPriceValue;
 
 		// Prepare course data for submission
 		const courseData = {
@@ -125,10 +125,8 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 			slug,
 			lesson: title,
 			duration: "0 hours",
-			price: usdRegularPrice.toFixed(2),
-			estimatedPrice: usdEstimatedPrice
-				? usdEstimatedPrice.toFixed(2)
-				: null,
+			price: usdRegularPrice,
+			estimatedPrice: usdEstimatedPrice || null,
 			isFree: offer === "Free",
 			tag: slug,
 			skillLevel: skillLevel,
