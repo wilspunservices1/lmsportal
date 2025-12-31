@@ -28,16 +28,16 @@ const NavbarRight = () => {
         <button id="search-toggle" className="hidden" onClick={toggleDrawer}></button>
         {!isDrawerOpen && (
           <li
-            className="hidden lg:flex px-2 text-gray-500 items-center hover:text-gray-600 hover:cursor-pointer lg:px-2 lg:py-4 group"
+            className="flex px-2 text-gray-500 items-center hover:text-gray-600 hover:cursor-pointer lg:px-2 lg:py-4 group"
             onClick={toggleDrawer}
           >
             <SearchIcon />
           </li>
         )}
 
-        {/* Render the search field inline - desktop only */}
+        {/* Render the search field inline - all screens */}
         {isDrawerOpen && (
-          <li className="hidden lg:block">
+          <li className="block px-2">
             <SearchField />
           </li>
         )}
