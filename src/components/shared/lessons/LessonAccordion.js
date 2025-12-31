@@ -78,11 +78,7 @@ const LessonAccordion = ({
   const [isFinalExamModalOpen, setIsFinalExamModalOpen] = useState(false);
 
   const [isPreFinalExamOpen, setIsPreFinalExamOpen] = useState(false);
-  const [isBooking, setIsBooking] = useState(false);
-  const [bookedExams, setBookedExams] = useState({});
   const [finalExamAttempted, setFinalExamAttempted] = useState(false);
-  const [bookingMessage, setBookingMessage] = useState("");
-  const [examBooked, setExamBooked] = useState(false);
   const isSuperAdmin = userRoles.includes("superAdmin");
   const isInstructor = userRoles.includes("instructor");
   const isCourseOwner = courseOwnerId !== "" && isInstructor;
@@ -94,143 +90,9 @@ const LessonAccordion = ({
 
   const canAccessAll = isSuperAdmin || isEnrolled || isCourseOwner;
 
-  const handleExamBooking = async () => {
-    setIsBooking(true);
-    try {
-      const result = await Swal.fire({
-        title: "Confirm Exam Booking",
-        text: "Are you sure you want to book your final exam?Once You Click Bookit, You won't be able to cancel it.",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, book it!",
-      });
+  const handleExamBooking = async () => {};
 
-      if (result.isConfirmed) {
-        const response = await fetch(
-          `${BASE_URL}/api/user/${session?.user?.id}/exambooked`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({ courseId }),
-          }
-        );
 
-        if (!response.ok) {
-          throw new Error("Failed to book exam");
-        }
-
-        const data = await response.json();
-
-        // Open booking page in new tab
-        window.open(
-          "https://meridianqualitymanagementprofessionals.zohobookings.sa/#/meridianqualitymanagementprofessionals",
-          "_blank"
-        );
-
-        // Update state
-        setBookedExams((prev) => ({ ...prev, [chapterId]: true }));
-        setBookingMessage(data.message);
-        setExamBooked(true);
-        localStorage.setItem(`examBooked_${chapterId}`, "true");
-        localStorage.setItem(`examBookingMessage_${chapterId}`, data.message);
-
-        Swal.fire({
-          icon: "success",
-          title: "Exam Booked!",
-          text: data.message,
-        });
-      }
-    } catch (error) {
-      console.error("Error booking exam:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Booking Failed",
-        text: "There was an error booking your exam. Please try again.",
-      });
-    } finally {
-      setIsBooking(false);
-    }
-  };
-
-  const getFormattedExamDate = async (chapterId) => {
-    try {
-      if (!session?.user?.id) return "Date not available";
-
-      const response = await fetch(
-        `${BASE_URL}/api/user/${session.user.id}/exambooked?courseId=${courseId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch exam booking");
-      }
-
-      const data = await response.json();
-
-      if (!data.examDateTime) return "Date not available";
-
-      // Parse the DDMMYYYY HHMMSS format
-      const [datePart, timePart] = data.examDateTime.split(" ");
-      const day = datePart.substring(0, 2);
-      const month = datePart.substring(2, 4);
-      const year = datePart.substring(4, 8);
-      const hours = timePart.substring(0, 2);
-      const minutes = timePart.substring(2, 4);
-
-      return `${day}/${month}/${year} at ${hours}:${minutes}`;
-    } catch (error) {
-      console.error("Error formatting exam date:", error);
-      return "Date not available";
-    }
-  };
-
-  const [examBookingDate, setExamBookingDate] = useState("");
-
-  useEffect(() => {
-    const fetchBookingStatus = async () => {
-      try {
-        const response = await fetch(
-          `${BASE_URL}/api/user/${session?.user?.id}/exambooked?courseId=${courseId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.booked) {
-            setBookedExams((prev) => ({ ...prev, [chapterId]: true }));
-            setBookingMessage(
-              data.message ||
-                `You booked the exam on ${new Date(
-                  data.examBookingDateTime
-                ).toLocaleString()}`
-            );
-            setExamBooked(true);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching booking status:", error);
-      }
-    };
-
-    fetchBookingStatus();
-  }, [chapterId, courseId, session?.user?.id]);
 
   // Fetch final exam ID using the courseId prop
   useEffect(() => {
@@ -719,119 +581,66 @@ const LessonAccordion = ({
             {isEnrolled &&
               totalChapters > 0 &&
               completedChapters === totalChapters && (
-                <>
-                  {/* Book Final Exam Button */}
-                  <li className="mb-25px">
-                    <div className="bg-whiteColor border border-borderColor dark:bg-whiteColor-dark dark:border-borderColor-dark rounded-md p-4">
-                      <div className="flex flex-col items-center justify-center">
-                        <h3 className="text-lg font-semibold mb-3">
-                          Schedule Your Final Exam
-                        </h3>
-                        <button
-                          onClick={handleExamBooking}
-                          disabled={bookedExams[chapterId] || isBooking}
-                          className={`${
-                            bookedExams[chapterId] || isBooking
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-yellow hover:bg-blue-700"
-                          } text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center space-x-2`}
-                        >
-                          {isBooking ? (
-                            <span>Booking...</span>
-                          ) : (
-                            <span>
-                              {bookedExams[chapterId]
-                                ? "Exam Booked"
-                                : "Book Final Exam"}
-                            </span>
-                          )}
-                          {!bookedExams[chapterId] && !isBooking && (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          )}
-                        </button>
-
-                        {bookedExams[chapterId] && (
-                          <p className="mt-2 text-sm text-gray-600">
-                            {bookingMessage || "Exam booking confirmed"}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </li>
-
-                  {/* Start Final Exam Button */}
-                  <li className="mb-25px">
-                    <div className="bg-whiteColor border border-borderColor dark:bg-whiteColor-dark dark:border-borderColor-dark rounded-md p-4">
-                      <div className="flex flex-col items-center justify-center">
-                        <h3 className="text-lg font-semibold mb-3">
-                          Final Exam
-                        </h3>
-                        {finalExamAttempted ? (
-                          <div className="text-center">
-                            <p
-                              style={{
-                                color: "red",
-                                fontWeight: "bold",
-                                marginBottom: "0.5rem",
-                              }}
-                            >
-                              You have already attempted the final exam.
-                            </p>
-                            <div className="mt-2 p-3 bg-gray-100 rounded-lg">
-                              <p className="text-lg font-semibold">
-                                Your Final Score:
-                              </p>
-                              <p className="text-3xl font-bold text-blue-600">
-                                {quizScores[finalExamId] || 0}%
-                              </p>
-                              <p className="text-sm text-gray-600 mt-1">
-                                {(quizScores[finalExamId] || 0) >= 70 ? (
-                                  <span className="text-green-600 font-semibold">
-                                    Passed ✓
-                                  </span>
-                                ) : (
-                                  <span className="text-red-600 font-semibold">
-                                    Not Passed ✗
-                                  </span>
-                                )}
-                              </p>
-                            </div>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={handleFinalExamStart}
-                            className="bg-red-400 text-black font-bold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center space-x-2 hover:bg-red-600"
+                <li className="mb-25px">
+                  <div className="bg-whiteColor border border-borderColor dark:bg-whiteColor-dark dark:border-borderColor-dark rounded-md p-4">
+                    <div className="flex flex-col items-center justify-center">
+                      <h3 className="text-lg font-semibold mb-3">
+                        Final Exam
+                      </h3>
+                      {finalExamAttempted ? (
+                        <div className="text-center">
+                          <p
+                            style={{
+                              color: "red",
+                              fontWeight: "bold",
+                              marginBottom: "0.5rem",
+                            }}
                           >
-                            <span>Start Final Exam</span>
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
+                            You have already attempted the final exam.
+                          </p>
+                          <div className="mt-2 p-3 bg-gray-100 rounded-lg">
+                            <p className="text-lg font-semibold">
+                              Your Final Score:
+                            </p>
+                            <p className="text-3xl font-bold text-blue-600">
+                              {quizScores[finalExamId] || 0}%
+                            </p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {(quizScores[finalExamId] || 0) >= 70 ? (
+                                <span className="text-green-600 font-semibold">
+                                  Passed ✓
+                                </span>
+                              ) : (
+                                <span className="text-red-600 font-semibold">
+                                  Not Passed ✗
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={handleFinalExamStart}
+                          className="bg-red-400 text-black font-bold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center space-x-2 hover:bg-red-600"
+                        >
+                          <span>Start Final Exam</span>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      )}
                     </div>
-                  </li>
-                </>
+                  </div>
+                </li>
               )}
           </>
         )}
