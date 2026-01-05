@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import { useCurrency } from '@/contexts/CurrencyContext';
-import { convertPrice, formatPrice, getCurrencySymbol } from '@/utils/currency';
 
 interface PriceDisplayProps {
   usdPrice: number;
@@ -9,6 +8,22 @@ interface PriceDisplayProps {
   showCurrencyCode?: boolean;
   size?: 'sm' | 'md' | 'lg';
 }
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  'SAR': 'ر.س',
+  'USD': '$',
+  'AED': 'د.إ',
+  'PKR': '₨',
+  'CAD': 'C$'
+};
+
+const CURRENCY_RATES: Record<string, number> = {
+  'SAR': 1,
+  'USD': 0.267,
+  'AED': 0.978,
+  'PKR': 74.67,
+  'CAD': 0.36
+};
 
 const PriceDisplay: React.FC<PriceDisplayProps> = ({ 
   usdPrice, 
@@ -18,8 +33,8 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({
 }) => {
   const { currency } = useCurrency();
   
-  const convertedPrice = currency === 'SAR' ? usdPrice : (usdPrice / 3.75);
-  const symbol = getCurrencySymbol(currency);
+  const convertedPrice = usdPrice * (CURRENCY_RATES[currency] || 1);
+  const symbol = CURRENCY_SYMBOLS[currency] || '$';
   
   const sizeClasses = {
     sm: 'text-sm',
@@ -30,7 +45,7 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({
   return (
     <span className={`${sizeClasses[size]} ${className}`}>
       {symbol}{convertedPrice.toFixed(2)}
-      {showCurrencyCode && currency !== 'USD' && (
+      {showCurrencyCode && currency !== 'SAR' && (
         <span className="text-xs text-gray-500 ml-1">
           {currency}
         </span>

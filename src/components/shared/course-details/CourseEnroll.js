@@ -12,7 +12,6 @@ import SkeletonButton from "@/components/Loaders/BtnSkeleton";
 import Link from "next/link";
 import PriceDisplay from "@/components/shared/PriceDisplay";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { convertPrice } from "@/utils/currency";
 
 const CourseEnroll = ({ type, course }) => {
 	const {
@@ -154,10 +153,19 @@ const CourseEnroll = ({ type, course }) => {
 			setError("");
 
 			try {
+				const sarPrice = parseFloat(price);
+				const RATES = {
+				  'SAR': 1,
+				  'USD': 0.267,
+				  'AED': 0.978,
+				  'PKR': 74.67,
+				  'CAD': 0.36
+				};
+				const convertedPrice = sarPrice * (RATES[currency] || 1);
 				const items = [
 					{
 						name: title,
-						price: parseFloat(price).toFixed(2),
+						price: convertedPrice.toFixed(2),
 						image: thumbnail,
 						quantity: 1,
 						courseId,
@@ -169,7 +177,7 @@ const CourseEnroll = ({ type, course }) => {
 				const response = await fetch("/api/paymob/checkout", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ items, userId, email: userEmail, phone: "+966500000000" }),
+					body: JSON.stringify({ items, userId, email: userEmail, phone: "+966500000000", currency }),
 				});
 
 				if (!response.ok) {
@@ -190,6 +198,10 @@ const CourseEnroll = ({ type, course }) => {
 			}
 		}
 	};
+
+	const regularPrice = parseFloat(price);
+	const estimatedPriceVal = parseFloat(estimatedPrice);
+	const calculatedDiscount = estimatedPriceVal > 0 ? ((estimatedPriceVal - regularPrice) / estimatedPriceVal) * 100 : 0;
 
 	return (
 		<div
@@ -217,27 +229,18 @@ const CourseEnroll = ({ type, course }) => {
 				}`}
 			>
 				<div className="text-size-21 font-bold text-primaryColor font-inter leading-25px">
-					<PriceDisplay usdPrice={parseFloat(price)} />{" "}
+					<PriceDisplay usdPrice={regularPrice} />{" "}
 					<del className="text-sm text-lightGrey4 font-semibold">
-						/ <PriceDisplay usdPrice={parseFloat(estimatedPrice)} />
+						/ <PriceDisplay usdPrice={estimatedPriceVal} />
 					</del>
 				</div>
 				<div>
-					{(() => {
-						const regularUSD = parseFloat(price);
-						const estimatedUSD = parseFloat(estimatedPrice);
-						const regularConverted = convertPrice(regularUSD, currency);
-						const estimatedConverted = convertPrice(estimatedUSD, currency);
-						const calculatedDiscount = ((estimatedConverted - regularConverted) / estimatedConverted) * 100;
-						return (
-							<a
-								href="#"
-								className="uppercase text-sm font-semibold text-secondaryColor2 leading-27px px-2 bg-whitegrey1 dark:bg-whitegrey1-dark"
-							>
-								{calculatedDiscount.toFixed(2)}% OFF
-							</a>
-						);
-					})()}
+					<a
+						href="#"
+						className="uppercase text-sm font-semibold text-secondaryColor2 leading-27px px-2 bg-whitegrey1 dark:bg-whitegrey1-dark"
+					>
+						{calculatedDiscount.toFixed(2)}% OFF
+					</a>
 				</div>
 			</div>
 

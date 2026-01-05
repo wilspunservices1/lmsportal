@@ -45,6 +45,7 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 		if (initialData) {
 			setTitle(initialData.title || "");
 			setSlug(initialData.slug || "");
+			// Display price as-is (already in user's currency)
 			setRegularPrice(initialData.price?.toString() || "");
 			setEstimatedPrice(initialData.estimatedPrice?.toString() || "");
 			setCategory(initialData.categories || "");
@@ -110,23 +111,20 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 			return;
 		}
 
-		// Convert prices from SAR to USD for storage (prices are stored in SAR, but we convert to USD for API)
+		// Convert prices from user's currency to USD for storage (system stores prices in USD)
 		const getCurrencyRate = (currencyCode: string): number => {
 			const currencyData = CURRENCIES.find(c => c.code === currencyCode);
 			return currencyData?.rate || 1;
 		};
 		
-		const sarRegularPrice = currency === 'SAR' ? regularPriceValue : regularPriceValue * getCurrencyRate(currency);
-		const sarEstimatedPrice = estimatedPriceValue && currency !== 'SAR' ? estimatedPriceValue * getCurrencyRate(currency) : estimatedPriceValue;
-
-		// Prepare course data for submission
+		// Store prices as-is (in SAR)
 		const courseData = {
 			title,
 			slug,
 			lesson: title,
 			duration: "0 hours",
-			price: sarRegularPrice,
-			estimatedPrice: sarEstimatedPrice || null,
+			price: regularPriceValue,
+			estimatedPrice: estimatedPriceValue || null,
 			isFree: offer === "Free",
 			tag: slug,
 			skillLevel: skillLevel,

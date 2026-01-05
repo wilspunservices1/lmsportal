@@ -2,23 +2,14 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { items, userId, email, phone } = await req.json();
+    const { items, userId, email, phone, currency = 'SAR' } = await req.json();
     
-    console.log('Received items:', JSON.stringify(items, null, 2));
-
     const isRenewal = items.some((item: any) => item.isRenewal);
-    console.log('Is Renewal:', isRenewal);
-
-    console.log('Secret Key:', process.env.PAYMOB_SECRET_KEY?.substring(0, 10) + '...');
-    console.log('Public Key:', process.env.PAYMOB_PUBLIC_KEY?.substring(0, 10) + '...');
-    console.log('Integration ID:', process.env.PAYMOB_INTEGRATION_ID);
-
     const secretKey = process.env.PAYMOB_SECRET_KEY;
     const publicKey = process.env.PAYMOB_PUBLIC_KEY;
 
-    // Create payment intention using official Paymob API (amount in cents)
+    // Prices come already converted from frontend, just convert to cents
     const totalAmountCents = Math.max(10, Math.round(items.reduce((sum: number, item: any) => sum + (parseFloat(item.price) * 100), 0)));
-    console.log('Total amount in cents:', totalAmountCents);
     
     const intentResponse = await fetch('https://ksa.paymob.com/v1/intention', {
       method: 'POST',
@@ -38,9 +29,9 @@ export async function POST(req: Request) {
           courseIds: items.map((item: any) => item.courseId).join(',')
         },
         items: items.map((item: any) => ({
-          name: item.name.substring(0, 50), // Max 50 chars
-          amount: Math.max(10, Math.round(parseFloat(item.price) * 100)), // Minimum 10 cents
-          description: `Course ID: ${item.courseId} - ${item.name}`.substring(0, 255), // Max 255 chars
+          name: item.name.substring(0, 50),
+          amount: Math.max(10, Math.round(parseFloat(item.price) * 100)),
+          description: `Course ID: ${item.courseId} - ${item.name}`.substring(0, 255),
           quantity: 1
         })),
         billing_data: {
@@ -63,8 +54,6 @@ export async function POST(req: Request) {
     });
     
     const intentData = await intentResponse.json();
-    console.log('Intent Response Status:', intentResponse.status);
-    console.log('Intent Response:', JSON.stringify(intentData, null, 2));
     
     if (!intentResponse.ok) {
       console.error('Paymob API Error:', intentData);
