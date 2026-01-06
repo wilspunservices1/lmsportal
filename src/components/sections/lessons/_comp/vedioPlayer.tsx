@@ -4,27 +4,21 @@ interface VideoPlayerProps {
 	videoUrl: string;
 	title: string;
 	videoDuration: number;
-	isCompleted: boolean; // ✅ Now passed from LessonPrimary.js
+	isCompleted: boolean;
 	onComplete?: () => void;
 }
 
-const getVideoSrc = (url: string): string => {
-	if (!/^https?:\/\//i.test(url)) return url;
+const getVideoId = (url: string): string => {
 	try {
 		const parsedUrl = new URL(url);
-		if (parsedUrl.hostname.includes("youtube.com") || parsedUrl.hostname.includes("youtu.be")) {
-			let videoId = parsedUrl.hostname.includes("youtu.be")
-				? parsedUrl.pathname.slice(1)
-				: parsedUrl.searchParams.get("v") || "";
-			return `https://www.youtube.com/embed/${videoId}`;
-		} else if (parsedUrl.hostname.includes("vimeo.com")) {
-			const videoId = parsedUrl.pathname.split("/").pop();
-			return `https://player.vimeo.com/video/${videoId}`;
+		if (parsedUrl.hostname.includes("youtu.be")) {
+			return parsedUrl.pathname.slice(1);
+		} else if (parsedUrl.hostname.includes("youtube.com")) {
+			return parsedUrl.searchParams.get("v") || "";
 		}
-		return url;
-	} catch (error) {
-		console.error("Invalid URL:", url);
-		return url;
+		return "";
+	} catch {
+		return "";
 	}
 };
 
@@ -35,81 +29,51 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 	isCompleted,
 	onComplete,
 }) => {
-	const videoRef = useRef<HTMLIFrameElement>(null);
-	const [isPlaying, setIsPlaying] = useState(false);
-	const [timeWatched, setTimeWatched] = useState(0);
-	const [hasMarkedComplete, setHasMarkedComplete] = useState(isCompleted); // ✅ Initial state from LessonPrimary.js
+	const playerRef = useRef<any>(null);
+	const [hasMarkedComplete, setHasMarkedComplete] = useState(isCompleted);
+	const [player, setPlayer] = useState<any>(null);
 
-	const videoSrc = getVideoSrc(videoUrl);
+	const videoId = getVideoId(videoUrl);
+	const requiredWatchTime = videoDuration * 60 * 0.6; // 60% of duration in seconds
 
 	useEffect(() => {
-		let timer: NodeJS.Timeout | null = null;
-
-		// ✅ Only track time if lesson is NOT already completed
-		if (isPlaying && !hasMarkedComplete) {
-			timer = setInterval(() => {
-				setTimeWatched((prev) => prev + 1);
-			}, 1000);
+		if (!window.YT) {
+			const tag = document.createElement("script");
+			tag.src = "https://www.youtube.com/iframe_api";
+			document.body.appendChild(tag);
 		}
 
-		// ✅ Mark as complete only if NOT already completed
-		if (timeWatched >= (videoDuration * 60) && !hasMarkedComplete) {
-			setHasMarkedComplete(true);
-			onComplete?.(); // ✅ Calls `handleMarkAsComplete()` in LessonPrimary.js
-		}
-
-		return () => {
-			if (timer) clearInterval(timer);
+		window.onYouTubeIframeAPIReady = () => {
+			if (playerRef.current && !player) {
+				const newPlayer = new window.YT.Player(playerRef.current, {
+					height: "100%",
+					width: "100%",
+					videoId: videoId,
+					events: {
+						onStateChange: (event: any) => handleStateChange(event, newPlayer),
+					},
+				});
+				setPlayer(newPlayer);
+			}
 		};
-	}, [isPlaying, timeWatched, hasMarkedComplete, videoDuration, onComplete]);
+	}, [videoId, player]);
 
-	const handlePlayVideo = () => {
-		if (!isPlaying) {
-			setIsPlaying(true);
+	const handleStateChange = (event: any, playerInstance: any) => {
+		if (event.data === window.YT.PlayerState.PLAYING) {
+			const checkInterval = setInterval(() => {
+				const currentTime = playerInstance.getCurrentTime();
+				if (currentTime >= requiredWatchTime && !hasMarkedComplete) {
+					setHasMarkedComplete(true);
+					onComplete?.();
+					clearInterval(checkInterval);
+				}
+			}, 1000);
 		}
 	};
 
 	return (
 		<div className="relative w-full aspect-video bg-black">
-			<iframe
-				ref={videoRef}
-				src={videoSrc}
-				allowFullScreen
-				allow="autoplay; encrypted-media"
-				className="w-full h-full border-0"
-				title={title}
-			/>
-
-			{!isPlaying && !hasMarkedComplete && (
-				<div
-					className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 cursor-pointer"
-					onClick={handlePlayVideo}
-				>
-					<div className="w-16 h-16 flex items-center justify-center bg-white rounded-full bg-opacity-75">
-						<svg className="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 84 84">
-							<circle cx="42" cy="42" r="42" fill="currentColor" />
-							<polygon points="33,25 63,42 33,59" fill="#fff" />
-						</svg>
-					</div>
-				</div>
-			)}
-
-			<div className="absolute top-4 left-4 flex items-center space-x-4 z-10">
-				<h3 className="text-lg font-bold text-white">{title}</h3>
-			</div>
-
-			{/* <p className="mt-2 text-white text-center">
-				Watched: {Math.floor(timeWatched)} sec / {Math.floor(videoDuration)} sec
-			</p> */}
-
-			{/* {hasMarkedComplete && (
-				<div className="absolute bottom-0 left-0 w-full h-2 bg-green-500" />
-			)} */}
-			{/* {hasMarkedComplete && (
-				<p className="text-green-500 font-semibold mt-2 text-center">
-					✔ Lesson Completed
-				</p>
-			)} */}
+			<div ref={playerRef} className="w-full h-full" />
 		</div>
 	);
 };

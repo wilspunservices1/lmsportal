@@ -53,14 +53,13 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 				}
 
 				const data = await response.json();
-				setCourseDetails(data.data);
-
-				// Calculate total duration
-				const totalDuration = calculateTotalDuration(data.data.chapters);
-				setCourseDetails((prev) => ({
-					...prev,
+				const courseData = data.data || data;
+				const totalDuration = calculateTotalDuration(courseData.chapters);
+				
+				setCourseDetails({
+					...courseData,
 					duration: totalDuration,
-				}));
+				});
 			} catch (error) {
 				setError(error.message);
 			}
@@ -608,7 +607,7 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 												</div>
 												<div>
 													<span className=" text-black dark:text-blackColor-dark">
-														{courseDetails.lesson || "23 Lesson"}
+														{courseDetails.chapters?.length || courseDetails.lesson || "23"} Modules
 													</span>
 												</div>
 											</div>
@@ -652,10 +651,10 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 														<p className="text-contentColor2 dark:text-contentColor2-dark flex items-center">
 															<span className="w-1/2">Modules:</span>
 															<span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-																{courseDetails.lesson
-																	? courseDetails.lesson
-																	: 0}{" "}
-																Modules
+																{(() => {
+																	const modulesCount = courseDetails.chapters?.length || courseDetails.lesson || 0;
+																	return `${modulesCount} Modules`;
+																})()}
 															</span>
 														</p>
 													</li>
@@ -733,9 +732,12 @@ const CourseDetailsPrimary = ({ id: currentId, type, courseDetails: initialCours
 																Price Discount:
 															</span>
 															<span className="w-1/2 text-base lg:text-sm 2xl:text-base text-blackColor dark:text-deepgreen-dark font-medium text-opacity-100">
-																{courseDetails.discount
-																	? `${courseDetails.discount}%`
-																	: "-20%"}
+																{(() => {
+																	const regularPrice = parseFloat(courseDetails.price) || 0;
+																	const estimatedPrice = parseFloat(courseDetails.estimatedPrice) || 0;
+																	const discountPercent = estimatedPrice > 0 ? ((estimatedPrice - regularPrice) / estimatedPrice) * 100 : 0;
+																	return `${discountPercent.toFixed(2)}%`;
+																})()}
 															</span>
 														</p>
 													</li>

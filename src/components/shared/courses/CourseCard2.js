@@ -155,7 +155,7 @@ const CourseCard2 = ({ course, card, isList, isNotSidebar, enrolledCourses }) =>
 									</div>
 									<div>
 										<span className="text-sm text-black dark:text-blackColor-dark">
-											{lesson}
+											{chapters?.length || lesson || "0"}
 										</span>
 									</div>
 								</div>

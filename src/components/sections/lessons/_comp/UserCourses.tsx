@@ -83,17 +83,22 @@ const UserCourses: React.FC<UserCoursesProps> = ({
     return <p className="text-gray-500">You are not enrolled in this course.</p>;
   }
 
-  // Use the progress value directly from the enrolled course data
-  const progress = enrolledCourse.progress || 0;
+  // Calculate total chapters in the course
+  const totalChapters = courseData.chapters.length;
 
-  // Calculate total lessons in the course
-  let totalLessons = 0;
+  // Calculate completed chapters by checking if all lectures in each chapter are completed
+  let completedChapters = 0;
   courseData.chapters.forEach((chapter) => {
-    totalLessons += chapter.lessons.length; // Counting all lessons in the chapter
+    const allLecturesInChapterCompleted = chapter.lessons.every((lesson) =>
+      enrolledCourse.completedLectures.includes(lesson.id)
+    );
+    if (allLecturesInChapterCompleted) {
+      completedChapters++;
+    }
   });
 
-  // Calculate the number of completed lessons from the backend data
-  const completedLessons = enrolledCourse.completedLectures.length;
+  // Calculate progress percentage based on completed chapters
+  const progress = totalChapters > 0 ? Math.round((completedChapters / totalChapters) * 100) : 0;
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
@@ -104,9 +109,9 @@ const UserCourses: React.FC<UserCoursesProps> = ({
 
       {/* Progress Banner */}
       <ProgressBanner
-        progress={progress} // Using progress from backend
-        completedLectures={completedLessons} // Completed lessons from backend
-        totalLectures={totalLessons} // Total lessons from course data
+        progress={progress}
+        completedLectures={completedChapters}
+        totalLectures={totalChapters}
       />
 
       {/* Display Assigned Quiz Section */}

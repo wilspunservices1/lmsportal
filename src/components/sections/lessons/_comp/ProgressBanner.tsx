@@ -23,7 +23,7 @@ const ProgressBanner: React.FC<ProgressBannerProps> = ({
       <div className="text-center">
         <h3 className="text-xl font-semibold">Course Progress</h3>
         <p className="text-lg">
-          {completedLectures}/{totalLectures} Lectures Completed
+          {completedLectures}/{totalLectures} Modules Completed
         </p>
       </div>
     </div>

@@ -208,6 +208,7 @@ const LessonPrimary = ({ lessonId }) => {
 							courseOwnerId={courseCreatorId}
 							courseId={courseId}
 							userId={user?.id}
+							progressRefreshTrigger={progressRefresh}
 						/>
 					</div>
 

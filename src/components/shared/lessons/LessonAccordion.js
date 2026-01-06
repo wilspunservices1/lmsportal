@@ -59,6 +59,7 @@ const LessonAccordion = ({
   courseOwnerId = "",
   userRoles = [],
   courseId,
+  progressRefreshTrigger = 0,
 }) => {
   const { data: session } = useSession();
   const [chapters, setChapters] = useState([]);
@@ -84,6 +85,7 @@ const LessonAccordion = ({
   const isCourseOwner = courseOwnerId !== "" && isInstructor;
 
   const [chapterCompletion, setChapterCompletion] = useState({});
+  const [lessonCompletion, setLessonCompletion] = useState({});
 
   const [completedChapters, setCompletedChapters] = useState(0); // Track completed chapters
   const [totalChapters, setTotalChapters] = useState(0); // Track total chapters
@@ -176,6 +178,7 @@ const LessonAccordion = ({
         setTotalChapters(fetchedChapters.chapters.length); // Set total chapters count
 
         const completionStatuses = {}; // ✅ Stores chapter completion status
+        const lessonCompletionMap = {}; // ✅ Stores lesson completion status
 
         const chapterQuestionnaires = sortedChapters
           .filter((chapter) => chapter.questionnaireId != null)
@@ -194,20 +197,23 @@ const LessonAccordion = ({
                     `/api/lessons/${lesson.id}/progress-markasdone`
                   );
                   const progressData = await response.json();
-                  return progressData.isChapterDone === true;
+                  const isCompleted = progressData.isChapterDone === true || progressData.completed === true || progressData.isCompleted === true;
+                  lessonCompletionMap[lesson.id] = isCompleted;
+                  return isCompleted;
                 } catch (error) {
                   console.error(
                     `Error fetching progress for lesson ${lesson.id}:`,
                     error
                   );
+                  lessonCompletionMap[lesson.id] = false;
                   return false;
                 }
               })
             );
 
             const quizAttempted = chapter.questionnaireId
-              ? quizAttempts[chapter.questionnaireId] > 0
-              : true; // Automatically true for chapters without questionnaires
+              ? true
+              : true; // Always true - quiz unlocks when lessons are completed
 
             // ✅ Mark chapter as completed only if ALL lessons are done AND quiz is attempted
             completionStatuses[chapter.id] =
@@ -221,6 +227,7 @@ const LessonAccordion = ({
         );
 
         setChapterCompletion(completionStatuses); // ✅ Update chapter completion state
+        setLessonCompletion(lessonCompletionMap); // ✅ Update lesson completion state
 
         if (chapterQuestionnaires.length > 0) {
           try {
@@ -272,7 +279,7 @@ const LessonAccordion = ({
     };
 
     loadChaptersAndQuestionnaires();
-  }, [chapterId, progressRefresh, quizAttempts]);
+  }, [chapterId, progressRefresh, quizAttempts, progressRefreshTrigger]);
 
   const handleQuizStart = async (quiz) => {
     try {
@@ -483,7 +490,12 @@ const LessonAccordion = ({
                               return null;
                             }
 
-                            return attemptsLeft > 0 ? (
+                            // Check if all lessons are completed by checking the DOM or state
+                            const allLessonsCompleted = chapter.lessons.every(
+                              (lesson) => lessonCompletion[lesson.id] === true
+                            );
+
+                            return attemptsLeft > 0 && allLessonsCompleted ? (
                               <button
                                 onClick={() =>
                                   handleQuizStart({
@@ -501,6 +513,15 @@ const LessonAccordion = ({
                               >
                                 Start Quiz
                               </button>
+                            ) : !allLessonsCompleted ? (
+                              <p
+                                style={{
+                                  color: "orange",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                Complete all lectures first
+                              </p>
                             ) : (
                               <p
                                 style={{

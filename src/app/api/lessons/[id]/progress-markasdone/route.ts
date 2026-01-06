@@ -56,7 +56,6 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
         let lessonCompleted = false;
         if (userData.length > 0 && userData[0].enrolledCourses) {
-            // Safely handle enrolledCourses - ensure it's an array
             const enrolledCourses = Array.isArray(userData[0].enrolledCourses) 
                 ? userData[0].enrolledCourses 
                 : [];
@@ -66,7 +65,6 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
             );
         }
 
-        // Rest of your code remains the same...
         // Fetch questionnaire related to the chapterId
         const questionnaireData = await db
             .select({
@@ -81,11 +79,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
         if (questionnaireData.length === 0) {
             // Introductory chapter (no questionnaire)
-            isChapterDone = lessonCompleted; // Mark as done if the lesson is completed
-            lesson = { ...lesson, isLocked: false }; // Unlock lesson permanently
+            isChapterDone = lessonCompleted;
+            lesson = { ...lesson, isLocked: false };
             return NextResponse.json({
                 lesson,
-                questionnaire: null, // No questionnaire for introductory chapters
+                questionnaire: null,
                 isChapterDone,
             });
         }
@@ -104,10 +102,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
             )
             .limit(1);
 
-        // Mark as done only if both conditions are met
-        if (quizAttempt.length > 0 && lessonCompleted) {
+        // Mark as done only if lesson is completed (duration elapsed)
+        if (lessonCompleted) {
             isChapterDone = true;
-            lesson = { ...lesson, isLocked: false }; // Unlock lesson permanently
+            lesson = { ...lesson, isLocked: false };
         }
 
         return NextResponse.json({
