@@ -275,7 +275,7 @@ const CartPrimary = () => {
                   onClick={handleCheckout}
                   disabled={loading}
                 >
-                  {loading ? "Processing..." : `PAY WITH ${paymentMethod.toUpperCase()} (USD)`}
+                  {loading ? "Processing..." : `Check Out Now`}
                 </button>
               </div>
             </div>
