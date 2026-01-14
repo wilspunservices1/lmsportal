@@ -19,10 +19,10 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 
 const CURRENCY_RATES: Record<string, number> = {
   'SAR': 1,
-  'USD': 0.267,
-  'AED': 0.978,
-  'PKR': 74.67,
-  'CAD': 0.36
+  'USD': 0.27,
+  'AED': 0.97,
+  'PKR': 74.66,
+  'CAD': 0.37
 };
 
 const PriceDisplay: React.FC<PriceDisplayProps> = ({ 
@@ -33,8 +33,9 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({
 }) => {
   const { currency } = useCurrency();
   
-  const convertedPrice = usdPrice * (CURRENCY_RATES[currency] || 1);
-  const symbol = CURRENCY_SYMBOLS[currency] || '$';
+  // usdPrice is actually SAR price, just display it without conversion
+  const displayPrice = usdPrice;
+  const symbol = CURRENCY_SYMBOLS[currency] || 'ر.س';
   
   const sizeClasses = {
     sm: 'text-sm',
@@ -44,7 +45,7 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({
 
   return (
     <span className={`${sizeClasses[size]} ${className}`}>
-      {symbol}{convertedPrice.toFixed(2)}
+      {symbol}{displayPrice.toFixed(2)}
       {showCurrencyCode && currency !== 'SAR' && (
         <span className="text-xs text-gray-500 ml-1">
           {currency}
