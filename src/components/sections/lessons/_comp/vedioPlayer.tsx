@@ -32,44 +32,60 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 	const playerRef = useRef<any>(null);
 	const [hasMarkedComplete, setHasMarkedComplete] = useState(isCompleted);
 	const [player, setPlayer] = useState<any>(null);
+	const intervalRef = useRef<any>(null);
 
 	const videoId = getVideoId(videoUrl);
-	const requiredWatchTime = videoDuration * 60 * 0.6; // 60% of duration in seconds
+	const requiredWatchTime = videoDuration * 60 * 0.6;
+
+	const handleStateChange = (event: any, playerInstance: any) => {
+		if (event.data === window.YT.PlayerState.PLAYING) {
+			if (intervalRef.current) clearInterval(intervalRef.current);
+			intervalRef.current = setInterval(() => {
+				const currentTime = playerInstance.getCurrentTime();
+				if (currentTime >= requiredWatchTime && !hasMarkedComplete) {
+					setHasMarkedComplete(true);
+					onComplete?.();
+					clearInterval(intervalRef.current);
+				}
+			}, 1000);
+		} else {
+			if (intervalRef.current) clearInterval(intervalRef.current);
+		}
+	};
+
+	const initPlayer = () => {
+		if (playerRef.current && !player && window.YT && window.YT.Player) {
+			const newPlayer = new window.YT.Player(playerRef.current, {
+				height: "100%",
+				width: "100%",
+				videoId: videoId,
+				events: {
+					onStateChange: (event: any) => handleStateChange(event, newPlayer),
+				},
+			});
+			setPlayer(newPlayer);
+		}
+	};
 
 	useEffect(() => {
 		if (!window.YT) {
 			const tag = document.createElement("script");
 			tag.src = "https://www.youtube.com/iframe_api";
-			document.body.appendChild(tag);
+			const firstScript = document.getElementsByTagName("script")[0];
+			firstScript?.parentNode?.insertBefore(tag, firstScript);
 		}
 
-		window.onYouTubeIframeAPIReady = () => {
-			if (playerRef.current && !player) {
-				const newPlayer = new window.YT.Player(playerRef.current, {
-					height: "100%",
-					width: "100%",
-					videoId: videoId,
-					events: {
-						onStateChange: (event: any) => handleStateChange(event, newPlayer),
-					},
-				});
-				setPlayer(newPlayer);
-			}
+		window.onYouTubeIframeAPIReady = initPlayer;
+
+		if (window.YT && window.YT.Player) {
+			initPlayer();
+		}
+
+		return () => {
+			if (intervalRef.current) clearInterval(intervalRef.current);
+			if (player) player.destroy();
 		};
-	}, [videoId, player]);
-
-	const handleStateChange = (event: any, playerInstance: any) => {
-		if (event.data === window.YT.PlayerState.PLAYING) {
-			const checkInterval = setInterval(() => {
-				const currentTime = playerInstance.getCurrentTime();
-				if (currentTime >= requiredWatchTime && !hasMarkedComplete) {
-					setHasMarkedComplete(true);
-					onComplete?.();
-					clearInterval(checkInterval);
-				}
-			}, 1000);
-		}
-	};
+	}, [videoId]);
 
 	return (
 		<div className="relative w-full aspect-video bg-black">
