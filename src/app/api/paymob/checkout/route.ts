@@ -93,8 +93,8 @@ export async function POST(req: Request) {
       }, 0)
     );
 
-    // Paymob minimum amount is 1000 cents (10 SAR)
-    const MINIMUM_AMOUNT_CENTS = 1000;
+    // Paymob minimum amount is 100 cents (1 SAR)
+    const MINIMUM_AMOUNT_CENTS = 100;
     if (totalAmountCents < MINIMUM_AMOUNT_CENTS) {
       throw new Error(`Amount too low. Minimum is ${MINIMUM_AMOUNT_CENTS / 100} SAR, but got ${totalAmountCents / 100} SAR`);
     }
