@@ -144,7 +144,7 @@ export async function POST(req: Request) {
         return {
           name: item.name.substring(0, 50),
           amount: priceInCents,
-          description: `${item.name} (${symbols[currency]}${priceInSelectedCurrency} ${currency})`.substring(0, 255),
+          description: `Course ID: ${item.courseId} | ${item.name} (${symbols[currency]}${priceInSelectedCurrency} ${currency})`.substring(0, 255),
           quantity: 1
         };
       }),

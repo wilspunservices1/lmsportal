@@ -16,8 +16,13 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     console.log('=== PAYMOB WEBHOOK RECEIVED ===');
+    console.log('Timestamp:', new Date().toISOString());
     console.log('Full body:', JSON.stringify(body, null, 2));
     console.log('Request headers:', Object.fromEntries(req.headers.entries()));
+    console.log('Body type:', body.type);
+    console.log('Transaction success:', body.obj?.success);
+    console.log('Order extras:', body.obj?.order?.extras);
+    console.log('Order items:', body.obj?.order?.items);
     
     // Verify HMAC signature (disabled for testing)
     const hmacSecret = process.env.PAYMOB_HMAC_SECRET!;
@@ -37,17 +42,26 @@ export async function POST(req: NextRequest) {
     //   }
     // }
 
-    console.log('Webhook type:', body.type);
-    console.log('Transaction success:', body.obj?.success);
-    
     // Process successful payment
     if (body.type === 'TRANSACTION' && body.obj.success === true) {
+      console.log('✅ Processing successful transaction');
       const transaction = body.obj;
       const orderId = transaction.order.id;
-      const userEmail = transaction.order.shipping_data?.email || transaction.payment_key_claims?.billing_data?.email;
+      const userEmail = transaction.order.shipping_data?.email || transaction.payment_key_claims?.billing_data?.email || transaction.billing_data?.email;
       const totalAmount = transaction.amount_cents / 100;
       
+      console.log('Transaction ID:', transaction.id);
+      console.log('Order ID:', orderId);
       console.log('Extracted user email:', userEmail);
+      console.log('Total amount:', totalAmount);
+      
+      if (!userEmail) {
+        console.error('❌ No email found in transaction data');
+        console.error('Shipping data:', transaction.order.shipping_data);
+        console.error('Payment key claims:', transaction.payment_key_claims);
+        console.error('Billing data:', transaction.billing_data);
+        return NextResponse.json({ error: 'Email not found' }, { status: 400 });
+      }
 
       // Get user by email
       const userData = await db
@@ -73,14 +87,34 @@ export async function POST(req: NextRequest) {
       const isRenewal = transaction.order.extras?.isRenewal === 'true';
       console.log('🔄 Is Renewal (Paymob):', isRenewal);
 
-      // Get course IDs from order items
-      const courseIds = transaction.order.items.map((item: any) => {
-        // Extract course ID from item description or name
-        const match = item.description.match(/Course ID: ([a-zA-Z0-9-]+)/);
-        return match ? match[1] : item.name;
-      });
+      // Get course IDs from extras first (most reliable)
+      let courseIds: string[] = [];
       
-      console.log('Extracted course IDs:', courseIds);
+      if (transaction.order.extras?.courseIds) {
+        courseIds = transaction.order.extras.courseIds.split(',').filter(Boolean);
+        console.log('✅ Course IDs from extras:', courseIds);
+      }
+      
+      // Fallback: extract from item descriptions
+      if (courseIds.length === 0) {
+        courseIds = transaction.order.items.map((item: any) => {
+          const match = item.description?.match(/Course ID: ([a-zA-Z0-9-]+)/);
+          if (match) {
+            return match[1];
+          }
+          console.warn('⚠️ Could not extract course ID from description:', item.description);
+          return null;
+        }).filter(Boolean);
+        console.log('📝 Course IDs from descriptions:', courseIds);
+      }
+      
+      if (courseIds.length === 0) {
+        console.error('❌ No course IDs found in order items or extras');
+        console.error('Transaction data:', JSON.stringify(transaction.order, null, 2));
+        return NextResponse.json({ error: 'No course IDs found' }, { status: 400 });
+      }
+      
+      console.log('Final extracted course IDs:', courseIds);
 
       // Get course details
       const courseDetails = await db
@@ -112,6 +146,19 @@ export async function POST(req: NextRequest) {
         paymentMethod: 'paymob',
         items,
       });
+      
+      // Increment enrolledCount for each purchased course (same as Stripe)
+      await Promise.all(
+        courseIds.map(async (courseId) => {
+          await db
+            .update(courses)
+            .set({
+              enrolledCount: sql`${courses.enrolledCount} + 1`,
+            })
+            .where(eq(courses.id, courseId));
+        })
+      );
+      console.log('✅ Enrolled count incremented for courses:', courseIds);
 
       // **Prepare the Courses to be Added to EnrolledCourses (same as Stripe)**
       const enrollmentDate = new Date();
