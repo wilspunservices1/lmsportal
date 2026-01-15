@@ -163,7 +163,7 @@ export async function POST(req: Request) {
         postal_code: '11564'
       },
       notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/paymob/webhook`,
-      redirection_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payProgress/success?payment_method=paymob`,
+      redirection_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payProgress/success?payment_method=paymob&success=true`,
       expiration: 3600
     };
 

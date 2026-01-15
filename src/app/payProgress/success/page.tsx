@@ -18,6 +18,13 @@ const SuccessPage = () => {
       
       // For Paymob, check if payment was actually successful
       if (method === 'paymob') {
+        // Check for explicit failure
+        if (success === 'false') {
+          setError("Payment was declined or cancelled. Please try again.");
+          return;
+        }
+        
+        // Require success=true or hmac for Paymob
         if (success !== 'true' && !hmac) {
           setError("Payment was not completed. Please try again.");
           return;
