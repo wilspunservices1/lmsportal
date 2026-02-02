@@ -147,7 +147,7 @@ export async function POST(req: Request) {
 		  const courseId = questionnaire[0].courseId;
 		  
 
-		if (courseId) {
+			if (courseId) {
 			const userData = await db
 				.select({ enrolledCourses: user.enrolledCourses })
 				.from(user)
@@ -155,9 +155,11 @@ export async function POST(req: Request) {
 				.limit(1);
 
 			const enrolled = userData?.[0]?.enrolledCourses || [];
+			console.log('📚 Before update - enrolled courses:', enrolled);
 
 			const updatedEnrolled = enrolled.map((course: any) => {
 				if (course.courseId === courseId) {
+					console.log(`✅ Setting finalExamStatus=true for course ${courseId}, score: ${score}`);
 					return {
 						...course,
 						finalExamStatus: score >= 70,
@@ -165,12 +167,14 @@ export async function POST(req: Request) {
 				}
 				return course;
 			});
-			console.log("updated Enrolled Courses", updatedEnrolled);
+			console.log('📚 After update - enrolled courses:', updatedEnrolled);
 
 			await db
 				.update(user)
 				.set({ enrolledCourses: updatedEnrolled })
 				.where(eq(user.id, user_id));
+				
+			console.log('💾 Database updated successfully');
 		}
 
 		

@@ -79,34 +79,56 @@ const CertificateForm: React.FC = () => {
 
 	//! fectch courses
 	useEffect(() => {
-		if (session?.user?.roles?.includes("instructor")) {
-			const fetchCourses = async () => {
-				try {
+		const fetchCourses = async () => {
+			try {
+				let response;
+				
+				if (session?.user?.roles?.includes("instructor")) {
+					// Fetch instructor's own courses
 					const instructorId = session?.user?.id;
-
-					const response = await fetch(
+					response = await fetch(
 						`${BASE_URL}/api/courses/instructorCourses?instructorId=${instructorId}`
 					);
-
-					if (!response.ok) {
-						throw new Error("Failed to fetch courses");
-					}
-
-					const data = await response.json();
-					const options = data.courses.map((course: { id: string; title: string }) => ({
-						value: course.id,
-						label: course.title,
-					}));
-					setCoursesOptions(options);
-				} catch (error) {
-					console.error("Error fetching courses:", error);
-					setFormErrors((prev) => ({
-						...prev,
-						global: "Failed to load courses. Please try again.",
-					}));
+				} else if (session?.user?.roles?.some((role: string) => ["admin", "superAdmin"].includes(role))) {
+					// Fetch all courses for admin/superAdmin
+					response = await fetch(`${BASE_URL}/api/courses`);
+				} else {
+					return; // No access for other roles
 				}
-			};
 
+				if (!response.ok) {
+					throw new Error("Failed to fetch courses");
+				}
+
+				const data = await response.json();
+				
+				// Handle different response structures
+				let coursesList;
+				if (data.courses) {
+					// Instructor courses response
+					coursesList = data.courses;
+				} else if (data.data) {
+					// All courses response
+					coursesList = data.data;
+				} else {
+					coursesList = data;
+				}
+				
+				const options = coursesList.map((course: { id: string; title: string }) => ({
+					value: course.id,
+					label: course.title,
+				}));
+				setCoursesOptions(options);
+			} catch (error) {
+				console.error("Error fetching courses:", error);
+				setFormErrors((prev) => ({
+					...prev,
+					global: "Failed to load courses. Please try again.",
+				}));
+			}
+		};
+
+		if (session?.user?.roles?.some((role: string) => ["admin", "instructor", "superAdmin"].includes(role))) {
 			fetchCourses();
 		}
 	}, [session?.user?.id, session?.user?.roles]);

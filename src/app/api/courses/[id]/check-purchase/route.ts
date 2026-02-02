@@ -48,7 +48,7 @@ export async function GET(
 
 		// Check if user has purchased this specific course
 		const hasPurchased = userData.enrolledCourses.some(
-			(course: { id: string }) => course.id === courseId
+			(course: { courseId: string }) => course.courseId === courseId
 		);
 
 		console.log("Purchase check result:", hasPurchased);

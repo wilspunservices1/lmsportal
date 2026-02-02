@@ -194,8 +194,12 @@ const CourseDetailsPrimary = ({
 
       try {
         // STEP 1: Get user info including roles and enrolledCourses
-        const userResponse = await fetch(`/api/user/${session.user.id}`);
+        const userResponse = await fetch(`/api/user/${session.user.id}`, {
+          cache: 'no-store' // Force fresh data
+        });
         const userData = await userResponse.json();
+
+        console.log('🔍 User enrolled courses:', userData?.enrolledCourses);
 
         const userRoles = userData?.roles || [];
 
@@ -218,6 +222,7 @@ const CourseDetailsPrimary = ({
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
+            cache: 'no-store' // Force fresh data
           }
         );
 
@@ -239,6 +244,9 @@ const CourseDetailsPrimary = ({
           const matchedCourse = userData.enrolledCourses.find(
             (course) => course.courseId === currentId
           );
+
+          console.log('🎯 Matched course:', matchedCourse);
+          console.log('📊 Final exam status:', matchedCourse?.finalExamStatus);
 
           setHasPassedFinalExam(matchedCourse?.finalExamStatus === true);
         }

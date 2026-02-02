@@ -62,10 +62,14 @@ export async function GET(req: NextRequest) {
 		const { searchParams } = new URL(req.url);
 		const courseId = searchParams.get("courseId");
 
-		let conditions = [
-			eq(certification.owner_id, session.user.id),
-			eq(certification.is_deleted, false),
-		];
+		let conditions = [eq(certification.is_deleted, false)];
+
+		// ✅ Role-based filtering
+		if (userRoles.includes("instructor")) {
+			// Instructors only see their own certificates
+			conditions.push(eq(certification.owner_id, session.user.id));
+		}
+		// Admins and superAdmins see all certificates (no owner_id filter)
 
 		// ✅ If courseId exists, filter by it
 		if (courseId) {
