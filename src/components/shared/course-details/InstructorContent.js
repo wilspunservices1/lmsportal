@@ -32,8 +32,6 @@ const InstructorContent = ({ id }) => {
 
   const { course, instructor, socials } = instructorData;
 
-  console.log("instructor",instructor)
-
   return (
     <div>
       <div

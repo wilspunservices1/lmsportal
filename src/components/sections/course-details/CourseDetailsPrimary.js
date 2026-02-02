@@ -199,8 +199,6 @@ const CourseDetailsPrimary = ({
         });
         const userData = await userResponse.json();
 
-        console.log('🔍 User enrolled courses:', userData?.enrolledCourses);
-
         const userRoles = userData?.roles || [];
 
         // STEP 2: Check if user is admin/instructor/superAdmin
@@ -244,9 +242,6 @@ const CourseDetailsPrimary = ({
           const matchedCourse = userData.enrolledCourses.find(
             (course) => course.courseId === currentId
           );
-
-          console.log('🎯 Matched course:', matchedCourse);
-          console.log('📊 Final exam status:', matchedCourse?.finalExamStatus);
 
           setHasPassedFinalExam(matchedCourse?.finalExamStatus === true);
         }

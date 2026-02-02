@@ -10,8 +10,6 @@ const CourseDescription: React.FC<Props> = ({ description }) => {
 	const [remainingContentHtml, setRemainingContentHtml] = useState<string>("");
 
 	useEffect(() => {
-		console.log("✅✅✅✅✅✅✅ CourseDescription received description:", description); // Debug log
-
 		if (description) {
 			// Use DOMParser only on the client side
 			const extractFirstParagraph = (htmlContent: string) => {

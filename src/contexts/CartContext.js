@@ -74,7 +74,6 @@ const CartContextProvider = ({ children }) => {
 
 			const data = await response.json();
 			if (data.length === 0) {
-				console.log("No items in the cart");
 				return;
 			}
 
