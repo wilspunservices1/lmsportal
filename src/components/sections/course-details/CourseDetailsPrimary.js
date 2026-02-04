@@ -253,16 +253,14 @@ const CourseDetailsPrimary = ({
     checkPurchaseStatus();
   }, [session, currentId]);
 
-  // A helper to build the HTML for the certificate + placeholders
   function buildCertificateHTML(
     certificate_data_url,
     placeholders = [],
-    originalWidth = 1024,
-    originalHeight = 728
+    originalWidth = 842,
+    originalHeight = 595
   ) {
-    const displayedWidth = 450;
-    const scaleFactor = displayedWidth / originalWidth;
-    const displayedHeight = originalHeight * scaleFactor;
+    const displayedWidth = 842;
+    const displayedHeight = 595;
 
     let html = `
 			<style>
@@ -273,22 +271,29 @@ const CourseDetailsPrimary = ({
 				.font-great-vibes { font-family: 'Great Vibes', cursive !important; }
 				.font-pinyon-script { font-family: 'Pinyon Script', cursive !important; }
 				.font-tangerine { font-family: 'Tangerine', cursive !important; }
+				.certificate-placeholder {
+					box-sizing: border-box;
+					margin: 0;
+					padding: 0;
+					border: none;
+					outline: none;
+					background: transparent;
+				}
 			</style>
-			<div style="position: relative; display: inline-block; width: ${displayedWidth}px; height: ${displayedHeight}px; overflow: hidden; border: 1px solid #ccc;">
+			<div style="position: relative; display: inline-block; width: ${displayedWidth}px; height: ${displayedHeight}px; overflow: hidden; border: 1px solid #ccc; background: white;">
 				<img 
 					src="${certificate_data_url}" 
 					alt="Certificate" 
-					style="display: block; width: 100%; height: 100%; object-fit: contain;"
+					style="display: block; width: ${displayedWidth}px; height: ${displayedHeight}px; object-fit: cover; position: absolute; top: 0; left: 0;"
 				/>
 		`;
 
     const visiblePlaceholders = placeholders.filter((ph) => ph.is_visible);
     visiblePlaceholders.forEach((ph) => {
-      // Calculate scaled positions
-      const posX = (ph.x / originalWidth) * 1100;
-      const posY = (ph.y / originalHeight) * 830;
-      const scaledFontSize = Math.max((ph.font_size ?? 16) * scaleFactor, 12);
-
+      // Use EXACT coordinates from database
+      const x = parseFloat(ph.x) || 0;
+      const y = parseFloat(ph.y) || 0;
+      
       const fontClass = ph.font_family
         ? `font-${ph.font_family.toLowerCase().replace(/\s+/g, "-")}`
         : "";
@@ -300,22 +305,25 @@ const CourseDetailsPrimary = ({
 
       html += `
 				<div 
-					class="${fontClass}"
+					class="certificate-placeholder ${fontClass}"
 					style="
 						position: absolute;
-                    top: ${posY}px;
-                    left: ${posX}px;
-                    font-size: ${scaledFontSize}px;
+                    top: ${y}px;
+                    left: ${x}px;
+                    font-size: ${parseFloat(ph.font_size) || 16}px;
                     color: ${ph.color || "#000"};
                     font-family: ${fontFamily};
-                    transform: translate(30%, -55%);
-                    text-align: center;
                     white-space: nowrap;
-                    background: rgba(255, 255, 255, 0.7);
-                    padding: 2px 5px;
-                    max-width: 90%;
                     z-index: 10;
-                    border-radius: 3px;
+                    line-height: 1;
+                    padding: 0;
+                    margin: 0;
+                    box-sizing: border-box;
+                    border: transparent;
+                    background: transparent;
+                    outline: none;
+                    padding: 0;
+                    text-align: left;
 					"
 				>
 					${ph.value ?? ph.label ?? ""}
@@ -336,8 +344,8 @@ const CourseDetailsPrimary = ({
   function openFullScreenCertificate(certificateUrl, placeholders) {
     if (typeof window === "undefined") return;
 
-    const originalWidth = 1024;
-    const originalHeight = 728;
+    const originalWidth = 842;
+    const originalHeight = 595;
 
     const newWindow = window.open("", "_blank");
 
@@ -347,11 +355,11 @@ const CourseDetailsPrimary = ({
 		  <html>
 		  <head>
 			<title>Certificate</title>
-			<!-- Add Font Imports -->
 			<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 			<link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap" rel="stylesheet">
 			<link href="https://fonts.googleapis.com/css2?family=Tangerine&display=swap" rel="stylesheet">
 			<style>
+			  * { margin: 0; padding: 0; box-sizing: border-box; }
 			  @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 			  @import url('https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap');
 			  @import url('https://fonts.googleapis.com/css2?family=Tangerine&display=swap');
@@ -366,12 +374,25 @@ const CourseDetailsPrimary = ({
 				position: relative; 
 				display: inline-block; 
 				width: ${originalWidth}px; 
-				height: ${originalHeight}px; 
+				height: ${originalHeight}px;
+				background: white;
+			  }
+			  .certificate-container img {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: ${originalWidth}px;
+				height: ${originalHeight}px;
+				object-fit: cover;
 			  }
 			  .placeholder { 
 				position: absolute; 
 				white-space: nowrap; 
 				z-index: 10;
+				padding: 0;
+				margin: 0;
+				line-height: 1;
+				text-align: left;
 			  }
 			  .font-great-vibes { font-family: 'Great Vibes', cursive !important; }
 			  .font-pinyon-script { font-family: 'Pinyon Script', cursive !important; }
@@ -393,7 +414,7 @@ const CourseDetailsPrimary = ({
 		  </head>
 		  <body>
 			<div class="certificate-container">
-			  <img src="${certificateUrl}" alt="Certificate" style="width: 100%; height: 100%;" object-fit: contain; position: absolute; top: 0; left: 0; id="certificate-image" />
+			  <img src="${certificateUrl}" alt="Certificate" id="certificate-image" />
 			  ${placeholders
           .filter((ph) => ph.is_visible)
           .map(
@@ -404,9 +425,9 @@ const CourseDetailsPrimary = ({
               : ""
           }" 
 					style="
-					  top: ${(ph.y / originalHeight) * 251}%;
-					  left: ${(ph.x / originalWidth) * 260}%;
-					  font-size: ${ph.font_size}px;
+					  top: ${parseFloat(ph.y)}px;
+					  left: ${parseFloat(ph.x)}px;
+					  font-size: ${parseFloat(ph.font_size) || 16}px;
 					  color: ${ph.color || "#000000"};
 					  font-family: ${
               ["Great Vibes", "Pinyon Script", "Tangerine"].includes(
@@ -423,31 +444,55 @@ const CourseDetailsPrimary = ({
           .join("")}
 			</div>
 			<br>
-			<button onclick="downloadCertificate()">Download</button>
+			<button onclick="downloadCertificatePDF()">Download PDF</button>
 			<script>
-			  function downloadCertificate() {
-				// Wait for fonts to load before capturing
-				document.fonts.ready.then(function() {
-				  html2canvas(document.querySelector('.certificate-container'), {
-					useCORS: true,
-					scale: 2,
-					onclone: function(clonedDoc) {
-					  // Additional font loading check
-					  const fonts = ['Great Vibes', 'Pinyon Script', 'Tangerine'];
-					  fonts.forEach(font => {
-						document.fonts.load(\`16px "\${font}"\`);
+			  function downloadCertificatePDF() {
+				try {
+				  document.fonts.ready.then(() => {
+					html2canvas(document.querySelector('.certificate-container'), {
+					  useCORS: true,
+					  scale: 2,
+					  backgroundColor: '#ffffff',
+					  allowTaint: false,
+					  logging: false
+					}).then(canvas => {
+					  const imgData = canvas.toDataURL('image/jpeg', 0.95);
+					  const { jsPDF } = window.jspdf;
+					  const pdf = new jsPDF({
+						orientation: 'landscape',
+						unit: 'mm',
+						format: 'a4'
 					  });
-					}
-				  }).then(canvas => {
-					const link = document.createElement("a");
-					link.href = canvas.toDataURL("image/png");
-					link.download = "certificate.png";
-					link.click();
+					  const pdfWidth = pdf.internal.pageSize.getWidth();
+					  const pdfHeight = pdf.internal.pageSize.getHeight();
+					  const imgWidth = canvas.width;
+					  const imgHeight = canvas.height;
+					  const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+					  const imgX = (pdfWidth - imgWidth * ratio) / 2;
+					  const imgY = (pdfHeight - imgHeight * ratio) / 2;
+					  pdf.addImage(imgData, 'JPEG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+					  const pdfBlob = pdf.output('blob');
+					  const url = URL.createObjectURL(pdfBlob);
+					  const a = document.createElement('a');
+					  a.href = url;
+					  a.download = 'certificate.pdf';
+					  document.body.appendChild(a);
+					  a.click();
+					  document.body.removeChild(a);
+					  URL.revokeObjectURL(url);
+					}).catch(err => {
+					  console.error('Canvas error:', err);
+					  alert('Failed to generate PDF');
+					});
 				  });
-				});
+				} catch(e) {
+				  console.error('PDF error:', e);
+				  alert('PDF library error');
+				}
 			  }
 			</script>
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 		  </body>
 		  </html>
 		`;
@@ -489,11 +534,16 @@ const CourseDetailsPrimary = ({
         return;
       }
 
-      // 2️⃣ Fetch the user details (for student name)
+      // Get user enrollment data first
       const userResponse = await fetch(`/api/user/${session.user.id}`);
       if (!userResponse.ok) throw new Error("Failed to fetch user data");
       const userData = await userResponse.json();
-      const studentName = userData?.name || "Student Name"; // Fallback
+      const studentName = userData?.name || "Student Name";
+      
+      // Find the enrolled course data
+      const enrolledCourse = userData?.enrolledCourses?.find(
+        (course) => course.courseId === currentId
+      );
 
       // 2️⃣ Fetch the course details to get the certificateId
       const courseResponse = await fetch(`/api/courses/${currentId}`, {
@@ -508,12 +558,9 @@ const CourseDetailsPrimary = ({
       }
 
       const courseData = await courseResponse.json();
-      // Assuming the response is shaped like { message: "...", data: { ...courseFields } }
       const { data: fetchedCourse } = courseData;
 
-      const sessionName = fetchedCourse?.title || "Session Name"; // Fallback
-      const sessionStartDate = fetchedCourse?.startDate || "Start Date"; // Fallback
-      const sessionEndDate = fetchedCourse?.endDate || "End Date"; // Fallback
+      const sessionName = fetchedCourse?.title || "Session Name";
 
       // 3️⃣ Check if the course has a certificateId
       const storedCertificateId = fetchedCourse?.certificateId;
@@ -544,8 +591,7 @@ const CourseDetailsPrimary = ({
         unique_identifier,
       } = certificateData;
 
-      // 6️⃣ Construct the Certificate Number
-      const certificateNumber = `${unique_identifier}-${certificateId}`;
+
 
       // 7️⃣ Replace Placeholders with Actual Data
       const filledPlaceholders = placeholders
@@ -557,14 +603,15 @@ const CourseDetailsPrimary = ({
             case "sessionName":
               return { ...ph, value: sessionName };
             case "sessionStartDate":
-              return { ...ph, value: new Date().toLocaleDateString() };
+              const enrollmentDate = enrolledCourse?.enrollmentDate 
+                ? new Date(enrolledCourse.enrollmentDate).toLocaleDateString()
+                : "N/A";
+              return { ...ph, value: enrollmentDate };
             case "sessionEndDate":
-              return {
-                ...ph,
-                value: new Date(
-                  new Date().setFullYear(new Date().getFullYear() + 2)
-                ).toLocaleDateString(),
-              };
+              const examCompletionDate = enrolledCourse?.finalExamCompletedDate 
+                ? new Date(enrolledCourse.finalExamCompletedDate).toLocaleDateString()
+                : "N/A";
+              return { ...ph, value: examCompletionDate };
             case "dateGenerated":
               return { ...ph, value: new Date().toLocaleDateString() };
             case "companyName":
@@ -589,6 +636,26 @@ const CourseDetailsPrimary = ({
           showCancelButton: true,
           confirmButtonText: "Download",
           cancelButtonText: "Close",
+          width: '900px',
+          customClass: {
+            popup: 'certificate-modal-popup',
+            htmlContainer: 'certificate-modal-content'
+          },
+          didOpen: () => {
+            // Add custom styles when modal opens
+            const style = document.createElement('style');
+            style.textContent = `
+              .certificate-modal-popup {
+                max-width: 95vw !important;
+                width: 900px !important;
+              }
+              .certificate-modal-content {
+                overflow-x: auto !important;
+                max-height: 80vh !important;
+              }
+            `;
+            document.head.appendChild(style);
+          }
         }).then((result) => {
           if (result.isConfirmed) {
             openFullScreenCertificate(certificate_data_url, filledPlaceholders);

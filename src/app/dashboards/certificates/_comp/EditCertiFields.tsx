@@ -1,14 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Select, { SingleValue } from "react-select";
-import ReactCrop, { Crop } from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
-import Draggable from "react-draggable";
 import html2canvas from "html2canvas";
 import { debounce } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import Image from "next/image";
-import "@/styles/fonts.css";
 import { useCallback, useMemo } from "react";
 
 // Icons, Hooks, and Components
@@ -93,23 +89,24 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showOptions, setShowOptions] = useState(false);
-  const [crop, setCrop] = useState<Crop>({
-    unit: "%",
-    x: 25,
-    y: 25,
-    width: 50,
-    height: 50,
-  });
   const [showCropper, setShowCropper] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [instructorName, setInstructorName] = useState("");
   const [selectedFont, setSelectedFont] = useState<string>("Arial"); // Default font
+  const [dragState, setDragState] = useState<{
+    isDragging: boolean;
+    dragId: string | null;
+    startX: number;
+    startY: number;
+    offsetX: number;
+    offsetY: number;
+  }>({ isDragging: false, dragId: null, startX: 0, startY: 0, offsetX: 0, offsetY: 0 });
   const [isSaving, setIsSaving] = useState(false);
 
   const CERTIFICATE_WIDTH = 842;
   const CERTIFICATE_HEIGHT = 595;
-  const PLACEHOLDER_MIN_WIDTH = 100;
-  const PLACEHOLDER_MIN_HEIGHT = 30;
+  const PLACEHOLDER_MIN_WIDTH = 50;  // Reduced from 100
+  const PLACEHOLDER_MIN_HEIGHT = 20; // Reduced from 30
 
   const fetchUserCertificates = useCallback(async () => {
     try {
@@ -135,7 +132,47 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
     fetchUserCertificates();
   }, [fetchUserCertificates]);
 
-  const handleSelectCertificate = (
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!dragState.isDragging || !dragState.dragId) return;
+      
+      const container = document.querySelector('.certificate-container');
+      if (!container) return;
+      
+      const rect = container.getBoundingClientRect();
+      const x = Math.max(0, Math.min(CERTIFICATE_WIDTH - PLACEHOLDER_MIN_WIDTH, e.clientX - rect.left - dragState.offsetX));
+      const y = Math.max(0, Math.min(CERTIFICATE_HEIGHT - PLACEHOLDER_MIN_HEIGHT, e.clientY - rect.top - dragState.offsetY));
+      
+      // Update placeholder position immediately
+      setSelectedPlaceholders((prev) =>
+        prev.map((item) =>
+          item.id === dragState.dragId ? { ...item, x, y } : item
+        )
+      );
+    };
+    
+    const handleMouseUp = () => {
+      if (dragState.isDragging && dragState.dragId) {
+        const placeholder = selectedPlaceholders.find(p => p.id === dragState.dragId);
+        if (placeholder) {
+          savePlaceholderPosition(dragState.dragId, placeholder.x, placeholder.y);
+        }
+      }
+      setDragState({ isDragging: false, dragId: null, startX: 0, startY: 0, offsetX: 0, offsetY: 0 });
+    };
+    
+    if (dragState.isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragState, selectedPlaceholders, CERTIFICATE_WIDTH, CERTIFICATE_HEIGHT, PLACEHOLDER_MIN_WIDTH, PLACEHOLDER_MIN_HEIGHT]);
+
+  const handleSelectCertificate = async (
     newValue: SingleValue<CertificateOption>
   ) => {
     if (!newValue) {
@@ -144,39 +181,38 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
       return;
     }
 
-    const found = allCertificates.find((cert) => cert.id === newValue.value);
-    if (!found) {
-      console.warn("Selected certificate not found in state:", newValue.value);
-      return;
-    }
-
-    setSelectedCertificate(found);
-
-    const placeholdersForCert: UIPlaceholder[] = found.placeholders.map(
-      (ph, index) => {
-        // Check if position is valid (not null/undefined and within bounds)
-        const hasValidPosition =
-          ph.x !== undefined &&
-          ph.x !== null &&
-          ph.y !== undefined &&
-          ph.y !== null &&
-          ph.x >= 0 &&
-          ph.y >= 0 &&
-          ph.x <= 842 - 100 && // Account for placeholder width
-          ph.y <= 595 - 30; // Account for placeholder height
-
-        return {
-          ...ph,
-          font_size: ph.font_size ?? 16,
-          font_family: ph.font_family || selectedFont,
-          is_visible: ph.is_visible !== false,
-          color: ph.color ?? "#000000",
-          x: hasValidPosition ? ph.x : 30, // Use saved x or default
-          y: hasValidPosition ? ph.y : index * 60 + 30, // Use saved y or default
-        };
+    try {
+      // Fetch fresh certificate data from API instead of using stale state
+      const response = await fetch(`/api/manageCertificates/${newValue.value}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch certificate: ${response.statusText}`);
       }
-    );
-    setSelectedPlaceholders(placeholdersForCert);
+      
+      const freshCertificate = await response.json();
+      
+      setSelectedCertificate(freshCertificate);
+
+      const placeholdersForCert: UIPlaceholder[] = freshCertificate.placeholders.map(
+        (ph: APIPlaceholder) => {
+          const finalX = typeof ph.x === 'string' ? parseFloat(ph.x) : ph.x;
+          const finalY = typeof ph.y === 'string' ? parseFloat(ph.y) : ph.y;
+          
+          return {
+            ...ph,
+            font_size: ph.font_size ?? 16,
+            font_family: ph.font_family || selectedFont,
+            is_visible: ph.is_visible !== false,
+            color: ph.color ?? "#000000",
+            x: finalX,
+            y: finalY,
+          };
+      });
+      
+      setSelectedPlaceholders(placeholdersForCert);
+    } catch (error) {
+      console.error("Error fetching fresh certificate data:", error);
+      showAlert("error", "Failed to load certificate data");
+    }
   };
 
   const handleDownload = useCallback(async () => {
@@ -274,18 +310,14 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
   
       // Validate placeholders before sending
       const validPlaceholders = selectedPlaceholders.map(ph => {
-        // Ensure x and y are valid numbers
+        // Use exact coordinates without bounds validation
         const x = Math.round(Number(ph.x));
         const y = Math.round(Number(ph.y));
   
-        // Validate position is within bounds
-        const validX = Math.max(0, Math.min(x, CERTIFICATE_WIDTH - PLACEHOLDER_MIN_WIDTH));
-        const validY = Math.max(0, Math.min(y, CERTIFICATE_HEIGHT - PLACEHOLDER_MIN_HEIGHT));
-  
         return {
           id: ph.id,
-          x: validX,
-          y: validY,
+          x: x, // Use exact x coordinate
+          y: y, // Use exact y coordinate
           value: ph.value || "",
           font_size: Math.round(Number(ph.font_size)) || 16,
           color: ph.color || "#000000",
@@ -318,7 +350,7 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
         throw new Error(errorData.details || `HTTP Error: ${response.status}`);
       }
   
-      // Refresh the certificate data to ensure we have the latest from the backend
+      // Update the allCertificates state with fresh data after successful save
       await fetchUserCertificates();
       showAlert("success", "Certificate changes saved successfully");
     } catch (err) {
@@ -345,10 +377,6 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
       if (!response.ok) {
         throw new Error("Failed to update visibility");
       }
-
-      console.log(
-        `Placeholder ${placeholderId} visibility updated to ${isVisible}`
-      );
     } catch (error) {
       console.error("Error updating placeholder visibility:", error);
     }
@@ -368,6 +396,17 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
           className="react-select-container"
           classNamePrefix="react-select"
           isSearchable
+          styles={{
+            menu: (provided) => ({
+              ...provided,
+              zIndex: 9999
+            }),
+            menuPortal: (provided) => ({
+              ...provided,
+              zIndex: 9999
+            })
+          }}
+          menuPortalTarget={document.body}
         />
       </div>
 
@@ -578,77 +617,38 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
             <div className="absolute inset-0">
               {selectedPlaceholders
                 .filter((ph) => ph.is_visible)
-                .map((placeholder) => (
-                  <Draggable
-                    key={placeholder.id}
-                    position={{
-                      x: placeholder.x,
-                      y: placeholder.y,
-                    }}
-                    bounds="parent" // This ensures the dragging is constrained to the parent container
-                    onDrag={(e, data) => {
-
-                      if (typeof data.x !== 'number' || typeof data.y !== 'number') return;   
-                      // Validate position during drag
-                      const x = Math.max(
-                        0,
-                        Math.min(
-                          Math.round(data.x), // Round to prevent floating point issues
-                          CERTIFICATE_WIDTH - PLACEHOLDER_MIN_WIDTH
-                        )
-                      );
-                      const y = Math.max(
-                        0,
-                        Math.min(
-                          Math.round(data.y), // Round to prevent floating point issues
-                          CERTIFICATE_HEIGHT - PLACEHOLDER_MIN_HEIGHT
-                        )
-                      );
-
-                      // Update position only if within bounds
-                      if (Number.isFinite(x) && Number.isFinite(y)) {
-                        setSelectedPlaceholders((prev) =>
-                          prev.map((item) =>
-                            item.id === placeholder.id
-                              ? { ...item, x, y }
-                              : item
-                          )
-                        );
-                      }
-                    }}
-                    onStop={(e, data) => {
-                      if (typeof data.x !== 'number' || typeof data.y !== 'number') return;
-                      // Ensure final position is within bounds
-                      const x = Math.max(
-                        0,
-                        Math.min(
-                          Math.round(data.x),
-                          CERTIFICATE_WIDTH - PLACEHOLDER_MIN_WIDTH
-                        )
-                      );
-                      const y = Math.max(
-                        0,
-                        Math.min(
-                          Math.round(data.y),
-                          CERTIFICATE_HEIGHT - PLACEHOLDER_MIN_HEIGHT
-                        )
-                      );
-
-                      if (Number.isFinite(x) && Number.isFinite(y)) {
-                        setSelectedPlaceholders((prev) =>
-                          prev.map((item) =>
-                            item.id === placeholder.id ? { ...item, x, y } : item
-                          )
-                        );
-                        savePlaceholderPosition(placeholder.id, x, y);
-                      }
-                    }}
-                  >
+                .map((placeholder) => {
+                  return (
                     <div
-                      className="absolute cursor-move group"
+                      key={placeholder.id}
+                      className="absolute cursor-move group select-none"
                       style={{
-                        left: `${placeholder.x}px`,
-                        top: `${placeholder.y}px`,
+                        left: `${Number(placeholder.x) || 0}px`,
+                        top: `${Number(placeholder.y) || 0}px`,
+                        zIndex: dragState.dragId === placeholder.id ? 1000 : 10,
+                        width: `${PLACEHOLDER_MIN_WIDTH}px`,
+                        maxHeight: `${PLACEHOLDER_MIN_WIDTH}px`,
+                        opacity: dragState.dragId === placeholder.id ? 0.8 : 1,
+                      }}
+                      onMouseDown={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const containerRect = e.currentTarget.parentElement!.getBoundingClientRect();
+                        
+                        setDragState({
+                          isDragging: true,
+                          dragId: placeholder.id,
+                          startX: e.clientX,
+                          startY: e.clientY,
+                          offsetX: e.clientX - rect.left,
+                          offsetY: e.clientY - rect.top,
+                        });
+                        
+                        e.preventDefault();
+                      }}
+                    >
+                    <div
+                      className="cursor-move group"
+                      style={{
                         zIndex: 10,
                         width: `${PLACEHOLDER_MIN_WIDTH}px`,
                         maxHeight: `${PLACEHOLDER_MIN_WIDTH}px`,
@@ -669,7 +669,7 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
                         }}
                         className={`bg-transparent hover:bg-white/50 focus:bg-white/50 
                        dark:hover:bg-blackColor-dark/50 dark:focus:bg-blackColor-dark/50 border border-transparent hover:border-gray-300 
-                        focus:border-blue-500 rounded px-2 py-1 outline-none transition-all
+                        focus:border-blue-500 rounded outline-none transition-all
                         ${placeholder.font_family === "Great Vibes" ? "font-great-vibes" : ""}
                         ${placeholder.font_family === "Pinyon Script"? "font-pinyon-script": ""}
                         ${placeholder.font_family === "Tangerine" ? "font-tangerine" : ""}`}
@@ -684,12 +684,18 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
                             ? undefined
                             : placeholder.font_family,
                           minWidth: `${PLACEHOLDER_MIN_WIDTH}px`,
+                          padding: 0,
+                          textAlign: 'left',
+                          margin: 0,
+                          lineHeight: 1,
+                          boxSizing: 'border-box',
                         }}
                         placeholder={placeholder.label || ""}
                       />
                     </div>
-                  </Draggable>
-                ))}
+                    </div>
+                );
+              })}
             </div>
           </div>
         </div>

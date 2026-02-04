@@ -91,7 +91,6 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 	useEffect(() => {
 
 		if (!courseId || courseId.trim() === "") {
-			console.log("error", "Welcome.");
 			return;
 		}
 
@@ -144,10 +143,6 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 		}
 
 		try {
-			console.log("Sending Unpublish Request with Payload:", {
-				courseId,
-			});
-
 			const unpublishResponse = await fetch(
 				`/api/certificates/unpublish`,
 				{
@@ -163,8 +158,6 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 					`Failed to unpublish certificates: ${errorData.message}`
 				);
 			}
-
-			console.log("✅ Unpublish API Success");
 
 			const responsex = await fetch(
 				`/api/certificates/${certificateId}`,
@@ -182,12 +175,10 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 				);
 			}
 
-			console.log("✅ Publish API Success");
-
 			const response = await fetch(`/api/courses/${courseId}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ certificateId }), // Updating the course
+				body: JSON.stringify({ certificateId }),
 			});
 
 			if (!response.ok) {
@@ -195,13 +186,9 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 				try {
 					const errorData = await response.json();
 					errorMessage = errorData?.message || errorMessage;
-				} catch (jsonError) {
-					console.error("Error parsing error response:", jsonError);
-				}
+				} catch (jsonError) {}
 				throw new Error(errorMessage);
 			}
-
-			console.log("✅ Course Update API Success");
 
 			setCertificates((prev) =>
 				prev.map((cert) =>
@@ -216,9 +203,7 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 				try {
 					const errorData = await response.json();
 					errorMessage = errorData?.message || errorMessage;
-				} catch (jsonError) {
-					console.error("Error parsing error response:", jsonError);
-				}
+				} catch (jsonError) {}
 				throw new Error(errorMessage);
 			}
 
@@ -230,7 +215,6 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 			// Automatically preview the certificate after updating it
 			handlePreview(certificateId);
 		} catch (err: any) {
-			console.error("❌ API Error:", err);
 			showAlert(
 				"error",
 				`Error: ${err.message || "An unexpected error occurred."}`
@@ -266,16 +250,10 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 					try {
 						const dataUrl = await toPng(element);
 						updatedImages[certificate.id] = dataUrl;
-					} catch (err) {
-						console.error(
-							`Failed to convert HTML to image for ${certificate.id}:`,
-							err
-						);
-					}
+					} catch (err) {}
 				}
 			}
 
-			console.log("Updated Converted Images:", updatedImages);
 			setConvertedImages(updatedImages);
 		};
 
@@ -309,17 +287,12 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 
 	// Handler for Create and Download actions
 	const handleCreate = (certificateId: string) => {
-		// Implement your create certificate logic here
-		console.log(`Create certificate with ID: ${certificateId}`);
 		showAlert("info", "Create Certificate action triggered.");
 		router.push("/courses/certificate/create-certificate");
 		// For example, navigate to a create page or open a different modal
 	};
 
 	const handleDownload = (certificateId: string) => {
-		// Implement your download certificate logic here
-		console.log(`Download certificate with ID: ${certificateId}`);
-		// Example: Trigger a download of the certificate image
 		const certificate = certificates.find(
 			(cert) => cert.id === certificateId
 		);
@@ -333,11 +306,6 @@ const CertificatesTemp: React.FC<{ courseId: string }> = ({ courseId }) => {
 			showAlert("error", "Certificate image not available for download.");
 		}
 	};
-
-	useEffect(() => {
-		console.log("Certificates:", certificates);
-		console.log("Converted Images:", convertedImages);
-	}, [certificates, convertedImages]);
 
 	const setCertificateRef = useCallback(
 		(id: string) => (el: HTMLDivElement | null) => {

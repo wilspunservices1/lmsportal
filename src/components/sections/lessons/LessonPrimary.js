@@ -88,9 +88,11 @@ const LessonPrimary = ({ lessonId }) => {
 		loadLessonAndCourse();
 	}, [lessonId, user, progressRefresh]);
 
-	if (!session) {
-		router.push("/login");
-	}
+	useEffect(() => {
+		if (!session) {
+			router.push("/login");
+		}
+	}, [session, router]);
 
 	const handleMarkAsComplete = async () => {
 		if (isCompleted || isSaving) return;

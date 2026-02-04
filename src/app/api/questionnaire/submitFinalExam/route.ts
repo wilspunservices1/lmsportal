@@ -11,7 +11,7 @@ import { options as authOptions } from "@/libs/auth";
 export async function POST(req: Request) {
 	try {
 		const session = await getServerSession(authOptions);
-		console.log("Session Data:", session);
+		//console.log("Session Data:", session);
 
 		if (!session?.user?.email) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -21,8 +21,8 @@ export async function POST(req: Request) {
 
 		// Parse request body
 		const { questionnaire_id, answers } = await req.json();
-		console.log("Questionnaire ID:", questionnaire_id);
-		console.log("Answers:", answers);
+		//console.log("Questionnaire ID:", questionnaire_id);
+		//console.log("Answers:", answers);
 
 		// Validate questionnaire_id
 		if (!questionnaire_id) {
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 			.limit(1);
 
 		if (!questionnaire || questionnaire.length === 0) {
-			console.error("Questionnaire not found:", questionnaire_id);
+			//console.error("Questionnaire not found:", questionnaire_id);
 			return NextResponse.json({ error: "Questionnaire not found" }, { status: 404 });
 		}
 
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
 			.from(questions)
 			.where(eq(questions.questionnaireId, questionnaire_id));
 
-		console.log("Fetched Questions from DB:", questionsList);
+		//console.log("Fetched Questions from DB:", questionsList);
 
 		if (!questionsList || questionsList.length === 0) {
 			return NextResponse.json(
@@ -135,7 +135,7 @@ export async function POST(req: Request) {
 			})
 			.returning({ id: quizAttempts.id });
 
-		console.log("Insert Result:", attempt);
+		//console.log("Insert Result:", attempt);
 
 		if (!attempt || attempt.length === 0) {
 			return NextResponse.json({ error: "Quiz submission failed" }, { status: 500 });
@@ -155,26 +155,27 @@ export async function POST(req: Request) {
 				.limit(1);
 
 			const enrolled = userData?.[0]?.enrolledCourses || [];
-			console.log('📚 Before update - enrolled courses:', enrolled);
+			//console.log('📚 Before update - enrolled courses:', enrolled);
 
 			const updatedEnrolled = enrolled.map((course: any) => {
 				if (course.courseId === courseId) {
-					console.log(`✅ Setting finalExamStatus=true for course ${courseId}, score: ${score}`);
+					//console.log(`✅ Setting finalExamStatus=true for course ${courseId}, score: ${score}`);
 					return {
 						...course,
 						finalExamStatus: score >= 70,
+						finalExamCompletedDate: score >= 70 ? new Date().toISOString() : course.finalExamCompletedDate,
 					};
 				}
 				return course;
 			});
-			console.log('📚 After update - enrolled courses:', updatedEnrolled);
+			//console.log('📚 After update - enrolled courses:', updatedEnrolled);
 
 			await db
 				.update(user)
 				.set({ enrolledCourses: updatedEnrolled })
 				.where(eq(user.id, user_id));
 				
-			console.log('💾 Database updated successfully');
+			//console.log('💾 Database updated successfully');
 		}
 
 		
@@ -192,7 +193,7 @@ export async function POST(req: Request) {
 			},
 		});
 	} catch (error) {
-		console.error("Error submitting quiz:", error);
+		//console.error("Error submitting quiz:", error);
 		return NextResponse.json({ error: "Failed to submit quiz" }, { status: 500 });
 	}
 }
