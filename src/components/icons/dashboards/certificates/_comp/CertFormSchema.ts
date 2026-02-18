@@ -14,8 +14,8 @@ export const formDataSchema = z.object({
     description: z.string().min(1, { message: "Description is required" }),
     certificateImage: z
         .any()
-        .refine((file) => file instanceof File && file.size <= 5 * 1024 * 1024, {
-            message: "Certificate Image must be a valid file and not exceed 5MB",
+        .refine((file) => file === null || (file instanceof File && file.size <= 20 * 1024 * 1024), {
+            message: "Certificate Image must be a valid file and not exceed 20MB",
         }),
 });
 

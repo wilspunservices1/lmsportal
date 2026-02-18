@@ -44,6 +44,92 @@ function stripHtmlTags(html: string | undefined): string {
 	return html.replace(/<[^>]+>/g, "").trim();
 }
 
+export async function PUT(req: NextRequest) {
+	try {
+		const session = await getSession();
+		if (!session || !session.user) {
+			return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+		}
+
+		const userRoles: string[] = session.user.roles || [];
+		const allowedRoles = ["superAdmin", "instructor", "admin"];
+		const hasAccess = userRoles.some((role) => allowedRoles.includes(role));
+		if (!hasAccess) {
+			return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+		}
+
+		const requestBody = await req.json();
+		const { certificateId, ...payload } = requestBody;
+
+		if (!certificateId) {
+			return NextResponse.json({ message: "Certificate ID required" }, { status: 400 });
+		}
+
+		const validatedPayload = saveCertificateSchema.parse(payload);
+		const {
+			owner_id,
+			certificate_data_url,
+			description,
+			title,
+			expiration_date,
+			is_revocable,
+			metadata,
+			is_enabled,
+			orientation,
+			max_download,
+			is_deleted,
+			course_id,
+			file_name,
+		} = validatedPayload;
+
+		await db
+			.update(certification)
+			.set({
+				owner_id,
+				certificate_data_url,
+				description: stripHtmlTags(description) || "No description provided",
+				title,
+				expiration_date,
+				is_revocable,
+				updated_at: new Date(),
+				file_name,
+				metadata,
+				is_enabled,
+				orientation,
+				max_download,
+				is_deleted: is_deleted ?? false,
+				course_id,
+			})
+			.where(eq(certification.id, certificateId));
+
+		return NextResponse.json(
+			{
+				message: "Certificate updated successfully.",
+				certificate_id: certificateId,
+			},
+			{ status: 200 }
+		);
+	} catch (error) {
+		console.error("Error in PUT handler:", error);
+		if (error instanceof z.ZodError) {
+			const errorMessages = error.errors.map(
+				(err) => `${err.path.join(".")}: ${err.message}`
+			);
+			return NextResponse.json(
+				{ message: "Invalid input data", errors: errorMessages },
+				{ status: 400 }
+			);
+		}
+		return NextResponse.json(
+			{
+				message: "An unexpected error occurred",
+				error: error instanceof Error ? error.message : String(error),
+			},
+			{ status: 500 }
+		);
+	}
+}
+
 export async function POST(req: NextRequest) {
 	try {
 		// Authenticate the user

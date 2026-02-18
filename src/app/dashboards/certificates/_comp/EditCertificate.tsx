@@ -1,30 +1,31 @@
 "use client"
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
+import { useParams } from "next/navigation";
 import CertificateHead from "./certificateHead";
 import CertificateForm from "./CertificateForm";
-import EditCertiFields from "./EditCertiFields";
-// import UserDetails from "./_comp/UserDetails"
+
+const EditCertiFields = dynamic(() => import("./EditCertiFields"), { ssr: false });
 
 const EditCertificate = () => {
+   const params = useParams();
+   const certificateId = params?.id as string;
 
    // State to hold design data
    const [designData, setDesignData] = useState<any>(null);
 
    // Callback function to handle button click
    const handleSave = () => {
-     // Here you can perform actions with designData
      console.log("Saving design data:", designData);
-     // You might want to send this data to an API or perform some logic here
    };
 
   return (
     <div className="p-10px md:px-10 md:py-50px mb-30px bg-whiteColor dark:bg-whiteColor-dark shadow-accordion dark:shadow-accordion-dark rounded-5">
       <CertificateHead 
         certificateTitle="Edit Certificate"
-        onButtonClick={handleSave} // Pass the callback
+        onButtonClick={handleSave}
       />
-      {/* Editting certificate at id creation form */}
-      <EditCertiFields setDesignData={setDesignData} />
+      <EditCertiFields setDesignData={setDesignData} certificateId={certificateId} />
     </div>
   );
 };

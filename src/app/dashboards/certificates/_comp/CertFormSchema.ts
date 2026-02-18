@@ -10,8 +10,8 @@ export const formDataSchema = z.object({
   }),
   maxDownloads: z.number().min(0, { message: "Maximum Downloads must be at least 0" }).max(1000, { message: "Maximum Downloads cannot exceed 1000" }),
   description: z.string().min(1, { message: "Description is required" }),
-  certificateImage: z.any().refine((file) => file instanceof File && file.size <= 5 * 1024 * 1024, {
-      message: "Certificate Image must be a valid file and not exceed 5MB",
+  certificateImage: z.any().refine((file) => file === null || (file instanceof File && file.size <= 20 * 1024 * 1024), {
+      message: "Certificate Image must be a valid file and not exceed 20MB",
     }),
 });
 

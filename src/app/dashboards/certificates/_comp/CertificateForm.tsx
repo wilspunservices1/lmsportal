@@ -12,9 +12,9 @@ import { Session } from "next-auth";
 import useSweetAlert from "@/hooks/useSweetAlert";
 
 // Dynamically import ReactQuill to avoid 'document is not defined' error during SSR
-const ReactQuill = dynamic(() => import("react-quill"));
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
-const CertificateForm: React.FC = () => {
+const CertificateForm: React.FC<{ certificateId?: string | null }> = ({ certificateId }) => {
 	// State variables
 	const [certificateName, setCertificateName] = useState(""); //*variable to fetch certificate name
 
@@ -41,6 +41,7 @@ const CertificateForm: React.FC = () => {
 	const [description, setDescription] = useState(""); //*variable to fetch description data
 
 	const [certificateImage, setCertificateImage] = useState<File | null>(null); //*variable to fetch image data
+	const [existingImageUrl, setExistingImageUrl] = useState<string>(''); //*variable to store existing image URL
 
 	const [coursesOptions, setCoursesOptions] = useState<Array<{ value: string; label: string }>>(
 		[]
@@ -53,6 +54,42 @@ const CertificateForm: React.FC = () => {
 	const [imageError, setImageError] = useState(""); //*variable to fetch image error data
 	const showAlert = useSweetAlert(); //*variable to show alert
 	const [exitCer, SetExitCertificate] = useState(false); //*variable to exit certificate stage
+
+	// Fetch certificate data if certificateId is provided
+	useEffect(() => {
+		if (certificateId && coursesOptions.length > 0) {
+			const fetchCertificate = async () => {
+				try {
+					const response = await fetch(`/api/manageCertificates/${certificateId}`);
+					if (!response.ok) throw new Error('Failed to fetch certificate');
+					
+					const data = await response.json();
+					
+					setCertificateName(data.title || '');
+					setDescription(data.description || '');
+					setMaxDownloads(data.max_download || '');
+					setIsEnabled(data.is_enabled);
+					setEnabledOption(data.is_enabled ? { value: true, label: 'Yes' } : { value: false, label: 'No' });
+					setOrientationOption(
+						data.orientation === 'portrait' 
+							? { value: 'portrait', label: 'Portrait' } 
+							: { value: 'landscape', label: 'Landscape' }
+					);
+					setExistingImageUrl(data.certificate_data_url || '');
+					
+					if (data.course_id) {
+						const course = coursesOptions.find(c => c.value === data.course_id);
+						if (course) setSelectedCourse(course);
+					}
+				} catch (error) {
+					showAlert('error', 'Failed to load certificate data');
+				}
+			};
+			
+			fetchCertificate();
+		}
+	}, [certificateId, coursesOptions]);
+
 	//! Handle User Authentication
 
 	const { data: session, status } = useSession() as {
@@ -178,7 +215,7 @@ const CertificateForm: React.FC = () => {
 				courseId: selectedCourse?.value || "",
 				enabled: isEnabled !== null ? isEnabled : true,
 				orientation: orientationOption?.value || "landscape",
-				certificateImage,
+				certificateImage: certificateImage || (existingImageUrl ? new File([], 'existing') : null),
 				maxDownloads: typeof maxDownloads === "number" ? maxDownloads : 0,
 				description,
 			};
@@ -222,7 +259,7 @@ const CertificateForm: React.FC = () => {
 				return;
 			}
 		} else {
-			submitCertificateForm("");
+			submitCertificateForm(existingImageUrl || "");
 		}
 	};
 
@@ -240,10 +277,10 @@ const CertificateForm: React.FC = () => {
 				title: certificateName,
 				description,
 				file_name: certificateImage?.name || fileName,
-				expirationDate: new Date(
+				expiration_date: new Date(
 					new Date().setFullYear(new Date().getFullYear() + 100)
 				).toISOString(),
-				isRevocable: true,
+				is_revocable: true,
 				metadata: {
 					courseName: selectedCourse?.label || "",
 					instructor: session?.user?.name || "",
@@ -257,19 +294,18 @@ const CertificateForm: React.FC = () => {
 				course_id: selectedCourse?.value || "",
 			};
 
+			const isUpdate = !!certificateId;
 			const response = await fetch("/api/certificates/save-mine", {
-				method: "POST",
+				method: isUpdate ? "PUT" : "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(payload),
+				body: JSON.stringify(isUpdate ? { ...payload, certificateId } : payload),
 			});
-			console.log("response", response);
 
 			const responseData = await response.json();
 
 			if (response.status === 409) {
-				// Handle the case where the certificate already exists
 				showAlert("error", "A certificate with this title already exists.");
 				setFormErrors((prev) => ({
 					...prev,
@@ -279,15 +315,16 @@ const CertificateForm: React.FC = () => {
 			}
 
 			if (!response.ok) {
-				showAlert("error", "Failed to save certificate");
+				showAlert("error", isUpdate ? "Failed to update certificate" : "Failed to save certificate");
 				throw new Error(responseData.message || "Failed to save certificate");
 			}
 
-			showAlert("success", "Certificate saved successfully");
-			// Navigate to the edit page for the created certificate
-			const owner_id_response = responseData.owner_id;
-
-			router.push(`/dashboards/certificates/edit`);
+			showAlert("success", isUpdate ? "Certificate updated successfully" : "Certificate created successfully");
+			
+			console.log('Redirecting to:', `/dashboards/certificates/edit/${isUpdate ? certificateId : responseData.certificate_id}`);
+			console.log('Response data:', responseData);
+			
+			router.push(`/dashboards/certificates/edit/${isUpdate ? certificateId : responseData.certificate_id}`);
 
 			// Reset form fields
 			setCertificateName("");
@@ -432,6 +469,12 @@ const CertificateForm: React.FC = () => {
 							<span className="ml-[3px] flex items-center text-red-400">*</span>
 						)}
 					</label>
+					{certificateId && existingImageUrl && (
+						<div className="mb-2">
+							<img src={existingImageUrl} alt="Current certificate" className="w-32 h-32 object-cover border rounded" />
+							<p className="text-xs text-gray-500 mt-1">Current image (upload new to replace)</p>
+						</div>
+					)}
 					<input
 						type="file"
 						id="certificateImage"
@@ -496,7 +539,7 @@ const CertificateForm: React.FC = () => {
 					className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue hover:bg-blueDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue"
 					disabled={isLoading}
 				>
-					{isLoading ? "Saving..." : "Save"}
+					{isLoading ? 'Saving...' : (certificateId ? 'Update' : 'Save')}
 				</button>
 			</div>
 		</form>

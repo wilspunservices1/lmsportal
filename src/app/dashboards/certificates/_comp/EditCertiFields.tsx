@@ -74,9 +74,10 @@ interface CertificateOption {
 
 interface EditCertiFieldsProps {
   setDesignData: (data: any) => void;
+  certificateId?: string;
 }
 
-const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
+const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData, certificateId }) => {
   const { currentIdx } = useTab();
   const showAlert = useSweetAlert();
 
@@ -131,6 +132,16 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
   useEffect(() => {
     fetchUserCertificates();
   }, [fetchUserCertificates]);
+
+  // Auto-load certificate if certificateId is provided
+  useEffect(() => {
+    if (certificateId && allCertificates.length > 0) {
+      const cert = allCertificates.find(c => c.id === certificateId);
+      if (cert) {
+        handleSelectCertificate({ value: cert.id, label: `${cert.title} - ${cert.unique_identifier}` });
+      }
+    }
+  }, [certificateId, allCertificates]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {

@@ -5,6 +5,40 @@ import { certification } from '@/db/schemas/certification';
 import { courses } from '@/db/schemas/courses';
 import { eq, and, isNull } from 'drizzle-orm';
 
+export async function POST(req: NextRequest) {
+    let session = await getSession();
+
+    if (!session) {
+        console.error('No session found');
+        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userRoles: string[] =
+    Array.isArray(session.user.roles)?
+    session.user.roles : [session.user.roles];
+
+    const allowedRoles = ['superAdmin', 'instructor', 'admin'];
+    const hasAccess = userRoles.some((role) => allowedRoles.includes(role));
+
+    if (!hasAccess) {
+        console.error('Forbidden access by user:', session.user.id);
+        return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+
+    try {
+        const { certificateId, name, description, courseId } = await req.json();
+        
+        // Update manageCertificates sync if needed
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Error in POST:', error);
+        return NextResponse.json(
+            { error: 'Failed to process request' },
+            { status: 500 }
+        );
+    }
+};
+
 export async function GET(req: NextRequest) {
     let session = await getSession();
 

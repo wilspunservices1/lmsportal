@@ -47,10 +47,11 @@ export async function POST(req: NextRequest) {
       skillLevel,
       categories,
       insName,
-      thumbnail, // URL to the image hosted on Cloudinary
+      thumbnail,
       userId,
       demoVideoUrl,
       description,
+      certificateId,
     } = body;
 
     // Fetch the user from the database using the provided userId
@@ -103,11 +104,11 @@ export async function POST(req: NextRequest) {
       .values({
         title,
         description,
-        price: parsedPrice, // Convert to float
+        price: parsedPrice,
         slug: uniqueSlug,
-        lesson: lesson || "", // Handle missing optional fields
-        duration: duration || "", // Handle missing optional fields
-        estimatedPrice: parsedEstimatedPrice, // Convert to float
+        lesson: lesson || "",
+        duration: duration || "",
+        estimatedPrice: parsedEstimatedPrice,
         isFree: isFree || false,
         tag: tag || "",
         skillLevel: skillLevel || "",
@@ -116,9 +117,10 @@ export async function POST(req: NextRequest) {
         thumbnail,
         userId,
         demoVideoUrl,
-        discount: Number(discount.toFixed(2)), // Store discount percentage as number
+        discount: Number(discount.toFixed(2)),
+        certificateId: certificateId || null,
       })
-      .returning(); // Returning the created course
+      .returning();
 
     // console.log("New course created:", newCourse);
 

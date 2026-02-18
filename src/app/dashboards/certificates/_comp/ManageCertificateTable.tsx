@@ -147,11 +147,11 @@ const ManageCertificateTable = () => {
   }, [session?.user]);
 
   const handleEdit = (certificate: Certificate) => {
-    if (!certificate?.course_id) {
+    if (!certificate?.id) {
       showAlert("error", "Invalid certificate data! Cannot edit.");
       return;
     }
-    router.push(`/dashboards/certificates/edit`);
+    router.push(`/dashboards/certificates/add?id=${certificate.id}`);
   };
 
   const handleDelete = async (certificateId: string) => {
@@ -509,8 +509,8 @@ const ManageCertificateTable = () => {
                         placeholder.font_family
                       )}`}
                       style={{
-                        left: `${(placeholder.x / CERTIFICATE_WIDTH) * 215}%`,
-                        top: `${(placeholder.y / CERTIFICATE_HEIGHT) * 202}%`,
+                        left: `${placeholder.x}px`,
+                        top: `${placeholder.y}px`,
                         fontSize: `${placeholder.font_size}px`,
                         color: placeholder.color,
                         fontFamily: [

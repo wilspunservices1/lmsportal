@@ -5,20 +5,10 @@ import DashboardContainer from "@/components/shared/containers/DashboardContaine
 
 import DsahboardWrapper from "@/components/shared/wrappers/DsahboardWrapper";
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
-import EditCertificate from "../_comp/EditCertificate";
+import EditCertificate from "../../_comp/EditCertificate";
 
 
-// export const metadata = {
-//   title: "Instructor Dashboard | Meridian LMS - Education LMS Certification",
-//   description: "Instructor Dashboard | Meridian LMS - Education LMS Certification",
-// };
-
-async function page({ params }: { params: { id: string } }) {
-  // Await params to ensure they are ready
-  const { id } = await params;
-
-  console.log("params", id);
-
+function page() {
   return (
     <PageWrapper>
       <main>
