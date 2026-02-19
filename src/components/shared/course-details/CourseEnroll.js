@@ -248,17 +248,9 @@ const CourseEnroll = ({ type, course }) => {
   const regularPrice = parseFloat(price);
   const estimatedPriceVal = parseFloat(estimatedPrice);
   
-  // Convert SAR prices to selected currency for display
-  // These rates convert FROM SAR TO other currencies
-  const RATES = {
-    SAR: 1,
-    USD: 0.27,       // 1 SAR = 0.27 USD
-    AED: 0.97,       // 1 SAR = 0.97 AED
-    PKR: 74.66,      // 1 SAR = 74.66 PKR
-    CAD: 0.37,       // 1 SAR = 0.37 CAD
-  };
-  const displayPrice = regularPrice * (RATES[currency] || 1);
-  const displayEstimatedPrice = estimatedPriceVal * (RATES[currency] || 1);
+  // Pass SAR prices directly to PriceDisplay (it will handle conversion)
+  const displayPrice = regularPrice;
+  const displayEstimatedPrice = estimatedPriceVal;
   
   const calculatedDiscount =
     estimatedPriceVal > 0

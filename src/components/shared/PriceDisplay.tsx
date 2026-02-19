@@ -33,8 +33,9 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({
 }) => {
   const { currency } = useCurrency();
   
-  // usdPrice is actually SAR price, just display it without conversion
-  const displayPrice = usdPrice;
+  // Convert SAR price to selected currency
+  const rate = CURRENCY_RATES[currency] || 1;
+  const displayPrice = usdPrice * rate;
   const symbol = CURRENCY_SYMBOLS[currency] || 'ر.س';
   
   const sizeClasses = {

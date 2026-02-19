@@ -193,58 +193,51 @@ const CourseDetailsPrimary = ({
       if (!session?.user) return;
 
       try {
-        // STEP 1: Get user info including roles and enrolledCourses
         const userResponse = await fetch(`/api/user/${session.user.id}`, {
-          cache: 'no-store' // Force fresh data
+          cache: 'no-store'
         });
         const userData = await userResponse.json();
-
         const userRoles = userData?.roles || [];
 
-        // STEP 2: Check if user is admin/instructor/superAdmin
         const isPrivileged = userRoles.some((role) =>
           ["admin", "instructor", "superAdmin"].includes(role)
         );
 
         if (isPrivileged) {
-          // 🔓 Auto-grant access
           setIsPurchased(true);
           setHasPassedFinalExam(true);
           return;
         }
 
-        // STEP 3: Otherwise check regular purchase
-        const purchaseResponse = await fetch(
-          `/api/courses/${currentId}/check-purchase`,
+        // Check enrollment from orders table (same as Go to Course button)
+        const enrollResponse = await fetch(
+          `/api/user/${session.user.id}/enrollCourses?t=${Date.now()}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            cache: 'no-store' // Force fresh data
+            cache: 'no-store'
           }
         );
 
-        if (!purchaseResponse.ok) {
-          throw new Error("Failed to check course enrollment");
-        }
-
-        const purchaseData = await purchaseResponse.json();
-
-        if (typeof purchaseData.hasPurchased !== "boolean") {
-          throw new Error("Invalid response format");
-        }
-
-        setIsPurchased(purchaseData.hasPurchased);
-        setError(null);
-
-        // STEP 4: Check finalExamStatus if purchased
-        if (purchaseData.hasPurchased && userData?.enrolledCourses) {
-          const matchedCourse = userData.enrolledCourses.find(
-            (course) => course.courseId === currentId
+        if (enrollResponse.ok) {
+          const enrolledCourses = await enrollResponse.json();
+          const enrolledCourse = enrolledCourses.find(
+            (course) => String(course.courseId) === String(currentId)
           );
-
-          setHasPassedFinalExam(matchedCourse?.finalExamStatus === true);
+          
+          setIsPurchased(!!enrolledCourse);
+          
+          // Check finalExamStatus from user's enrolledCourses array
+          if (enrolledCourse && userData?.enrolledCourses) {
+            const matchedCourse = userData.enrolledCourses.find(
+              (course) => course.courseId === currentId
+            );
+            setHasPassedFinalExam(matchedCourse?.finalExamStatus === true);
+          }
         }
+
+        setError(null);
       } catch (error) {
         setError(error.message);
       }

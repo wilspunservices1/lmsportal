@@ -117,7 +117,7 @@ const CourseContent = ({ setCourseId, initialData, isEditMode = false }) => {
 			return currencyData?.rate || 1;
 		};
 		
-		// Store prices as-is (in SAR)
+		// Store prices in SAR
 		const courseData = {
 			title,
 			slug,
